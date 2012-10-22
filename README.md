@@ -7,3 +7,4 @@ CoffeeScript sketches and boilerplate using [fjenett/coffeescript-mode-processin
 
 - Basic view-mode system.
 - Initial view-modes (Wind, Liquid, Attractor).
+- Use bit-masks for options.

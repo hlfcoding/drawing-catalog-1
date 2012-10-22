@@ -1,15 +1,17 @@
 ###
 Constants.
 ###
-BLACK = WHITE = null
+BLACK = WHITE = RED = null
 FRAME_RATE = 24 # Processing bug.
 SPEED_FACTOR = 60 / FRAME_RATE
 
 ###
 Globals.
 ###
-wrap = null
+stage = null
 frozen = no
+responded =
+  mousePressed: no
 
 ###
 System functions.
@@ -17,20 +19,22 @@ System functions.
 
 setup: ->
   
-  # Stage.
+  # Setup context.
   size 300, 300
   frameRate FRAME_RATE
+  noStroke()
   
   ###
   We need to do additional setup calls since constants and statics reference things 
   that aren't loaded by the time of the initial closure invocation. 
-  #####
+  ###
   
   # Setup constants.
   colorMode RGB, 255
   BLACK = color 0
   WHITE = color 255
-
+  RED = color 255, 0, 0
+  
   # Setup patches.
   Vector.setup()
   
@@ -38,36 +42,47 @@ setup: ->
   Node.setup()
   Wrap.setup()
   
-  # Setup sketch(es)
-  wind =     new PVector 0.01, 0
+  # Setup sketch(es).
+  wind =     new PVector 0.001, 0
   gravity =  Vector.gravity()
   
-  wrap = new Wrap()
-  wrap.nodes = []
+  stage = new Wrap _.extend true, {}, Wrap.defaults,
+    containment: Wrap.REFLECTIVE
+    hasGravity: yes # TODO: Patched.
+  stage.nodes = []
   
   for i in [1...50]
     do (i) ->
-      n = new Node _.extend true, {}, Node.defaults, 
+      n = new Node _.extend true, {}, Node.defaults,
+        id: i
+        viewMode: Node.BALL
         should:
           varyMass: yes
-        wrap: wrap
+        num:
+          attrtConst: 0.001
+        wrap: stage
       n.p.randomize()
       if i is 1 then n.log()
       
       n.applyForce(wind)
        .applyForce(gravity, yes)
       
-      wrap.nodes.push n
+      stage.nodes.push n
+
+  stage.ready yes
 
 draw: ->
-
-  background 255
   
-  n.draw() for n in wrap.nodes
+  stage.draw()
 
 mousePressed: ->
   
-  @freeze()
+  responded.mousePressed = no
+  
+  n.mousePressed() for n in stage.nodes
+
+  if responded.mousePressed is no
+    @freeze()
 
 ###
 Global helpers.
@@ -82,7 +97,7 @@ freeze: (should) ->
   # Default.
   should ?= !frozen
 
-  n.should.move = !should for n in wrap.nodes
+  n.should.move = !should for n in stage.nodes
   
   # Note: noLoop() and loop() are somehow global in PJS.
   if should then window.noLoop() else window.loop()
