@@ -33,6 +33,7 @@ class Wrap extends Node
         move: no
         autoMass: no
         contain: yes
+        drainAtEdge: yes
       num:
         entropy: 1
       containment: Wrap.REFLECTIVE
@@ -116,18 +117,21 @@ class Wrap extends Node
         
     else if @containment is Wrap.TOROIDAL
       # X
+      didContain = no
       if n.left() > @right()
         n.right @left()
-        n.v.normalize()
+        didContain = yes
       else if n.right() < @left()
         n.left @right()
-        n.v.normalize()
+        didContain = yes
       # Y
       if n.top() > @bottom()
         n.bottom @top()
-        n.v.normalize()
+        didContain = yes
       else if n.bottom() < @top()
         n.top @bottom()
+        didContain = yes
+      
+      if didContain and @should.drainAtEdge
         n.v.normalize()
-  
-
+        n.a.normalize()
