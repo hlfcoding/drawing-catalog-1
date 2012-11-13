@@ -51,9 +51,11 @@ setup: ->
     hasGravity: yes # TODO: Patched.
   stage.nodes = []
   
-  for i in [1...50]
-    do (i) ->
-      n = new Node _.extend true, {}, Node.defaults,
+  scale = (width / 300)
+  
+  for i in [1...( parseInt 50 * scale )]
+    do (i, defaults = Node.defaults) ->
+      n = new Node _.extend true, {}, defaults,
         id: i
         viewMode: Node.BALL
         should:
