@@ -20,9 +20,11 @@ System functions.
 setup: ->
   
   # Setup context.
-  size 300, 300
+  #size 300, 300
+  size 1252, 626
   frameRate FRAME_RATE
   noStroke()
+  background 255
   
   ###
   We need to do additional setup calls since constants and statics reference things 
@@ -44,10 +46,11 @@ setup: ->
   
   # Setup sketch(es).
   wind =     new PVector 0.001, 0
-  gravity =  Vector.gravity()
+  #gravity =  Vector.gravity()
+  gravity =  new PVector 0, 0
   
   stage = new Wrap _.extend true, {}, Wrap.defaults,
-    containment: Wrap.REFLECTIVE
+    containment: Wrap.TOROIDAL
     hasGravity: yes # TODO: Patched.
   stage.nodes = []
   
@@ -57,7 +60,7 @@ setup: ->
     do (i, defaults = Node.defaults) ->
       n = new Node _.extend true, {}, defaults,
         id: i
-        viewMode: Node.BALL
+        viewMode: Node.LINE
         should:
           varyMass: yes
         num:
@@ -106,4 +109,5 @@ freeze: (should) ->
   
   # Save.
   frozen = should
+  console.log "is frozen: #{frozen}"
   
