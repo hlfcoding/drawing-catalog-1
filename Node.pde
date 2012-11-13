@@ -171,7 +171,8 @@ pplying (Vector)
       noFill()
       # Style
       strokeWeight 0.1
-      stroke @stroke() 
+      c = @stroke()
+      stroke red(c), green(c), blue(c), alpha(c) / 3
       if @pPrev? and @p.dist(@pPrev) < width
         line @x(), @y(), @pPrev.x, @pPrev.y
         @pPrev.set @p

@@ -66,12 +66,12 @@ class Wrap extends Node
     
     @should.trace ?= @nodes[0].viewMode is Node.LINE
     
-    if @should.trace is yes and millis() % FRAME_RATE is 0
+    if @should.trace is yes and millis() % (FRAME_RATE * 10) is 0
       c = @fill()
-      fill red(c), green(c), blue(c), alpha(c) / 60
+      fill red(c), green(c), blue(c), alpha(c) / 100
       rect @top(), @left(), @width(), @height()
       noFill()
-    else
+    else if @should.trace is no
       fill @fill()
       rect @top(), @left(), @width(), @height()
   
