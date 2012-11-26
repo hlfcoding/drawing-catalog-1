@@ -6,6 +6,8 @@ class Wrap extends Node
   @frictionMag - (Number)
   @_isReady - (Bool)
   @hasGravity - (Bool)
+  @_needsClear - (Bool)
+  @_screenStates - (Object<Array<ImageData>>)
   ###
 
   ###
@@ -16,6 +18,9 @@ class Wrap extends Node
   @NONE: 0
   @REFLECTIVE: 1
   @TOROIDAL: 2
+
+  @DEFAULT: 0
+  @TRACE: 1
 
   @defaults: null
   @setup: ->
@@ -30,25 +35,31 @@ class Wrap extends Node
       c:
         fill: color 255
       should:
-        move: no
-        autoMass: no
-        contain: yes
-        drainAtEdge: yes
+        move: no # Override.
+        autoMass: no # Override.
+        contain: yes # Contain nodes.
+        drainAtEdge: yes # Drain node inertia at edges.
       num:
         entropy: 1
       containment: Wrap.REFLECTIVE
       frictionMag: 0.01 * SPEED_FACTOR # constant * normal
+      hasGravity: no
       _isReady: no
-        
+      _needsClear: no
+      _screenStates: {}
+
   constructor: (params = Wrap.defaults) ->
-  
+
     super params
-  
+
+    @_screenStates[Wrap.TRACE] = []
+    @_screenStates[Wrap.DEFAULT] = []
+
   ###
   Accessors
   Sugar you should use.
   ###
-  
+
   left: -> @x()
   top: -> @y()
   right: -> @width() + @left()
@@ -62,22 +73,34 @@ class Wrap extends Node
   ###
   Inherited
   ###
-  
+
   draw: () ->
-    
-    @should.trace ?= @nodes[0].viewMode is Node.LINE
-    
-    if @should.trace is yes and millis() % (FRAME_RATE * 10) is 0
+
+    wasTracing = @should.trace
+    @should.trace = @nodes[0].viewMode is Node.LINE
+    changeTracing = @should.trace isnt wasTracing
+
+    if wasTracing is yes and changeTracing is yes
+      @pushScreen Wrap.TRACE
+
+    if @should.trace and millis() % (FRAME_RATE * 10) is 0
+      # 'Layer' the canvas.
       c = @fill()
       fill red(c), green(c), blue(c), alpha(c) / 100
       rect @top(), @left(), @width(), @height()
       noFill()
-    else if @should.trace is no
+
+    if @should.trace is no or @_needsClear is yes
+      # Clear the canvas.
       fill @fill()
       rect @top(), @left(), @width(), @height()
-  
+      # Sometimes when switching view modes, the canvas needs to be cleared and restored.
+      if @_needsClear is yes
+        @_needsClear = no
+        @popScreen()
+
     n.draw() for n in @nodes
-  
+
   ###
   Public
   ###
@@ -86,19 +109,23 @@ class Wrap extends Node
 
     @applyFrictionForNode n
     if @should.contain is yes then @checkEdgesForNode n
-  
+
+  nodeChangedViewMode: (n) ->
+
+    if n.viewMode is Node.LINE then @_needsClear = yes
+
   applyFrictionForNode: (n) ->
-  
+
     f = n.v.get()
     f.normalize()
     f.mult -1
     f.mult @frictionMag
     n.applyForce f
-  
+
   checkEdgesForNode: (n) ->
-    
+
     shift = if @hasGravity then 1 else (1 - @num.entropy)
-    
+
     if @containment is Wrap.REFLECTIVE
       # X
       if n.right() > @right()
@@ -114,7 +141,7 @@ class Wrap extends Node
       else if n.y() < @top()
         n.top @top()
         if n.v.y < 0 then n.v.y *= -shift
-        
+
     else if @containment is Wrap.TOROIDAL
       # X
       didContain = no
@@ -131,7 +158,19 @@ class Wrap extends Node
       else if n.bottom() < @top()
         n.top @bottom()
         didContain = yes
-      
+
       if didContain and @should.drainAtEdge
         n.v.normalize()
         n.a.normalize()
+
+  _prepScreenOp: -> [document.querySelector('canvas').getContext('2d'), if @should.trace is yes then Wrap.TRACE else Wrap.DEFAULT]
+
+  pushScreen: (forcedStack) ->
+    [ctx, stack] = @_prepScreenOp()
+    screen = ctx.getImageData @left(), @top(), @width(), @height()
+    @_screenStates[if forcedStack? then forcedStack else stack].push screen
+
+  popScreen: ->
+    [ctx, stack] = @_prepScreenOp()
+    ctx.putImageData @_screenStates[stack].pop(), @left(), @top()
+

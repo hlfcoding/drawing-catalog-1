@@ -1,35 +1,33 @@
-# TODO: extend()
-
 class PVectorAdditions
-  
+
   ###
   Monkey patch PVector
   @type - (Constant)
   ###
-    
+
   @GENERIC: 0
   @POSITION: 1
   @VELOCITY: 2
   @ACCELERATION: 3
   @GRAVITY: 4
   @ATTRACTION: 4
-  
+
   ###
   Gravity constant.
   ###
   @G: 0.01
-  
+
   @setup: ->
-    
+
     PVector::randomize = ->
       if @type is Vector.POSITION
         @x = random width
         @y = random height
-        
+
   @gravity: ->
     v = new PVector 0, 0.5 * SPEED_FACTOR
     v.type = Vector.GRAVITY
-    v 
+    v
 
 # Alias.
 Vector = PVectorAdditions
@@ -37,12 +35,12 @@ Vector = PVectorAdditions
 ###
 Language Additions
 ###
- 
+
 
 class Utility
 
   # Concise type-checking. Slowest form. Courtesy of jQuery.
-  @typeOf: (obj) -> if obj? then _.TYPES[toString.call(obj)] else String(obj) or 'object' 
+  @typeOf: (obj) -> if obj? then _.TYPES[toString.call(obj)] else String(obj) or 'object'
   @TYPES:
     '[object Boolean]':  'boolean'
     '[object Number]':   'number'
@@ -62,14 +60,14 @@ class Utility
     '' for key of obj
     return key is undefined or hasOwnProperty.call(obj, key)
   @isArray: Array.isArray # Faster form.
-  
-  # Check instance Class, recursively as needed to check the inheritance chain. 
+
+  # Check instance Class, recursively as needed to check the inheritance chain.
   @isKindOfClass: (obj, aClass) ->
     bool = obj.constructor is aClass
     if not bool and obj.constructor.__super__?
       bool = isKindOfClass obj.constructor.__super__, aClass
     bool
-  
+
   # Extend + deep-extend + clone. Courtesy of jQuery.
   @extend: (args...) ->
     target = args[0] or {}
@@ -105,25 +103,25 @@ class Utility
             target[name] = prop
     # Return the modified object.
     return target
-    
+
   ###
   Math
   ###
-    
+
   @randomDualScale: (n) -> random(1, n) / random(1, n)
-    
+
 # Alias.
 _ = Utility
 
 Event =
   SPLITTER: (/\s+/)
-  mixin: 
+  mixin:
     on: (events, callback, context) ->
-    
+
       return @ if not callback?
       events = events.split Event.SPLITTER
       calls = @_callbacks or (@_callbacks = {})
-      
+
       while event = events.shift()
         list = calls[event]
         node = if list then list.tail else {}
@@ -133,16 +131,16 @@ Event =
         calls[event] =
           tail: tail
           next: if list then list.next else node
-      
+
       @
-      
+
     off: (events, callback, context) ->
-    
+
       if not(calls = @._callbacks) then return
       if not(events or callback or context)
         delete @._callbacks
         return @
-      
+
       events = if events then events.split(Event.SPLITTER) else Object.keys(calls)
       while event = events.shift()
         node = calls[event]
@@ -153,15 +151,15 @@ Event =
           cb = node.callback
           ctx = node.context
           if (callback and cb isnt callback) or (context and ctx isnt context) then @.on event, cb, ctx
-      
+
       @
-      
+
     trigger: (events, rest...) ->
-    
+
       if not(calls = @._callbacks) then return @
       all = calls.all
       events = events.split Event.SPLITTER
-  
+
       while event = events.shift()
         if node = calls[event]
           tail = node.tail
@@ -170,5 +168,11 @@ Event =
           tail = node.tail
           args = [event].concat rest
           node.callback.apply(node.context or @, args) while (node = node.next) isnt tail
-      
+
       @
+
+Input = {}
+
+for i in [1...9]
+  Input["NUM_#{i}"] = 48 + i
+
