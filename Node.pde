@@ -30,6 +30,7 @@ class Node
   @defaults: null
   @setup: ->
     Node.defaults =
+      id: -1
       p: [0, 0, 0]
       v: [0, 0, 0]
       a: [0, 0, 0]
@@ -183,7 +184,7 @@ class Node
     didHit = @overlapsWith mouseX, mouseY
     if didHit
 
-      responded.mousePressed = yes
+      G.responded.mousePressed = yes
 
       # On hit, visibly toggle attraction.
       @should.attract = not @should.attract
@@ -198,7 +199,7 @@ class Node
       when Input.NUM_2 then @viewMode = Node.LINE
 
     if @viewMode isnt pViewMode
-      responded.keyPressed = yes
+      G.responded.keyPressed = yes
       @wrap().nodeChangedViewMode @
 
   # Caching allows the resulting acceleration to be committed into cache and reused later as base.

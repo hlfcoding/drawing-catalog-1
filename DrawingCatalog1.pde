@@ -8,13 +8,15 @@ SPEED_FACTOR = 60 / FRAME_RATE
 ###
 Globals.
 ###
-stage = null
-frozen = no
-# UI responder flag for allowing optional global handling. Any individual
-# responders should register the global flag accordingly.
-responded =
-  mousePressed: no
-  keyPressed: no
+G = 
+  stage: null
+  frozen: no
+  # UI responder flag for allowing optional global handling. Any individual
+  # responders should register the global flag accordingly.
+  responded:
+    mousePressed: no
+    keyPressed: no
+  gui: null
 
 ###
 System functions.
@@ -41,10 +43,10 @@ setup: ->
   WHITE = color 255
   RED = color 255, 0, 0
 
-  # Setup patches.
+  # Setup Processing patches.
   Vector.setup()
 
-  # Setup classes.
+  # Setup parts of classes that rely on Processing patches.
   Node.setup()
   Wrap.setup()
 
@@ -53,9 +55,10 @@ setup: ->
   #gravity =  Vector.gravity()
   gravity =  new PVector 0, 0
 
-  stage = new Wrap _.extend true, {}, Wrap.defaults,
+  G.stage = new Wrap _.extend true, {}, Wrap.defaults,
+    id: 1
     containment: Wrap.TOROIDAL
-  stage.nodes = []
+  G.stage.nodes = []
 
   scale = (width / 300)
 
@@ -68,37 +71,42 @@ setup: ->
           varyMass: yes
         num:
           attrtConst: 0.001
-        wrap: stage
+        wrap: G.stage
       n.p.randomize()
       if i is 1 then n.log()
 
       n.applyForce(wind)
        .applyForce(gravity, yes)
 
-      stage.nodes.push n
+      G.stage.nodes.push n
 
-  stage.ready yes
+  G.stage.ready yes
+  
+  # Setup GUI
+  
+  G.gui = new dat.GUI()  
+  G.stage.setupGUI()
   
 draw: ->
 
-  stage.draw()
+  G.stage.draw()
 
 mousePressed: ->
 
-  responded.mousePressed = no
+  G.responded.mousePressed = no
 
-  n.mousePressed() for n in stage.nodes
+  n.mousePressed() for n in G.stage.nodes
 
-  if responded.mousePressed is no
+  if G.responded.mousePressed is no
     @freeze()
 
 keyPressed: ->
 
-  responded.keyPressed = no
+  G.responded.keyPressed = no
 
   #console.log key
 
-  n.keyPressed() for n in stage.nodes
+  n.keyPressed() for n in G.stage.nodes
 
 ###
 Global helpers.
@@ -111,14 +119,14 @@ without stopping the server. This is especially handy when LiveReload is used.
 freeze: (should) ->
 
   # Default.
-  should ?= !frozen
+  should ?= !G.frozen
 
-  n.should.move = !should for n in stage.nodes
+  n.should.move = !should for n in G.stage.nodes
 
   # Note: noLoop() and loop() are somehow global in PJS.
   if should then window.noLoop() else window.loop()
 
   # Save.
-  frozen = should
-  console.log "is frozen: #{frozen}"
+  G.frozen = should
+  console.log "is frozen: #{G.frozen}"
 

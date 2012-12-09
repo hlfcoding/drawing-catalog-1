@@ -55,6 +55,22 @@ class Wrap extends Node
     @_screenStates[Wrap.TRACE] = []
     @_screenStates[Wrap.DEFAULT] = []
 
+  setupGUI: ->
+    
+    return if not G.gui?
+    
+    gui = G.gui.addFolder "Wrap #{@id}"
+    gui.add @, 'frictionMag', 0.001, 0.1
+    gui.add @.num, 'entropy', 0, 2
+    gui.add @, 'hasGravity'
+    # TODO: Don't work.
+    gui.add @, 'containment', 
+      'Reflective': Wrap.REFLECTIVE
+      'Toroidal': Wrap.TOROIDAL
+    gui.add @.c, 'fill'
+    
+    gui.open()
+
   ###
   Accessors
   Sugar you should use.
