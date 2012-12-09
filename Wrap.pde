@@ -64,10 +64,14 @@ class Wrap extends Node
   top: -> @y()
   right: -> @width() + @left()
   bottom: -> @height() + @top()
+  $canvas: -> $('canvas')
+  canvas: -> @$canvas().get(0)
   ready: (isReady) ->
     if isReady?
       @_isReady = isReady
-      if isReady is yes then @trigger 'ready'
+      if isReady is yes
+        @trigger 'ready'
+        @$canvas().focus()
     @_isReady
 
   ###
@@ -163,7 +167,7 @@ class Wrap extends Node
         n.v.normalize()
         n.a.normalize()
 
-  _prepScreenOp: -> [document.querySelector('canvas').getContext('2d'), if @should.trace is yes then Wrap.TRACE else Wrap.DEFAULT]
+  _prepScreenOp: -> [@canvas().getContext('2d'), if @should.trace is yes then Wrap.TRACE else Wrap.DEFAULT]
 
   pushScreen: (forcedStack) ->
     [ctx, stack] = @_prepScreenOp()
