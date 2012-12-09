@@ -34,8 +34,9 @@ Vector = PVectorAdditions
 
 ###
 Language Additions
-###
 
+Some are from Underscore / Backbone, some from jQuery. Only here if they are heavily relied upon.
+###
 
 class Utility
 

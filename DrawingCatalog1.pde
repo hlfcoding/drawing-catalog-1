@@ -24,7 +24,8 @@ setup: ->
 
   # Setup context.
   #size 300, 300
-  size 1252, 626
+  size 720, 480
+  #size 1252, 626
   frameRate FRAME_RATE
   noStroke()
   background 255
@@ -77,7 +78,7 @@ setup: ->
       stage.nodes.push n
 
   stage.ready yes
-
+  
 draw: ->
 
   stage.draw()
