@@ -13,11 +13,3 @@ CoffeeScript sketches and boilerplate using [fjenett/coffeescript-mode-processin
 
 Screenshot of HEAD, but with line view-mode in toroidal container:
 http://cl.ly/image/0e3E0m3i0O2I
-
-###TODO
-
-- Basic view-mode system.
-- Initial view-modes (Wind, Liquid, Attractor).
-- Use bit-masks for options.
-
-- Use requestAnimationFrame.
