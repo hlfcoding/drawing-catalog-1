@@ -1,0 +1,32 @@
+/* Base */
+body {
+  background-color: #333;
+  color: #bbb;
+}
+a {
+  color: #cdcdcd;
+  text-decoration: underline;
+}
+#content {
+  background-color: #3d3d3d;
+  border-color: #444 #333 #333 #444;
+  border-style: solid;
+  border-width: 1px;
+  font: 11px/1.5em Helvetica, Arial, sans-serif;
+  margin: 50px auto 0px;
+  min-width: 300px;
+  overflow: auto;
+  padding: 25px 25px 15px;
+  text-decoration: none;
+}
+#content h1 {
+  width: 100%;
+  letter-spacing: 0.1em;
+  margin-bottom: 1em;
+  font-size: 1.65em;
+}
+#content canvas {
+  display: block;
+  outline: 0px;
+  margin-bottom: 1.5em;
+}
