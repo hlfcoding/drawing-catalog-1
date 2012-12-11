@@ -4,6 +4,7 @@ class Wrap extends Node
   Container for nodes. A more flexible version of stage.
   @nodes - (Array)
   @frictionMag - (Number)
+  @nodeViewMode - (BitMask) Passes through to nodes.
   @_isReady - (Bool)
   @hasGravity - (Bool)
   @_needsClear - (Bool)
@@ -11,11 +12,12 @@ class Wrap extends Node
   ###
 
   ###
-  Constants
+  Constants (in order)
   - containment
+  - screen-state
   ###
 
-  @NONE: 0
+  @UNCONTAINED: 0
   @REFLECTIVE: 1
   @TOROIDAL: 2
 
@@ -33,7 +35,7 @@ class Wrap extends Node
         width: width
         height: height
       c:
-        fill: color 255
+        fill: WHITE
       should:
         move: no # Override.
         autoMass: no # Override.
@@ -44,6 +46,8 @@ class Wrap extends Node
       containment: Wrap.REFLECTIVE
       frictionMag: 0.01 * SPEED_FACTOR # constant * normal
       hasGravity: no
+      viewMode: Node.FORMLESS
+      nodeViewMode: Node.BALL
       _isReady: no
       _needsClear: no
       _screenStates: {}
@@ -56,20 +60,44 @@ class Wrap extends Node
     @_screenStates[Wrap.DEFAULT] = []
 
   setupGUI: ->
-    
+
     return if not G.gui?
-    
+
     gui = G.gui.addFolder "Wrap #{@id}"
+
+    # Speed controls.
     gui.add @, 'frictionMag', 0.001, 0.1
     gui.add @.num, 'entropy', 0, 2
-    gui.add @, 'hasGravity'
+
+    # Edge controls.
     # TODO: Don't work.
-    gui.add @, 'containment', 
+    gui.add @, 'hasGravity'
+    gui.add @, 'containment',
       'Reflective': Wrap.REFLECTIVE
       'Toroidal': Wrap.TOROIDAL
-    gui.add @.c, 'fill'
-    
+
+    # View controls.
+    # Additional binding glue required.
+    gui.add(@, 'nodeViewMode',
+      'Ball': Node.BALL
+      'Line': Node.LINE
+    ).onFinishChange (viewMode) => @onNodeViewModeChange viewMode
+    # Additional binding glue required.
+    # TODO: Still has issues.
+    gui.addColor(@.c, 'fill').onChange (c) =>
+
     gui.open()
+
+  ###
+  Binding
+  ###
+
+  onNodeViewModeChange: (viewMode) ->
+    # Beware of dat-GUI type-conversion bugs.
+    if viewMode? then @nodeViewMode = parseInt(viewMode, 10) else viewMode = @nodeViewMode
+    (n.viewMode = viewMode) for n in @nodes
+    @_needsClear = @nodeViewMode is Node.LINE
+    @draw()
 
   ###
   Accessors
@@ -84,10 +112,12 @@ class Wrap extends Node
   canvas: -> @$canvas().get(0)
   ready: (isReady) ->
     if isReady?
+      # DOM-ready-dependent initialization.
       @_isReady = isReady
       if isReady is yes
         @trigger 'ready'
         @$canvas().focus()
+        @onNodeViewModeChange()
     @_isReady
 
   ###
@@ -97,7 +127,7 @@ class Wrap extends Node
   draw: () ->
 
     wasTracing = @should.trace
-    @should.trace = @nodes[0].viewMode is Node.LINE
+    @should.trace = @nodeViewMode is Node.LINE
     changeTracing = @should.trace isnt wasTracing
 
     if wasTracing is yes and changeTracing is yes
@@ -121,6 +151,10 @@ class Wrap extends Node
 
     n.draw() for n in @nodes
 
+  mousePressed: -> n.mousePressed() for n in @nodes
+
+  keyPressed: -> n.keyPressed() for n in @nodes
+
   ###
   Public
   ###
@@ -129,10 +163,6 @@ class Wrap extends Node
 
     @applyFrictionForNode n
     if @should.contain is yes then @checkEdgesForNode n
-
-  nodeChangedViewMode: (n) ->
-
-    if n.viewMode is Node.LINE then @_needsClear = yes
 
   applyFrictionForNode: (n) ->
 
@@ -192,5 +222,6 @@ class Wrap extends Node
 
   popScreen: ->
     [ctx, stack] = @_prepScreenOp()
+    return if not @_screenStates[stack].length
     ctx.putImageData @_screenStates[stack].pop(), @left(), @top()
 

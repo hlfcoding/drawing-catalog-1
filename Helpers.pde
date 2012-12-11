@@ -111,9 +111,16 @@ class Utility
 
   @randomDualScale: (n) -> random(1, n) / random(1, n)
 
+  ###
+  Framework Glue
+  ###
+
+  @trueColor: (c) -> if c > 0 then c - 16777216 else c
+
 # Alias.
 _ = Utility
 
+# Native events.
 Event =
   SPLITTER: (/\s+/)
   mixin:
@@ -172,8 +179,8 @@ Event =
 
       @
 
+#Input sugar.
 Input = {}
-
 for i in [1...9]
   Input["NUM_#{i}"] = 48 + i
 

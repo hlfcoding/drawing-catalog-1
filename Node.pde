@@ -10,7 +10,7 @@ class Node
   @a - acceleration (Vector)
   @m - mass (Number)
   @s - sizes (Object)
-  @c - colors (Object<Color|Bool>)
+  @c - colors (Object<Array|Bool>) Us rgba arrays for portability.
   @should - switches (Object)
   @num - numbers (Object<Number>)
   @viewMode - (BitMask)
@@ -24,6 +24,7 @@ class Node
   Constants
   ###
 
+  @FORMLESS: 0
   @BALL: 1 << 0
   @LINE: 1 << 1
 
@@ -128,11 +129,11 @@ class Node
 
   fill: (fill) ->
     if fill? then @c.fill = fill
-    @c.fill
+    _.trueColor @c.fill
 
   stroke: (stroke) ->
     if stroke? then @c.stroke = stroke
-    @c.stroke
+    _.trueColor @c.stroke
 
   wrap: (wrap) ->
     if wrap?
@@ -181,6 +182,8 @@ class Node
 
   mousePressed: ->
 
+    return if G.responded.mousePressed
+
     didHit = @overlapsWith mouseX, mouseY
     if didHit
 
@@ -191,16 +194,6 @@ class Node
       @fill if @should.attract then RED else BLACK
 
   keyPressed: ->
-
-    pViewMode = @viewMode
-
-    switch key.code
-      when Input.NUM_1 then @viewMode = Node.BALL
-      when Input.NUM_2 then @viewMode = Node.LINE
-
-    if @viewMode isnt pViewMode
-      G.responded.keyPressed = yes
-      @wrap().nodeChangedViewMode @
 
   # Caching allows the resulting acceleration to be committed into cache and reused later as base.
   # Chainable.

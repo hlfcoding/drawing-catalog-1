@@ -8,7 +8,7 @@ SPEED_FACTOR = 60 / FRAME_RATE
 ###
 Globals.
 ###
-G = 
+G =
   stage: null
   frozen: no
   # UI responder flag for allowing optional global handling. Any individual
@@ -24,13 +24,16 @@ System functions.
 
 setup: ->
 
-  # Setup context.
+  # Setup environment.
+  colorMode RGB, 255
+  frameRate FRAME_RATE
+  noStroke()
+
+  # Setup viewport.
+  background 255
   #size 300, 300
   size 720, 480
   #size 1252, 626
-  frameRate FRAME_RATE
-  noStroke()
-  background 255
 
   ###
   We need to do additional setup calls since constants and statics reference things
@@ -38,7 +41,6 @@ setup: ->
   ###
 
   # Setup constants.
-  colorMode RGB, 255
   BLACK = color 0
   WHITE = color 255
   RED = color 255, 0, 0
@@ -66,7 +68,6 @@ setup: ->
     do (i, defaults = Node.defaults) ->
       n = new Node _.extend true, {}, defaults,
         id: i
-        viewMode: Node.LINE
         should:
           varyMass: yes
         num:
@@ -81,12 +82,14 @@ setup: ->
       G.stage.nodes.push n
 
   G.stage.ready yes
-  
+
   # Setup GUI
-  
-  G.gui = new dat.GUI()  
+
+  G.gui = new dat.GUI()
   G.stage.setupGUI()
-  
+
+  G.gui.add(G, 'frozen').onFinishChange (should) => @freeze should
+
 draw: ->
 
   G.stage.draw()
@@ -95,10 +98,7 @@ mousePressed: ->
 
   G.responded.mousePressed = no
 
-  n.mousePressed() for n in G.stage.nodes
-
-  if G.responded.mousePressed is no
-    @freeze()
+  G.stage.mousePressed()
 
 keyPressed: ->
 
@@ -106,7 +106,7 @@ keyPressed: ->
 
   #console.log key
 
-  n.keyPressed() for n in G.stage.nodes
+  G.stage.keyPressed()
 
 ###
 Global helpers.
@@ -128,5 +128,5 @@ freeze: (should) ->
 
   # Save.
   G.frozen = should
-  console.log "is frozen: #{G.frozen}"
+  #console.log "is frozen: #{G.frozen}"
 
