@@ -1,20 +1,43 @@
+class PEnvironmentAdditions
+
+  ###
+  Static class for additional environment-based sugar.
+  Constants (in order):
+  - size constants
+  - frame-rate constants
+  ###
+
+  @SMALL_SIZE: [300, 300]
+  @MEDIUM_SIZE: [720, 480]
+  @TWITTER_SIZE: [1252, 626]
+
+  @DEBUG_FPS: 1
+  @ANIM_FPS: 12
+  @FILM_FPS: 24
+  @VIDEO_FPS: 30
+  @REAL_FPS: 60
+
+  @setup: ->
+
+System = PEnvironmentAdditions
+
 class PVectorAdditions
 
   ###
-  Monkey patch PVector
-  @type - (Constant)
+  Static class to monkey patch PVector and add additional sugar.
+  Constants (in order):
+  [type] - (Constant|BitMask) Force-type vectors can be used as options.
+  G - Gravity constant.
   ###
 
   @GENERIC: 0
   @POSITION: 1
   @VELOCITY: 2
   @ACCELERATION: 3
-  @GRAVITY: 4
-  @ATTRACTION: 4
 
-  ###
-  Gravity constant.
-  ###
+  @GRAVITY:    1 << 0
+  @ATTRACTION: 1 << 1
+
   @G: 0.01
 
   @setup: ->
@@ -25,7 +48,7 @@ class PVectorAdditions
         @y = random height
 
   @gravity: ->
-    v = new PVector 0, 0.5 * SPEED_FACTOR
+    v = new PVector 0, G.speedFactor / 2
     v.type = Vector.GRAVITY
     v
 
@@ -34,8 +57,10 @@ Vector = PVectorAdditions
 
 ###
 Language Additions
+###
 
-Some are from Underscore / Backbone, some from jQuery. Only here if they are heavily relied upon.
+###
+Static helpers. Some are from Underscore / Backbone, some from jQuery. Only here if they are heavily relied upon.
 ###
 
 class Utility
@@ -104,6 +129,9 @@ class Utility
             target[name] = prop
     # Return the modified object.
     return target
+
+  @remove: (haystack, needles...) ->
+    haystack.splice(haystack.indexOf(n), 1) for n in needles
 
   ###
   Math

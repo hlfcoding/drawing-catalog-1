@@ -12,9 +12,10 @@ class Wrap extends Node
   ###
 
   ###
-  Constants (in order)
+  Constants (in order):
   - containment
-  - screen-state
+  - screen-state - Private?
+  - layout-pattern
   ###
 
   @UNCONTAINED: 0
@@ -24,9 +25,13 @@ class Wrap extends Node
   @DEFAULT: 0
   @TRACE: 1
 
+  @UNIFORM_PATTERN: 0
+  @RANDOM_PATTERN: 1
+
   @defaults: null
   @setup: ->
     # Don't extend Node.defaults.
+    # Inherited.
     Wrap.defaults =
       p: [0, 0, 0]
       v: [0, 0, 0]
@@ -42,12 +47,24 @@ class Wrap extends Node
         contain: yes # Contain nodes.
         drainAtEdge: yes # Drain node inertia at edges.
       num:
+        density: 1 / 6
         entropy: 1
-      containment: Wrap.REFLECTIVE
-      frictionMag: 0.01 * SPEED_FACTOR # constant * normal
-      hasGravity: no
       viewMode: Node.FORMLESS
-      nodeViewMode: Node.BALL
+      # Custom.
+      f:
+        options: 0
+        custom: null
+        _allCustom: null
+      containment: Wrap.REFLECTIVE
+      frictionMag: 0.01 * G.speedFactor # constant * normal
+      hasGravity: no
+      layoutPattern: Wrap.RANDOM_PATTERN
+      nodeViewMode: null # Placeholder.
+      nodeCount: null # Placeholder.
+      nodeParams:
+        should:
+          varyMass: yes
+        viewMode: Node.BALL
       _isReady: no
       _needsClear: no
       _screenStates: {}
@@ -58,6 +75,8 @@ class Wrap extends Node
 
     @_screenStates[Wrap.TRACE] = []
     @_screenStates[Wrap.DEFAULT] = []
+    @nodes = []
+    @f.custom = []
 
   setupGUI: ->
 
@@ -70,14 +89,22 @@ class Wrap extends Node
     gui.add @.num, 'entropy', 0, 2
 
     # Edge controls.
-    # TODO: Don't work.
-    gui.add @, 'hasGravity'
-    gui.add @, 'containment',
+    # Provide a ground as needed.
+    gui.add(@, 'hasGravity').onFinishChange (has) =>
+     @containment = if has then Wrap.REFLECTIVE else Wrap.TOROIDAL
+     @toggleForce Vector.GRAVITY, has
+    gui.add(@, 'containment',
       'Reflective': Wrap.REFLECTIVE
       'Toroidal': Wrap.TOROIDAL
+    ).listen().onFinishChange (type) => @containment = parseInt type, 10
+
+    # Population controls.
+    @nodeCount = @nodes.length
+    gui.add(@, 'nodeCount', 0, 500).onFinishChange (nodeCount) => @updateNodeCount nodeCount
 
     # View controls.
     # Additional binding glue required.
+    @nodeViewMode = @nodeParams.viewMode
     gui.add(@, 'nodeViewMode',
       'Ball': Node.BALL
       'Line': Node.LINE
@@ -94,10 +121,31 @@ class Wrap extends Node
 
   onNodeViewModeChange: (viewMode) ->
     # Beware of dat-GUI type-conversion bugs.
-    if viewMode? then @nodeViewMode = parseInt(viewMode, 10) else viewMode = @nodeViewMode
-    (n.viewMode = viewMode) for n in @nodes
+    if viewMode?
+      @nodeViewMode = parseInt(viewMode, 10)
+      (n.viewMode = viewMode) for n in @nodes
+    else @nodeViewMode = @nodeParams.viewMode
     @_needsClear = @nodeViewMode is Node.LINE
     @draw()
+
+  toggleForce: (f, toggle) ->
+    return if not toggle?
+    @f._allCustom ?= @f.custom
+    if typeof f is 'number' # Force option.
+      # Vector.
+      switch f
+        when Vector.GRAVITY then vec = Vector.gravity()
+      # Update.
+      if toggle then @f.options |= f else @f.options ^= f
+    else if f in @f._allCustom # Force name.
+      # Vector.
+      vec = @f._allCustom[f]
+      # Update.
+      if toggle then @f.custom.push vec
+      else _.remove @f.custom, vec
+    if vec? then for n in @nodes
+      n.applyForce(vec, toggle)
+      n.cacheAcceleration()
 
   ###
   Accessors
@@ -118,6 +166,7 @@ class Wrap extends Node
         @trigger 'ready'
         @$canvas().focus()
         @onNodeViewModeChange()
+        @log()
     @_isReady
 
   ###
@@ -133,7 +182,7 @@ class Wrap extends Node
     if wasTracing is yes and changeTracing is yes
       @pushScreen Wrap.TRACE
 
-    if @should.trace and millis() % (FRAME_RATE * 10) is 0
+    if @should.trace and millis() % (G.fps * 10) is 0
       # 'Layer' the canvas.
       c = @fill()
       fill red(c), green(c), blue(c), alpha(c) / 100
@@ -158,6 +207,35 @@ class Wrap extends Node
   ###
   Public
   ###
+
+  updateNodeCount: (count) ->
+    # Infer count as needed.
+    count ?= parseInt @width() * @num.density
+    currentCount = @nodes.length
+    shouldContract = count < currentCount
+    # Contract.
+    if shouldContract
+      @nodes.pop() for i in [(currentCount - 1)...count]
+      return
+    # Setup forces.
+    if @f.options & Vector.GRAVITY then gravity = Vector.gravity()
+    # Or expand.
+    for i in [1...(count - currentCount)]
+      do (i, defaults = Node.defaults) =>
+        n = new Node _.extend true, {}, defaults, @nodeParams,
+          id: currentCount + i
+          wrap: @
+          viewMode: if @nodeViewMode? then @nodeViewMode else @nodeParams.viewMode
+        # Additional setup.
+        if @layoutPattern is Wrap.RANDOM_PATTERN then n.p.randomize()
+        # Introduce forces.
+        if @f.options & Vector.GRAVITY then n.applyForce gravity
+        n.applyForce(f) for f in @f.custom
+        n.cacheAcceleration()
+        # Log once.
+        if i is 1 then n.log()
+        # Add.
+        G.stage.nodes.push n
 
   nodeMoved: (n) ->
 
@@ -193,23 +271,17 @@ class Wrap extends Node
         if n.v.y < 0 then n.v.y *= -shift
 
     else if @containment is Wrap.TOROIDAL
+      didContain = { x: yes, y: yes }
       # X
-      didContain = no
-      if n.left() > @right()
-        n.right @left()
-        didContain = yes
-      else if n.right() < @left()
-        n.left @right()
-        didContain = yes
+      if n.left() > @right() then       n.right @left()
+      else if n.right() < @left() then  n.left @right()
+      else didContain.x = no
       # Y
-      if n.top() > @bottom()
-        n.bottom @top()
-        didContain = yes
-      else if n.bottom() < @top()
-        n.top @bottom()
-        didContain = yes
+      if n.top() > @bottom() then       n.bottom @top()
+      else if n.bottom() < @top() then  n.top @bottom()
+      else didContain.y = no
 
-      if didContain and @should.drainAtEdge
+      if (didContain.x or didContain.y) and @should.drainAtEdge
         n.v.normalize()
         n.a.normalize()
 

@@ -51,7 +51,7 @@ class Node
       num:
         massMax: 5
         velMax: 5
-        attrtConst: Vector.G
+        attrtConst: Vector.G / 10
         attrtDistMin: 5 # Avoid applying huge attraction.pplying huge attraction.
         attrtDistMax: 25 # Avoid applying tiny attraction.
       wrap: null
@@ -196,14 +196,15 @@ class Node
   keyPressed: ->
 
   # Caching allows the resulting acceleration to be committed into cache and reused later as base.
+  cacheAcceleration: -> @_aCached = @a.get()
+
   # Chainable.
-  applyForce: (vec, shouldCacheA = no) ->
+  applyForce: (vec, toggle = on) ->
 
     mutableVec = vec.get()
     if vec.type isnt Vector.GRAVITY
       mutableVec.div @m
-    @a.add vec
-    if shouldCacheA is yes then @_aCached = @a.get()
+    if toggle is on then @a.add vec else @a.sub vec
     @
 
   move: ->
@@ -237,8 +238,6 @@ class Node
   # TODO - Primitive shape types.
   overlapsWith: (x, y) -> dist(@x(), @y(), x, y) < @width()
 
-  log: ->
-
-    console.info @
+  log: -> console.info @
 
 _.extend Node::, Event.mixin
