@@ -23,7 +23,8 @@ System functions.
 ###
 
 setup: ->
-
+  #size 720, 480
+  
   # Setup base environment.
   colorMode RGB, 255
   noStroke()
@@ -42,8 +43,8 @@ setup: ->
   #[w, h] = System.SMALL_SIZE
   [w, h] = System.MEDIUM_SIZE
   #[w, h] = System.TWITTER_SIZE
-  # size(720, 480); -- Required for CS-P5-mode parser.
-  size w, h
+  #size(720, 480); -- Required for CS-P5-mode parser.
+  #size w, h
 
   ###
   We need to do additional setup calls since constants and statics reference things
