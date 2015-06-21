@@ -13,6 +13,6 @@
   "dependencies": {
     "coffeescript": "~1.9.3",
     "dat-gui": "~0.5.1",
-    "Processing.js": "~1.4.15"
+    "Processing.js": "1.4.1"
   }
 }
