@@ -1,0 +1,17 @@
+{
+  "name": "processing-coffee-sketches",
+  "version": "0.0.0",
+  "authors": [
+    "Peng Wang <peng@pengxwang.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "coffeescript": "~1.9.3",
+    "dat-gui": "~0.5.1"
+  }
+}
