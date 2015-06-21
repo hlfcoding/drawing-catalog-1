@@ -1,129 +1,94 @@
-###
-Constants.
-###
-BLACK = WHITE = RED = null
+sketch = null
 
-###
-Globals.
-###
-G =
-  stage: null
-  fps: 0
-  frozen: no
-  # UI responder flag for allowing optional global handling. Any individual
-  # responders should register the global flag accordingly.
-  responded:
-    mousePressed: no
-    keyPressed: no
-  speedFactor: 0
-  gui: null
+# Initializers
+# ------------
 
-###
-System functions.
-###
+setup: ->   
+  # Required for CS-P5-mode parser.
+  # size(720, 480);
 
-setup: ->
-  #size 720, 480
-  
-  # Setup base environment.
-  colorMode RGB, 255
+  @_setupConstants()
+
+  sketch = @
+  @state =
+    frozen: no
+    frameRate: frameRate.FILM
+    speedFactor: 0
+
+  colorMode(RGB, 255)
   noStroke()
 
-  # Setup constants.
-  BLACK = color 0
-  WHITE = color 255
-  RED = color 255, 0, 0
+  [w, h] = size.MEDIUM
+  size w, h
 
-  # Setup globals and environment.
-  G.fps = System.FILM_FPS
-  updateSpeedFactor = -> G.speedFactor = System.REAL_FPS / G.fps
-  updateSpeedFactor()
-  frameRate G.fps
-  background WHITE
-  #[w, h] = System.SMALL_SIZE
-  [w, h] = System.MEDIUM_SIZE
-  #[w, h] = System.TWITTER_SIZE
-  #size(720, 480); -- Required for CS-P5-mode parser.
-  #size w, h
+  @_updateSpeedFactor()
+
+  background color.WHITE
+  
+  @_setupGUI()
+
+_setupConstants: ->
 
   ###
-  We need to do additional setup calls since constants and statics reference things
-  that aren't loaded by the time of the initial closure invocation.
+  Constants, when possible, are attached to the Processing (sketch) API methods.
+  This is because scope globals are of limited use in CS mode, and globalized
+  methods are conveniently fitting as namespaces, despite being a little risky
+  to modify.
   ###
 
-  # Setup Processing patches.
-  System.setup()
-  Vector.setup()
+  color.BLACK = color 0
+  color.WHITE = color 255
+  color.RED = color 255, 0, 0
 
-  # Setup parts of classes that rely on Processing patches.
-  Node.setup()
-  Wrap.setup()
+  frameRate.DEBUG = 1
+  frameRate.ANIMATION = 12
+  frameRate.FILM = 24
+  frameRate.VIDEO = 30
+  frameRate.REAL = 60
 
-  # Setup sketch(es) _last_.
-  wind = new PVector 0.001, 0
+  size.SMALL = [300, 300]
+  size.MEDIUM = [720, 480]
+  size.TWITTER = [1252, 626]
 
-  G.stage = new Wrap _.extend true, {}, Wrap.defaults,
-    id: 1
-    containment: Wrap.TOROIDAL
-    f:
-      custom: { wind: wind }
+_setupGUI: ->
 
-  G.stage.updateNodeCount()
+  ###
+  The sketch has state and the datGUI library builds an to manipulate and tune
+  that state for various results.
+  ###
 
-  G.stage.ready yes
+  gui = new dat.GUI()
 
-  # Setup GUI
+  toggle = gui.add @state, 'frozen'
+  toggle.onFinishChange (frozen) => @freeze frozen
 
-  G.gui = new dat.GUI()
-  G.gui.add(G, 'frozen').onFinishChange (should) => @freeze should
-  G.gui.add(G, 'fps',
-    'Debug': System.DEBUG_FPS
-    'Animation': System.ANIM_FPS
-    'Film': System.FILM_FPS
-    'Video': System.VIDEO_FPS
-    'Real': System.REAL_FPS
-  ).onFinishChange (fps) ->
-   updateSpeedFactor()
-   frameRate parseInt fps, 10
-  G.stage.setupGUI()
+  select = gui.add @state, 'frameRate',
+    "Debug": frameRate.DEBUG
+    "Animation": frameRate.ANIMATION
+    "Film": frameRate.FILM
+    "Video": frameRate.VIDEO
+    "Real": frameRate.REAL
+  select.onFinishChange (frameRate) => @state.frameRate = parseInt frameRate, 10
+
+  dat.GUI.shared = gui
+
+  gui.open()
+
+# Updaters
+# --------
 
 draw: ->
 
-  G.stage.draw()
+freeze: (frozen) ->
 
-mousePressed: ->
+  ###
+  One of the first things we need to do is to be able to control the cycle-
+  expensive run state without stopping the server. This is especially handy when
+  LiveReload is used.
+  ###
 
-  G.responded.mousePressed = no
+_updateSpeedFactor: ->
+  @state.speedFactor = frameRate.REAL / @state.frameRate
+  frameRate @state.frameRate
 
-  G.stage.mousePressed()
-
-keyPressed: ->
-
-  G.responded.keyPressed = no
-
-  #console.log key
-
-  G.stage.keyPressed()
-
-###
-Global helpers.
-###
-
-###
-One of the first things we need to do is to be able to control the cycle-expensive run state
-without stopping the server. This is especially handy when LiveReload is used.
-###
-freeze: (should) ->
-
-  # Default.
-  should ?= !G.frozen
-
-  n.should.move = !should for n in G.stage.nodes
-
-  # Note: noLoop() and loop() are somehow global in PJS.
-  if should then window.noLoop() else window.loop()
-
-  # Save.
-  G.frozen = should
-  #console.log "is frozen: #{G.frozen}"
 
