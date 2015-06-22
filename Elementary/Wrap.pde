@@ -65,6 +65,8 @@ class Wrap extends Node
     params reference other values not ready on initial declaration.
     ###
 
+    _.defaults @defaults, Node.defaults
+
     @defaults.width = width
     @defaults.height = height
 
