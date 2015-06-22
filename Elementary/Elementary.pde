@@ -7,13 +7,16 @@ setup: ->
   # Required for CS-P5-mode parser.
   # size(720, 480);
 
-  @_setupConstants()
-
   sketch = @
   @state =
     frozen: no
-    frameRate: frameRate.FILM
     speedFactor: 0
+
+  @_setupConstants()
+  @_setupExtensions()
+  @_setupClasses()
+
+  @state.frameRate = frameRate.FILM
 
   colorMode(RGB, 255)
   noStroke()
@@ -49,6 +52,38 @@ _setupConstants: ->
   size.SMALL = [300, 300]
   size.MEDIUM = [720, 480]
   size.TWITTER = [1252, 626]
+
+_setupExtensions: ->
+
+  ###
+  PVector extension to add helper constants and methods for the sketch. The main
+  addition is the concept of a vector type.
+  ###
+
+  PVector.G = 0.01
+
+  PVector.GENERIC = 0
+  PVector.POSITION = 1
+  PVector.VELOCITY = 2
+  PVector.ACCELERATION = 3
+
+  PVector.GRAVITY = 1 << 0
+  PVector.ATTRACTION = 1 << 1
+
+  PVector.createGravity = =>
+    v = new PVector 0, @state.speedFactor / 2
+    v.type = PVector.GRAVITY
+    v
+
+  PVector::randomize = ->
+    return unless @type is PVector.POSITION
+    @x = random width
+    @y = random height
+
+_setupClasses: ->
+
+  Node.setup()
+  Wrap.setup()
 
 _setupGUI: ->
 
@@ -90,5 +125,4 @@ freeze: (frozen) ->
 _updateSpeedFactor: ->
   @state.speedFactor = frameRate.REAL / @state.frameRate
   frameRate @state.frameRate
-
 
