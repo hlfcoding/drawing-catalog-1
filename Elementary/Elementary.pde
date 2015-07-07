@@ -18,7 +18,7 @@ setup: ->
 
   @state.frameRate = frameRate.FILM
 
-  colorMode(RGB, 255)
+  colorMode RGB, 255
   noStroke()
 
   [w, h] = size.MEDIUM
@@ -28,6 +28,8 @@ setup: ->
 
   background color.WHITE
   
+  @_setupStage()
+
   @_setupGUI()
 
 _setupConstants: ->
@@ -71,9 +73,9 @@ _setupExtensions: ->
   PVector.ATTRACTION = 1 << 1
 
   PVector.createGravity = =>
-    v = new PVector 0, @state.speedFactor / 2
-    v.type = PVector.GRAVITY
-    v
+    vec = new PVector 0, @state.speedFactor / 2
+    vec.type = PVector.GRAVITY
+    vec
 
   PVector::randomize = ->
     return unless @type is PVector.POSITION
@@ -88,8 +90,8 @@ _setupClasses: ->
 _setupGUI: ->
 
   ###
-  The sketch has state and the datGUI library builds an to manipulate and tune
-  that state for various results.
+  The sketch has state and the datGUI library builds an interface to manipulate
+  and tune that state for various results.
   ###
 
   gui = new dat.GUI()
@@ -105,9 +107,28 @@ _setupGUI: ->
     "Real": frameRate.REAL
   select.onFinishChange (frameRate) => @state.frameRate = parseInt frameRate, 10
 
+  range = gui.add @stage, 'frictionMag', 0.001, 0.1
+  range = gui.add @stage, 'entropy', 0, 2
+
   dat.GUI.shared = gui
 
   gui.open()
+
+_setupStage: ->
+
+  ###
+  The sketch only has one Wrap, and filling the sketch, it acts like a 'stage'.
+  ###
+
+  @stage = new Wrap
+    id: 1
+    containment: Wrap.TOROIDAL
+    customForces:
+      wind: new PVector 0.001, 0
+
+  @stage.updateNodeCount()
+
+  @stage.ready yes
 
 # Updaters
 # --------

@@ -8,10 +8,14 @@ class Node
     automatically if possible.
     ###
 
+    _.defaults params, Node.defaults unless params is Node.defaults
+
     for name, value of params
+      # Account for constructing.
       if value instanceof Array and value.length is 3
         [x, y, z] = value
         value = new PVector x, y, z
+      # Account for accessors.
       if typeof @[name] is 'function' then @[name](value)
       else @[name] = value
 
@@ -88,3 +92,15 @@ class Node
   x: (x) -> @p.x = x if x?; @p.x
   y: (y) -> @p.y = y if y?; @p.y
   z: (z) -> @p.z = z if z?; @p.z
+
+  mass: (mass) ->
+    if mass?
+      if mass is Node.AUTO_MASS and @autoMass is on
+        @m = @w * @h
+      else
+        @m = mass
+      if @varyMass in on
+        @m *= _.randomDualScale @mMax
+      if @autoSize is on
+        @w = @h = @m / @w
+    @m

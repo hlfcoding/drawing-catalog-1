@@ -2,6 +2,7 @@ class Wrap extends Node
 
   constructor: (params = Wrap.defaults) ->
 
+    _.defaults params, Wrap.defaults unless params is Wrap.defaults
     super params
 
     @_allForces = null
@@ -47,6 +48,7 @@ class Wrap extends Node
     contain: on # Contain nodes.
     drainAtEdge: on # Drain node inertia at edges.
     forceOptions: 0
+    customForces: {}
 
     autoMass: off
     gravity: off
@@ -80,3 +82,6 @@ class Wrap extends Node
 
     @defaults.frictionMag = 0.01 * sketch.state.speedFactor # constant * normal
 
+  ready: ->
+
+  updateNodeCount: ->
