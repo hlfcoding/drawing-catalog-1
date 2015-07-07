@@ -24,10 +24,6 @@ class Node
   Constants
   ###
 
-  @FORMLESS: 0
-  @BALL: 1 << 0
-  @LINE: 1 << 1
-
   @defaults: null
   @setup: ->
     Node.defaults =
@@ -56,48 +52,10 @@ class Node
         attrtDistMax: 25 # Avoid applying tiny attraction.
       wrap: null
 
-  constructor: (params = Node.defaults) ->
-
-    for name, p of params
-      # Account for constructing.
-      value = if name in ['p', 'v', 'a'] then new PVector p[0], p[1], p[2] else p
-      # Account for accessors.
-      if typeof @[name] is 'function' then @[name](value) else @[name] = value
-
-    @p.type = Vector.POSITION
-    @v.type = Vector.VELOCITY
-    @a.type = Vector.ACCELERATION
-
-    if not @m? then @mass Node.AUTO_MASS
-
   ###
   Accessors
   Sugar you should use.
   ###
-
-  width: (width) ->
-    if width?
-      @s.width = width
-      @mass Node.AUTO_MASS
-    @s.width
-
-  height: (height) ->
-    if height?
-      @s.height = height
-      @mass Node.AUTO_MASS
-    @s.height
-
-  x: (x) ->
-    if x? then @p.x = x
-    @p.x
-
-  y: (y) ->
-    if y? then @p.y = y
-    @p.y
-
-  z: (z) ->
-    if z? then @p.z = z
-    @p.z
 
   top: (top) ->
     if top? then @y top + @s.height / 2
@@ -114,18 +72,6 @@ class Node
   right: (right) ->
     if right? then @x right - @s.width / 2
     @x() + @s.width / 2
-
-  @AUTO_MASS: 1
-  mass: (mass) ->
-    if mass?
-      if mass is Node.AUTO_MASS and @should.autoMass
-        @m = @s.width * @s.height
-      else @m = mass
-      if @should.varyMass
-        @m *= _.randomDualScale @num.massMax
-      if @should.autoSize
-        @s.width = @s.height = @m / @s.width
-    @m
 
   fill: (fill) ->
     if fill? then @c.fill = fill

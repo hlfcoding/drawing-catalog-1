@@ -11,23 +11,6 @@ class Wrap extends Node
   @_screenStates - (Object<Array<ImageData>>)
   ###
 
-  ###
-  Constants (in order):
-  - containment
-  - screen-state - Private?
-  - layout-pattern
-  ###
-
-  @UNCONTAINED: 0
-  @REFLECTIVE: 1
-  @TOROIDAL: 2
-
-  @DEFAULT: 0
-  @TRACE: 1
-
-  @UNIFORM_PATTERN: 0
-  @RANDOM_PATTERN: 1
-
   @defaults: null
   @setup: ->
     # Don't extend Node.defaults.
@@ -69,24 +52,7 @@ class Wrap extends Node
       _needsClear: no
       _screenStates: {}
 
-  constructor: (params = Wrap.defaults) ->
-
-    super params
-
-    @_screenStates[Wrap.TRACE] = []
-    @_screenStates[Wrap.DEFAULT] = []
-    @nodes = []
-    @f.custom = []
-
   setupGUI: ->
-
-    return if not G.gui?
-
-    gui = G.gui.addFolder "Wrap #{@id}"
-
-    # Speed controls.
-    gui.add @, 'frictionMag', 0.001, 0.1
-    gui.add @.num, 'entropy', 0, 2
 
     # Edge controls.
     # Provide a ground as needed.
