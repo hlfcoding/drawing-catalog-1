@@ -74,8 +74,11 @@ class Node
 
     @defaults.attractConst = PVector.G / 10
 
+  # Public
+  # ======
+
   # Accessors
-  # =========
+  # ---------
 
   width: (w) ->
     if w?

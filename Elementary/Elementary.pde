@@ -97,7 +97,7 @@ _setupGUI: ->
   gui = new dat.GUI()
 
   toggle = gui.add @state, 'frozen'
-  toggle.onFinishChange (frozen) => @freeze frozen
+  toggle.onFinishChange (toggled) => @freeze toggled
 
   select = gui.add @state, 'frameRate',
     "Debug": frameRate.DEBUG
@@ -105,10 +105,29 @@ _setupGUI: ->
     "Film": frameRate.FILM
     "Video": frameRate.VIDEO
     "Real": frameRate.REAL
-  select.onFinishChange (frameRate) => @state.frameRate = parseInt frameRate, 10
+  select.onFinishChange (option) => @state.frameRate = parseInt option, 10
 
   range = gui.add @stage, 'frictionMag', 0.001, 0.1
   range = gui.add @stage, 'entropy', 0, 2
+
+  toggle = gui.add @stage, 'gravity'
+  toggle.onFinishChange (toggled) =>
+    @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL
+    @stage.toggleForce PVector.GRAVITY, toggled
+
+  select = gui.add @stage, 'containment'
+  select.onFinishChange (option) => @stage.containment = parseInt option, 10
+
+  range = gui.add @stage, 'nodeCount', 0, 500
+  range.onFinishChange (count) => @stage.updateNodeCount count
+
+  select = gui.add @stage.nodeParams, 'viewMode',
+    'Ball': Node.BALL
+    'Line': Node.LINE
+  select.onFinishChange (option) => @stage.onNodeViewModeChange viewMode
+
+  # TODO: Still has issues.
+  colorPicker = gui.addColor @stage, 'fill'
 
   dat.GUI.shared = gui
 

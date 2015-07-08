@@ -52,35 +52,6 @@ class Wrap extends Node
       _needsClear: no
       _screenStates: {}
 
-  setupGUI: ->
-
-    # Edge controls.
-    # Provide a ground as needed.
-    gui.add(@, 'hasGravity').onFinishChange (has) =>
-     @containment = if has then Wrap.REFLECTIVE else Wrap.TOROIDAL
-     @toggleForce Vector.GRAVITY, has
-    gui.add(@, 'containment',
-      'Reflective': Wrap.REFLECTIVE
-      'Toroidal': Wrap.TOROIDAL
-    ).listen().onFinishChange (type) => @containment = parseInt type, 10
-
-    # Population controls.
-    @nodeCount = @nodes.length
-    gui.add(@, 'nodeCount', 0, 500).onFinishChange (nodeCount) => @updateNodeCount nodeCount
-
-    # View controls.
-    # Additional binding glue required.
-    @nodeViewMode = @nodeParams.viewMode
-    gui.add(@, 'nodeViewMode',
-      'Ball': Node.BALL
-      'Line': Node.LINE
-    ).onFinishChange (viewMode) => @onNodeViewModeChange viewMode
-    # Additional binding glue required.
-    # TODO: Still has issues.
-    gui.addColor(@.c, 'fill').onChange (c) =>
-
-    gui.open()
-
   ###
   Binding
   ###

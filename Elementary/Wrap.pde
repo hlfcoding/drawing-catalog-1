@@ -15,6 +15,8 @@ class Wrap extends Node
     @nodes = []
     @forces = []
 
+    @nodeCount = @nodes.length
+
   # Static
   # ======
 
@@ -54,11 +56,8 @@ class Wrap extends Node
     gravity: off
     move: off
 
-    node:
-      count: null
-      params:
-        varyMass: on
-      viewMode: null
+    nodeParams:
+      varyMass: on
 
   @setup: ->
 
@@ -78,10 +77,24 @@ class Wrap extends Node
     @defaults.layoutPattern = Wrap.RANDOM
     @defaults.viewMode = Node.FORMLESS
 
-    @defaults.node.params.viewMode = Node.BALL
+    @defaults.nodeParams.viewMode = Node.BALL
 
     @defaults.frictionMag = 0.01 * sketch.state.speedFactor # constant * normal
 
-  ready: ->
+  # Public
+  # ======
 
-  updateNodeCount: ->
+  # Accessors
+  # ---------
+
+  ready: (isReady) ->
+
+  # Change
+  # ------
+
+  updateNodeCount: (count) ->
+
+  # Binding
+  # -------
+
+  toggleForce: (f, toggled) ->
