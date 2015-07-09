@@ -77,8 +77,21 @@ class Node
   # Public
   # ======
 
+  # TODO: Better freezing.
+  draw: ->
+
+  drawBoundsRect: -> rect @top(), @left(), @width(), @height()
+
   # Accessors
   # ---------
+
+  ###
+  Use accessors for public access when possible instead of the attributes, which
+  are generally protected outside of construction. Also note accessor names are
+  adjusted, so they don't conflict with their respective attributes. Lastly, the
+  main reason to wrap attributes in accessors is to allow for will-set and
+  did-set behaviors, as well as additional transformations.
+  ###
 
   width: (w) ->
     if w?
@@ -92,18 +105,34 @@ class Node
       @mass Node.AUTO_MASS
     @h
 
-  x: (x) -> @p.x = x if x?; @p.x
-  y: (y) -> @p.y = y if y?; @p.y
-  z: (z) -> @p.z = z if z?; @p.z
-
-  mass: (mass) ->
-    if mass?
-      if mass is Node.AUTO_MASS and @autoMass is on
+  mass: (m) ->
+    if m?
+      if m is Node.AUTO_MASS and @autoMass is on
         @m = @w * @h
       else
-        @m = mass
+        @m = m
       if @varyMass in on
         @m *= _.randomDualScale @mMax
       if @autoSize is on
         @w = @h = @m / @w
     @m
+
+  ###
+  As an exception, try to always use the position accessors, since they wrap a
+  complex object.
+  ###
+
+  x: (x) -> @p.x = x if x?; @p.x
+  y: (y) -> @p.y = y if y?; @p.y
+  z: (z) -> @p.z = z if z?; @p.z
+
+  ###
+  Note these assume ellipseMode or rectMode is CENTER.
+  ###
+
+  top: (t) -> @y (t + @h / 2) if t?; @y() - @h / 2
+  bottom: (b) -> @y (b - @h / 2) if b?; @y() + @h / 2
+  left: (l) -> @x (l + @w / 2) if l?; @x() - @w / 2
+  right: (r) -> @x (r - @w / 2) if r?; @x() + @w / 2
+
+  fillColor: (fc) -> @fill = color.ensure fc if fc?; @fill

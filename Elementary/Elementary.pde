@@ -82,6 +82,15 @@ _setupExtensions: ->
     @x = random width
     @y = random height
 
+  ###
+  Add helpers to the color API methods, mainly for conversion.
+  ###
+
+  # This should be less magical.
+  color.ensure = (c) -> if c > 0 then c - 16777216 else c
+
+  color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
+
 _setupClasses: ->
 
   Node.setup()
@@ -152,7 +161,7 @@ _setupStage: ->
 # Updaters
 # --------
 
-draw: ->
+draw: -> @stage.draw()
 
 freeze: (frozen) ->
 
@@ -165,4 +174,3 @@ freeze: (frozen) ->
 _updateSpeedFactor: ->
   @state.speedFactor = frameRate.REAL / @state.frameRate
   frameRate @state.frameRate
-

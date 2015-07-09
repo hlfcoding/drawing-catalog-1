@@ -110,33 +110,6 @@ class Wrap extends Node
   Inherited
   ###
 
-  draw: () ->
-
-    wasTracing = @should.trace
-    @should.trace = @nodeViewMode is Node.LINE
-    changeTracing = @should.trace isnt wasTracing
-
-    if wasTracing is yes and changeTracing is yes
-      @pushScreen Wrap.TRACE
-
-    if @should.trace and millis() % (G.fps * 10) is 0
-      # 'Layer' the canvas.
-      c = @fill()
-      fill red(c), green(c), blue(c), alpha(c) / 100
-      rect @top(), @left(), @width(), @height()
-      noFill()
-
-    if @should.trace is no or @_needsClear is yes
-      # Clear the canvas.
-      fill @fill()
-      rect @top(), @left(), @width(), @height()
-      # Sometimes when switching view modes, the canvas needs to be cleared and restored.
-      if @_needsClear is yes
-        @_needsClear = no
-        @popScreen()
-
-    n.draw() for n in @nodes
-
   mousePressed: -> n.mousePressed() for n in @nodes
 
   keyPressed: -> n.keyPressed() for n in @nodes

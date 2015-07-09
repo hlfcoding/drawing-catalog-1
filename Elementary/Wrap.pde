@@ -55,6 +55,7 @@ class Wrap extends Node
     autoMass: off
     gravity: off
     move: off
+    trace: off
 
     nodeParams:
       varyMass: on
@@ -72,6 +73,7 @@ class Wrap extends Node
     @defaults.height = height
 
     @defaults.fill = color.WHITE
+    @defaults.traceFill = @traceFillColor @defaults.fill
 
     @defaults.containment = Wrap.REFLECTIVE
     @defaults.layoutPattern = Wrap.RANDOM
@@ -81,11 +83,51 @@ class Wrap extends Node
 
     @defaults.frictionMag = 0.01 * sketch.state.speedFactor # constant * normal
 
+  @traceFillColor: (fc) -> color.transparentize fc, 0.01
+
+  # Inherited
+  # =========
+
+  draw: () ->
+
+    tracePrev = @trace
+    @trace = @nodeViewMode is Node.LINE
+
+    if tracePrev is on and @trace isnt tracePrev
+      @_pushScreen Wrap.TRACE
+
+    # 'Layer' the canvas if needed.
+    isTraceFrame = millis() % (sketch.state.frameRate * 10) is 0
+    if @trace is on and isTraceFrame
+      fill @getTraceFillColor()
+      @drawBoundsRect()
+      noFill()
+
+    # Clear the canvas if needed.
+    if @trace is off or @_needsClear
+      fill @fillColor()
+      @drawBoundsRect()
+      # Sometimes when switching view modes, the canvas needs to be cleared and restored.
+      if @_needsClear
+        @_needsClear = no
+        @_popScreen()
+
+    n.draw() for n in @nodes
+
+  # Accessors
+  # ---------
+
+  fillColor: (fc) ->
+    @traceFill = @traceFillColor fc if fc?
+    super fc
+
   # Public
   # ======
 
   # Accessors
   # ---------
+
+  getTraceFillColor: -> @traceFill
 
   ready: (isReady) ->
 
@@ -98,3 +140,14 @@ class Wrap extends Node
   # -------
 
   toggleForce: (f, toggled) ->
+
+  # Protected
+  # =========
+
+  # Documenting
+  # -----------
+  # TODO: I think that's their purpose?
+
+  _pushScreen: (customStack) ->
+
+  _popScreen: ->

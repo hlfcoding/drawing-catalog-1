@@ -57,26 +57,6 @@ class Node
   Sugar you should use.
   ###
 
-  top: (top) ->
-    if top? then @y top + @s.height / 2
-    @y() - @s.height / 2
-
-  bottom: (bottom) ->
-    if bottom? then @y bottom - @s.height / 2
-    @y() + @s.height / 2
-
-  left: (left) ->
-    if left? then @x left + @s.width / 2
-    @x() - @s.width / 2
-
-  right: (right) ->
-    if right? then @x right - @s.width / 2
-    @x() + @s.width / 2
-
-  fill: (fill) ->
-    if fill? then @c.fill = fill
-    _.trueColor @c.fill
-
   stroke: (stroke) ->
     if stroke? then @c.stroke = stroke
     _.trueColor @c.stroke
