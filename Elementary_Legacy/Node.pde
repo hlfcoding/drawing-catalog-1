@@ -121,18 +121,6 @@ class Node
 
   keyPressed: ->
 
-  # Caching allows the resulting acceleration to be committed into cache and reused later as base.
-  cacheAcceleration: -> @_aCached = @a.get()
-
-  # Chainable.
-  applyForce: (vec, toggle = on) ->
-
-    mutableVec = vec.get()
-    if vec.type isnt Vector.GRAVITY
-      mutableVec.div @m
-    if toggle is on then @a.add vec else @a.sub vec
-    @
-
   move: ->
 
     @v.add @a
@@ -163,7 +151,5 @@ class Node
   # TODO - Hit area.
   # TODO - Primitive shape types.
   overlapsWith: (x, y) -> dist(@x(), @y(), x, y) < @width()
-
-  log: -> console.info @
 
 _.extend Node::, Event.mixin

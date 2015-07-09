@@ -25,6 +25,8 @@ class Node
 
     @mass Node.AUTO_MASS unless @m?
 
+    @_aCached = null
+
   # Static
   # ======
 
@@ -82,12 +84,30 @@ class Node
 
   drawBoundsRect: -> rect @top(), @left(), @width(), @height()
 
+  log: -> console.info @
+
+  # Physics
+  # -------
+
+  applyForce: (vec, toggled = on) ->
+    mutableVec = vec.get()
+    mutableVec.div @m if vec.type isnt PVector.GRAVITY
+    if toggled is on then @a.add(vec) else @a.sub(vec)
+    @ # Chaining.
+
+  ###
+  Caching allows the resulting acceleration to be committed into cache and
+  reused later as base.
+  ###
+
+  cacheAcceleration: -> @_aCached = @a.get()
+
   # Accessors
   # ---------
 
   ###
   Use accessors for public access when possible instead of the attributes, which
-  are generally protected outside of construction. Also note accessor names are
+  are generally private outside of construction. Also note accessor names are
   adjusted, so they don't conflict with their respective attributes. Lastly, the
   main reason to wrap attributes in accessors is to allow for will-set and
   did-set behaviors, as well as additional transformations.

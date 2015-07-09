@@ -91,7 +91,7 @@ class Wrap extends Node
   draw: () ->
 
     tracePrev = @trace
-    @trace = @nodeViewMode is Node.LINE
+    @trace = @nodeParams.viewMode is Node.LINE
 
     if tracePrev is on and @trace isnt tracePrev
       @_pushScreen Wrap.TRACE
@@ -124,17 +124,37 @@ class Wrap extends Node
   # Public
   # ======
 
+  updateNodeCount: (count) ->
+    count ?= parseInt @width() * @density # Infer if needed.
+    currentCount = @nodes.length
+    # Contract if needed.
+    if count < currentCount
+      # Return nodes removed.
+      return (@nodes.pop() for i in [(currentCount - 1)...count])
+    # Or expand.
+    hasGravity = !!(@forceOptions & PVector.GRAVITY)
+    gravity = PVector.createGravity() if hasGravity
+    # TODO: Why 1-index?
+    for i in [1...(count - currentCount)]
+      do (i) =>
+        nodeParams = _.extend {}, @nodeParams,
+          id: currentCount + i
+          wrap: @
+        n = new Node nodeParams
+        n.p.randomize() if @layoutPattern is Wrap.RANDOM
+        n.applyForce gravity if hasGravity
+        n.applyForce f for own name, f in @customForces
+        n.cacheAcceleration()
+        n.log() if i is 1 # Log once.
+        @nodes.push n
+
+
   # Accessors
   # ---------
 
   getTraceFillColor: -> @traceFill
 
   ready: (isReady) ->
-
-  # Change
-  # ------
-
-  updateNodeCount: (count) ->
 
   # Binding
   # -------

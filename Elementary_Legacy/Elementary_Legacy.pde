@@ -13,10 +13,6 @@ G =
 System functions.
 ###
 
-draw: ->
-
-  G.stage.draw()
-
 mousePressed: ->
 
   G.responded.mousePressed = no

@@ -118,35 +118,6 @@ class Wrap extends Node
   Public
   ###
 
-  updateNodeCount: (count) ->
-    # Infer count as needed.
-    count ?= parseInt @width() * @num.density
-    currentCount = @nodes.length
-    shouldContract = count < currentCount
-    # Contract.
-    if shouldContract
-      @nodes.pop() for i in [(currentCount - 1)...count]
-      return
-    # Setup forces.
-    if @f.options & Vector.GRAVITY then gravity = Vector.gravity()
-    # Or expand.
-    for i in [1...(count - currentCount)]
-      do (i, defaults = Node.defaults) =>
-        n = new Node _.extend true, {}, defaults, @nodeParams,
-          id: currentCount + i
-          wrap: @
-          viewMode: if @nodeViewMode? then @nodeViewMode else @nodeParams.viewMode
-        # Additional setup.
-        if @layoutPattern is Wrap.RANDOM_PATTERN then n.p.randomize()
-        # Introduce forces.
-        if @f.options & Vector.GRAVITY then n.applyForce gravity
-        n.applyForce(f) for f in @f.custom
-        n.cacheAcceleration()
-        # Log once.
-        if i is 1 then n.log()
-        # Add.
-        G.stage.nodes.push n
-
   nodeMoved: (n) ->
 
     @applyFrictionForNode n
