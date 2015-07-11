@@ -93,18 +93,6 @@ class Wrap extends Node
   top: -> @y()
   right: -> @width() + @left()
   bottom: -> @height() + @top()
-  $canvas: -> $('canvas')
-  canvas: -> @$canvas().get(0)
-  ready: (isReady) ->
-    if isReady?
-      # DOM-ready-dependent initialization.
-      @_isReady = isReady
-      if isReady is yes
-        @trigger 'ready'
-        @$canvas().focus()
-        @onNodeViewModeChange()
-        @log()
-    @_isReady
 
   ###
   Inherited

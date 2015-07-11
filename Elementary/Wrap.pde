@@ -148,18 +148,32 @@ class Wrap extends Node
         n.log() if i is 1 # Log once.
         @nodes.push n
 
-
   # Accessors
   # ---------
 
+  canvasElement: -> document.querySelector 'canvas'
+
   getTraceFillColor: -> @traceFill
 
-  ready: (isReady) ->
+  ready: (r) -> @_ready = r if r?; @onReady() if r; @_ready
 
   # Binding
   # -------
 
   toggleForce: (f, toggled) ->
+
+  # Callbacks
+  # ---------
+
+  nodeMoved: (n) ->
+
+  onNodeViewModeChange: ->
+
+  onReady: ->
+    n.onWrapReady @ for n in @nodes
+    @canvasElement().focus()
+    @onNodeViewModeChange()
+    @log()
 
   # Protected
   # =========

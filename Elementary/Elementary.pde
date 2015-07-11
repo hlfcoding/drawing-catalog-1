@@ -137,6 +137,7 @@ _setupGUI: ->
 
   # TODO: Still has issues.
   colorPicker = gui.addColor @stage, 'fill'
+  colorPicker.onFinishChange (color) => @stage.fillColor color
 
   dat.GUI.shared = gui
 
