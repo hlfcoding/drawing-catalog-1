@@ -168,7 +168,12 @@ class Wrap extends Node
 
   nodeMoved: (n) ->
 
-  onNodeViewModeChange: ->
+  onNodeViewModeChange: (vm) ->
+    if vm?
+      @nodeParams.viewMode = vm
+      n.viewMode = vm for n in @nodes
+    @_needsClear = @nodeParams.viewMode is Node.LINE
+    @draw()
 
   onReady: ->
     n.onWrapReady @ for n in @nodes

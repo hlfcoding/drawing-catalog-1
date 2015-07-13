@@ -56,15 +56,6 @@ class Wrap extends Node
   Binding
   ###
 
-  onNodeViewModeChange: (viewMode) ->
-    # Beware of dat-GUI type-conversion bugs.
-    if viewMode?
-      @nodeViewMode = parseInt(viewMode, 10)
-      (n.viewMode = viewMode) for n in @nodes
-    else @nodeViewMode = @nodeParams.viewMode
-    @_needsClear = @nodeViewMode is Node.LINE
-    @draw()
-
   toggleForce: (f, toggle) ->
     return if not toggle?
     @f._allCustom ?= @f.custom

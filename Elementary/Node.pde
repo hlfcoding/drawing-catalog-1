@@ -194,7 +194,7 @@ class Node
       if m isnt Node.AUTO_MASS then @m = m
       else if @autoMass is on then @m = @w * @h
       # Support varySize.
-      @m *= _.randomDualScale @mMax if @varyMass in on
+      @m *= random.dualScale @mMax if @varyMass in on
       # Support autoSize.
       @w = @h = @m / @w if @autoSize is on and @m?
     @m

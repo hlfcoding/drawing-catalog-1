@@ -91,6 +91,12 @@ _setupExtensions: ->
 
   color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
 
+  ###
+  Add helpers to number methods, mainly for macro-calculations.
+  ###
+
+  random.dualScale = (n) -> random(1, n) / random(1, n)
+
 _setupClasses: ->
 
   Node.setup()
@@ -133,11 +139,10 @@ _setupGUI: ->
   select = gui.add @stage.nodeParams, 'viewMode',
     'Ball': Node.BALL
     'Line': Node.LINE
-  select.onFinishChange (option) => @stage.onNodeViewModeChange viewMode
+  select.onFinishChange (option) => @stage.onNodeViewModeChange parseInt option, 10
 
   # TODO: Still has issues.
   colorPicker = gui.addColor @stage, 'fill'
-  colorPicker.onFinishChange (color) => @stage.fillColor color
 
   dat.GUI.shared = gui
 
