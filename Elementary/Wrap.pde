@@ -69,9 +69,6 @@ class Wrap extends Node
 
     _.defaults @defaults, Node.defaults
 
-    @defaults.width = width
-    @defaults.height = height
-
     @defaults.fill = color.WHITE
     @defaults.traceFill = @traceFillColor @defaults.fill
 
@@ -117,8 +114,13 @@ class Wrap extends Node
   # Accessors
   # ---------
 
+  left: -> @x()
+  top: -> @y()
+  right: -> @w + @left()
+  bottom: -> @h + @top()
+
   fillColor: (fc) ->
-    @traceFill = @traceFillColor fc if fc?
+    @traceFill = Wrap.traceFillColor fc if fc?
     super fc
 
   # Public

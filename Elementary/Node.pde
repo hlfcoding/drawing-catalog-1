@@ -16,7 +16,10 @@ class Node
         [x, y, z] = value
         value = new PVector x, y, z
       # Account for accessors.
-      if typeof @[name] is 'function' then @[name](value)
+      accessor = @[name]
+      accessor ?= @[Node.ATTRIBUTE_TO_ACCESSOR[name]]
+      accessor ?= @["#{name}Color"]
+      if typeof accessor is 'function' then accessor.call @, value
       else @[name] = value
 
     @p.type = PVector.POSITION
@@ -39,6 +42,11 @@ class Node
   @LINE: 1 << 1
 
   @AUTO_MASS: 1
+
+  @ATTRIBUTE_TO_ACCESSOR:
+    w: 'width'
+    h: 'height'
+    m: 'mass'
 
   @defaults:
 
@@ -175,14 +183,13 @@ class Node
 
   mass: (m) ->
     if m?
-      if m is Node.AUTO_MASS and @autoMass is on
-        @m = @w * @h
-      else
-        @m = m
-      if @varyMass in on
-        @m *= _.randomDualScale @mMax
-      if @autoSize is on
-        @w = @h = @m / @w
+      # Support autoMass.
+      if m isnt Node.AUTO_MASS then @m = m
+      else if @autoMass is on then @m = @w * @h
+      # Support varySize.
+      @m *= _.randomDualScale @mMax if @varyMass in on
+      # Support autoSize.
+      @w = @h = @m / @w if @autoSize is on and @m?
     @m
 
   ###

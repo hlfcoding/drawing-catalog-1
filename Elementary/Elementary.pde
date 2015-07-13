@@ -154,6 +154,8 @@ _setupStage: ->
     containment: Wrap.TOROIDAL
     customForces:
       wind: new PVector 0.001, 0
+    h: height
+    w: width
 
   @stage.updateNodeCount()
 
