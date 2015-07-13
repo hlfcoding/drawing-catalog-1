@@ -97,6 +97,17 @@ _setupExtensions: ->
 
   random.dualScale = (n) -> random(1, n) / random(1, n)
 
+  ###
+  Add core helpers.
+  ###
+
+  # Currently unused.
+  Processing.isKindOfClass = (obj, aClass) ->
+    test = obj.constructor is aClass
+    if not bool and obj.constructor.__super__?
+      test = isKindOfClass obj.constructor.__super__, aClass
+    test
+
 _setupClasses: ->
 
   Node.setup()
