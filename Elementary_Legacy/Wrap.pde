@@ -85,16 +85,6 @@ class Wrap extends Node
       n.cacheAcceleration()
 
   ###
-  Accessors
-  Sugar you should use.
-  ###
-
-  left: -> @x()
-  top: -> @y()
-  right: -> @width() + @left()
-  bottom: -> @height() + @top()
-
-  ###
   Inherited
   ###
 

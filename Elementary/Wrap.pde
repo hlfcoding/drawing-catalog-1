@@ -86,7 +86,6 @@ class Wrap extends Node
   # =========
 
   draw: () ->
-
     tracePrev = @trace
     @trace = @nodeParams.viewMode is Node.LINE
 
