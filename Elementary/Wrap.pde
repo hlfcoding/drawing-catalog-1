@@ -64,7 +64,7 @@ class Wrap extends Node
 
     ###
     This needs to be called for the class to be ready for use. Some default
-    params reference other values not ready on initial declaration.
+    attributes reference other values not ready on initial declaration.
     ###
 
     _.defaults @defaults, Node.defaults

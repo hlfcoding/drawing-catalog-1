@@ -10,17 +10,15 @@ class Node
 
     _.defaults params, Node.defaults unless params is Node.defaults
 
-    for name, value of params
+    for attribute, value of params
       # Account for constructing.
       if value instanceof Array and value.length is 3
         [x, y, z] = value
         value = new PVector x, y, z
       # Account for accessors.
-      accessor = @[name]
-      accessor ?= @[Node.ATTRIBUTE_TO_ACCESSOR[name]]
-      accessor ?= @["#{name}Color"]
-      if typeof accessor is 'function' then accessor.call @, value
-      else @[name] = value
+      accessor = @getAccessor attribute
+      if accessor? then accessor value
+      else @[attribute] = value
 
     @p.type = PVector.POSITION
     @v.type = PVector.VELOCITY
@@ -74,7 +72,7 @@ class Node
 
     ###
     This needs to be called for the class to be ready for use. Some default
-    params reference other values not ready on initial declaration.
+    attributes reference other values not ready on initial declaration.
     ###
 
     @defaults.fill = color.BLACK
@@ -168,6 +166,13 @@ class Node
   main reason to wrap attributes in accessors is to allow for will-set and
   did-set behaviors, as well as additional transformations.
   ###
+
+  getAccessor: (attribute) ->
+    accessor = @[attribute]
+    accessor ?= @[Node.ATTRIBUTE_TO_ACCESSOR[attribute]]
+    accessor ?= @["#{attribute}Color"]
+    return accessor.bind @ if typeof accessor is 'function'
+    undefined
 
   width: (w) ->
     if w?
