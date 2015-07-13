@@ -174,6 +174,14 @@ freeze: (frozen) ->
   LiveReload is used.
   ###
 
+  frozen ?= @state.frozen
+
+  n.move = !frozen for n in @stage.nodes
+  if frozen then noLoop()
+  else @loop()
+
+  @state.frozen = frozen
+
 _updateSpeedFactor: ->
   @state.speedFactor = frameRate.REAL / @state.frameRate
   frameRate @state.frameRate

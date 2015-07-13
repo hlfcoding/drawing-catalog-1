@@ -103,6 +103,8 @@ class Node
       stroke color.transparentize(@strokeColor(), 0.33)
       line @x(), @y(), @px(), @py()
 
+    @updateStorage()
+
   drawBoundsRect: -> rect @top(), @left(), @width(), @height()
 
   shouldDrawLine: -> @pPrev? and @p.dist(@pPrev) < width
