@@ -131,7 +131,6 @@ class Node
     mutableVec = vec.get()
     mutableVec.div @m if vec.type isnt PVector.GRAVITY
     if toggled is on then @a.add(vec) else @a.sub(vec)
-    @ # Chaining.
 
   attractNode: (n) ->
     f = PVector.sub @p, n.p

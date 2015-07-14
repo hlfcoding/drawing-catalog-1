@@ -13,7 +13,6 @@ class Wrap extends Node
     @_screenStates[Wrap.DEFAULT] = []
 
     @nodes = []
-    @forces = []
 
     @nodeCount = @nodes.length
 
@@ -50,7 +49,7 @@ class Wrap extends Node
     contain: on # Contain nodes.
     drainAtEdge: on # Drain node inertia at edges.
     forceOptions: 0
-    customForces: {}
+    customForces: []
 
     autoMass: off
     gravity: off
@@ -144,10 +143,71 @@ class Wrap extends Node
         n = new Node nodeParams
         n.p.randomize() if @layoutPattern is Wrap.RANDOM
         n.applyForce gravity if hasGravity
-        n.applyForce f for own name, f in @customForces
+        n.applyForce f for f in @customForces
         n.cacheAcceleration()
         n.log() if i is 1 # Log once.
         @nodes.push n
+
+  updateNodeContainment: (n) ->
+    shift = if @gravity is on then 1 else (1 - @entropy)
+
+    if @containment is Wrap.REFLECTIVE
+      do (v = n.v) =>
+        if n.right() > @right()
+          n.right @right()
+          v.x *= -shift if v.x > 0
+        else if n.left() < @left()
+          n.left @left()
+          v.x *= -shift if v.x < 0
+        if n.bottom() > @bottom()
+          n.bottom @bottom()
+          v.y *= -shift if v.y > 0
+        else if n.y() < @top()
+          n.top @top()
+          v.y *= -shift if v.y < 0
+
+    else if @containment is Wrap.TOROIDAL
+      contained = { x: yes, y: yes }
+
+      if n.left() > @right() then n.right @left()
+      else if n.right() < @left() then n.left @right()
+      else contained.x = no
+      if n.top() > @bottom() then n.bottom @top()
+      else if n.bottom() < @top() then n.top @bottom()
+      else contained.y = no
+
+      if @drainAtEdge is on and (contained.x or contained.y)
+        n.v.normalize()
+        n.a.normalize()
+
+  # Physics
+  # -------
+
+  applyNodeFriction: (n) ->
+    friction = n.v.get()
+    friction.normalize()
+    friction.mult -1
+    friction.mult @frictionMag
+    n.applyForce friction
+
+  toggleForce: (f, toggled) ->
+    return no unless toggled?
+    @_allForces ?= @customForces
+    isForceOption = typeof f is 'number'
+    isForceName = f in @_allForces
+
+    if isForceOption
+      vec = PVector.createGravity() if f is PVector.GRAVITY
+      if toggled is on then @forceOptions |= f else @forceOptions ^= f
+
+    else if isForceName
+      vec = @_allForces[f]
+      if toggled is on then @customForces.push vec
+      else @customForces.splice @customForces.indexOf(vec), 1
+
+    if vec? then for n in @nodes
+      n.applyForce vec, toggled
+      n.cacheAcceleration()
 
   # Accessors
   # ---------
@@ -158,15 +218,12 @@ class Wrap extends Node
 
   ready: (r) -> @_ready = r if r?; @onReady() if r; @_ready
 
-  # Binding
-  # -------
-
-  toggleForce: (f, toggled) ->
-
   # Callbacks
   # ---------
 
   nodeMoved: (n) ->
+    @applyNodeFriction n
+    @updateNodeContainment n if @contain is on
 
   onNodeViewModeChange: (vm) ->
     if vm?

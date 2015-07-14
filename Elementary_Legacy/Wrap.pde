@@ -53,29 +53,6 @@ class Wrap extends Node
       _screenStates: {}
 
   ###
-  Binding
-  ###
-
-  toggleForce: (f, toggle) ->
-    return if not toggle?
-    @f._allCustom ?= @f.custom
-    if typeof f is 'number' # Force option.
-      # Vector.
-      switch f
-        when Vector.GRAVITY then vec = Vector.gravity()
-      # Update.
-      if toggle then @f.options |= f else @f.options ^= f
-    else if f in @f._allCustom # Force name.
-      # Vector.
-      vec = @f._allCustom[f]
-      # Update.
-      if toggle then @f.custom.push vec
-      else _.remove @f.custom, vec
-    if vec? then for n in @nodes
-      n.applyForce(vec, toggle)
-      n.cacheAcceleration()
-
-  ###
   Inherited
   ###
 
@@ -86,54 +63,6 @@ class Wrap extends Node
   ###
   Public
   ###
-
-  nodeMoved: (n) ->
-
-    @applyFrictionForNode n
-    if @should.contain is yes then @checkEdgesForNode n
-
-  applyFrictionForNode: (n) ->
-
-    f = n.v.get()
-    f.normalize()
-    f.mult -1
-    f.mult @frictionMag
-    n.applyForce f
-
-  checkEdgesForNode: (n) ->
-
-    shift = if @hasGravity then 1 else (1 - @num.entropy)
-
-    if @containment is Wrap.REFLECTIVE
-      # X
-      if n.right() > @right()
-        n.right @right()
-        if n.v.x > 0 then n.v.x *= -shift
-      else if n.x() < @left()
-        n.left @left()
-        if n.v.x < 0 then n.v.x *= -shift
-      # Y
-      if n.y() > @bottom()
-        n.bottom @bottom()
-        if n.v.y > 0 then n.v.y *= -shift
-      else if n.y() < @top()
-        n.top @top()
-        if n.v.y < 0 then n.v.y *= -shift
-
-    else if @containment is Wrap.TOROIDAL
-      didContain = { x: yes, y: yes }
-      # X
-      if n.left() > @right() then       n.right @left()
-      else if n.right() < @left() then  n.left @right()
-      else didContain.x = no
-      # Y
-      if n.top() > @bottom() then       n.bottom @top()
-      else if n.bottom() < @top() then  n.top @bottom()
-      else didContain.y = no
-
-      if (didContain.x or didContain.y) and @should.drainAtEdge
-        n.v.normalize()
-        n.a.normalize()
 
   _prepScreenOp: -> [@canvas().getContext('2d'), if @should.trace is yes then Wrap.TRACE else Wrap.DEFAULT]
 

@@ -165,11 +165,11 @@ _setupStage: ->
   The sketch only has one Wrap, and filling the sketch, it acts like a 'stage'.
   ###
 
+  wind = new PVector 0.001, 0
   @stage = new Wrap
     id: 1
     containment: Wrap.TOROIDAL
-    customForces:
-      wind: new PVector 0.001, 0
+    customForces: [ wind ]
     h: height
     w: width
 
