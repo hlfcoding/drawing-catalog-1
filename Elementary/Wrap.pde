@@ -8,9 +8,10 @@ class Wrap extends Node
     @_allForces = null
     @_isReady = no
     @_needsClear = no
-    @_screenStates = {}
-    @_screenStates[Wrap.TRACE] = []
-    @_screenStates[Wrap.DEFAULT] = []
+
+    @_screenStacks = {}
+    @_screenStacks[Wrap.TRACE] = []
+    @_screenStacks[Wrap.DEFAULT] = []
 
     @nodes = []
 
@@ -245,10 +246,21 @@ class Wrap extends Node
   # Protected
   # =========
 
-  # Documenting
-  # -----------
-  # TODO: I think that's their purpose?
+  # Canvas State
+  # ------------
+
+  _screenUpdateVars: ->
+    context = @canvasElement().getContext '2d'
+    stack = if @trace is on then Wrap.TRACE else Wrap.DEFAULT
+    [context, stack]
 
   _pushScreen: (customStack) ->
+    [context, stack] = @_screenUpdateVars()
+    stack = customStack if customStack?
+    screen = context.getImageData @left(), @top(), @w, @h
+    @_screenStacks[stack].push screen
 
   _popScreen: ->
+    [context, stack] = @_screenUpdateVars()
+    return unless @_screenStacks[stack].length
+    context.putImageData @_screenStacks[stack].pop(), @left(), @top()
