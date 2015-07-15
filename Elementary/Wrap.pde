@@ -221,6 +221,10 @@ class Wrap extends Node
   # Callbacks
   # ---------
 
+  mouseClicked: ->
+    for n in @nodes
+      break if n.handleClick { mouseX, mouseY }
+
   nodeMoved: (n) ->
     @applyNodeFriction n
     @updateNodeContainment n if @contain is on

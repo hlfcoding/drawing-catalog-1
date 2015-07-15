@@ -205,3 +205,8 @@ freeze: (frozen) ->
 _updateSpeedFactor: ->
   @state.speedFactor = frameRate.REAL / @state.frameRate
   frameRate @state.frameRate
+
+# Responders
+# ----------
+
+mouseClicked: -> @stage.mouseClicked()

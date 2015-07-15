@@ -110,6 +110,11 @@ class Node
 
   shouldDrawLine: -> @pPrev? and @p.dist(@pPrev) < width
 
+  toggleAttraction: ->
+    @attract = not @attract
+    @_pFill ?= @fill
+    @fillColor if @attract then color.RED else @_pFill
+
   updateAttraction: -> @attractNode n for n in @neighbors()
 
   updateMovement: ->
@@ -124,6 +129,13 @@ class Node
       if @shouldDrawLine() then @pPrev.set @p else @pPrev = @p.get()
 
   log: -> console.info @
+
+  # Geometry
+  # --------
+
+  # TODO - Configurable hit area.
+  overlapsWith: (x, y) ->
+    abs(@x() - x) < (@w / 2) and abs(@y() - y) < (@h / 2)
 
   # Physics
   # -------
@@ -233,5 +245,10 @@ class Node
 
   # Callbacks
   # ---------
+
+  handleClick: (c) ->
+    should = @overlapsWith c.mouseX, c.mouseY
+    return no unless should
+    @toggleAttraction()
 
   onWrapReady: (wrap) -> @neighbors wrap.nodes

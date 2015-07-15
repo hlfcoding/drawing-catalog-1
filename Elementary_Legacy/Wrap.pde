@@ -52,18 +52,6 @@ class Wrap extends Node
       _needsClear: no
       _screenStates: {}
 
-  ###
-  Inherited
-  ###
-
-  mousePressed: -> n.mousePressed() for n in @nodes
-
-  keyPressed: -> n.keyPressed() for n in @nodes
-
-  ###
-  Public
-  ###
-
   _prepScreenOp: -> [@canvas().getContext('2d'), if @should.trace is yes then Wrap.TRACE else Wrap.DEFAULT]
 
   pushScreen: (forcedStack) ->
