@@ -14,8 +14,6 @@ class Wrap extends Node
 
     @nodes = []
 
-    @nodeCount = @nodes.length
-
   # Static
   # ======
 
@@ -147,6 +145,8 @@ class Wrap extends Node
         n.cacheAcceleration()
         n.log() if i is 1 # Log once.
         @nodes.push n
+    # Observable value for datGUI
+    @nodeCount ?= @nodes.length
 
   updateNodeContainment: (n) ->
     shift = if @gravity is on then 1 else (1 - @entropy)

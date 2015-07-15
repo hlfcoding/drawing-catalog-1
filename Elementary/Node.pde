@@ -27,6 +27,7 @@ class Node
     @mass Node.AUTO_MASS unless @m?
 
     @_aCached = null
+    @_pFill = null
 
   # Static
   # ======
@@ -62,7 +63,7 @@ class Node
     attractDistMin: 5 # Avoid applying huge attraction.
     attractDistMax: 25 # Avoid applying tiny attraction.
 
-    attract: on
+    attract: off
     autoMass: on
     autoSize: on
     move: on
@@ -227,7 +228,7 @@ class Node
   wrap: (wrap) ->
     if wrap?
       @_wrap = wrap
-      if wrap.ready() then @onWrapReady()
+      if wrap.ready() then @onWrapReady wrap
     @_wrap
 
   # Callbacks

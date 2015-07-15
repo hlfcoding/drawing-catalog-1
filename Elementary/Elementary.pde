@@ -126,11 +126,11 @@ _setupGUI: ->
   toggle.onFinishChange (toggled) => @freeze toggled
 
   select = gui.add @state, 'frameRate',
-    "Debug": frameRate.DEBUG
-    "Animation": frameRate.ANIMATION
-    "Film": frameRate.FILM
-    "Video": frameRate.VIDEO
-    "Real": frameRate.REAL
+    'Debug': frameRate.DEBUG
+    'Animation': frameRate.ANIMATION
+    'Film': frameRate.FILM
+    'Video': frameRate.VIDEO
+    'Real': frameRate.REAL
   select.onFinishChange (option) => @state.frameRate = parseInt option, 10
 
   range = gui.add @stage, 'frictionMag', 0.001, 0.1
@@ -141,7 +141,9 @@ _setupGUI: ->
     @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL
     @stage.toggleForce PVector.GRAVITY, toggled
 
-  select = gui.add @stage, 'containment'
+  select = gui.add @stage, 'containment',
+    'Reflective': Wrap.REFLECTIVE
+    'Toroidal': Wrap.TOROIDAL
   select.onFinishChange (option) => @stage.containment = parseInt option, 10
 
   range = gui.add @stage, 'nodeCount', 0, 500
@@ -154,6 +156,8 @@ _setupGUI: ->
 
   # TODO: Still has issues.
   colorPicker = gui.addColor @stage, 'fill'
+  colorPicker.onChange (color) => @stage.fillColor color
+  colorPicker.onFinishChange (color) => @stage.fillColor color
 
   dat.GUI.shared = gui
 
