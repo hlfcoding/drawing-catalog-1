@@ -14,17 +14,17 @@ setup: ->
 
   @_setupConstants()
   @_setupExtensions()
-  @_setupClasses()
 
   @state.frameRate = frameRate.FILM
+  @_updateSpeedFactor()
+  # Class defaults may require additional globals.
+  @_setupClasses()
 
   colorMode RGB, 255
   noStroke()
 
   [w, h] = size.MEDIUM
   size w, h
-
-  @_updateSpeedFactor()
 
   background color.WHITE
   
