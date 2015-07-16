@@ -108,7 +108,7 @@ class Node
 
   drawBoundsRect: -> rect @top(), @left(), @width(), @height()
 
-  shouldDrawLine: -> @pPrev? and @p.dist(@pPrev) < width
+  shouldDrawLine: -> @pPrev? and @p.dist(@pPrev) < @w
 
   toggleAttraction: ->
     @attract = not @attract
