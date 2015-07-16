@@ -124,7 +124,7 @@ class Wrap extends Node
     fill @fillColor()
     @drawBoundsRect()
 
-  updateNodeCount: (count) ->
+  updateNodeCount: (count, customNodeParams) ->
     count ?= parseInt @width() * @density # Infer if needed.
     currentCount = @nodes.length
     # Contract if needed.
@@ -137,11 +137,11 @@ class Wrap extends Node
     # TODO: Why 1-index?
     for i in [1...(count - currentCount)]
       do (i) =>
-        nodeParams = _.extend {}, @nodeParams,
+        nodeParams = _.extend {}, @nodeParams, customNodeParams,
           id: currentCount + i
           wrap: @
         n = new Node nodeParams
-        n.p.randomize() if @layoutPattern is Wrap.RANDOM
+        n.p.randomize() if @layoutPattern is Wrap.RANDOM and not customNodeParams?.p?
         n.applyForce gravity if hasGravity
         n.applyForce f for f in @customForces
         n.cacheAcceleration()
@@ -222,8 +222,14 @@ class Wrap extends Node
   # ---------
 
   mouseClicked: ->
-    for n in @nodes
-      break if n.handleClick { mouseX, mouseY }
+    handled = _.any @nodes, (n) ->
+      n.handleClick { mouseX, mouseY }
+    , @
+    return if handled
+    # Add attractor node in empty space.
+    @updateNodeCount @nodes.length,
+      attract: on
+      p: [ mouseX, mouseY, 0 ]
 
   nodeMoved: (n) ->
     @applyNodeFriction n
