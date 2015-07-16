@@ -171,6 +171,8 @@ _setupGUI: ->
     'Line': Node.LINE
   select.onFinishChange (option) => @stage.onNodeViewModeChange parseInt option, 10
 
+  button = folder.add @stage, 'clear'
+
   dat.GUI.shared = gui
 
   gui.open()

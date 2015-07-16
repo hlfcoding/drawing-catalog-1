@@ -120,6 +120,10 @@ class Wrap extends Node
   # Public
   # ======
 
+  clear: ->
+    fill @fillColor()
+    @drawBoundsRect()
+
   updateNodeCount: (count) ->
     count ?= parseInt @width() * @density # Infer if needed.
     currentCount = @nodes.length
