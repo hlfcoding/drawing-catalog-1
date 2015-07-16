@@ -122,10 +122,12 @@ _setupGUI: ->
 
   gui = new dat.GUI()
 
-  toggle = gui.add @state, 'frozen'
+  folder = gui.addFolder 'sketch'
+
+  toggle = folder.add @state, 'frozen'
   toggle.onFinishChange (toggled) => @freeze toggled
 
-  select = gui.add @state, 'frameRate',
+  select = folder.add @state, 'frameRate',
     'Debug': frameRate.DEBUG
     'Animation': frameRate.ANIMATION
     'Film': frameRate.FILM
@@ -133,31 +135,36 @@ _setupGUI: ->
     'Real': frameRate.REAL
   select.onFinishChange (option) => @state.frameRate = parseInt option, 10
 
-  range = gui.add @stage, 'frictionMag', 0.001, 0.1
-  range = gui.add @stage, 'entropy', 0, 2
+  folder = gui.addFolder 'colors'
 
-  toggle = gui.add @stage, 'gravity'
+  # TODO: Still has issues.
+  colorPicker = folder.addColor @stage, 'fill'
+  colorPicker.onChange (color) => @stage.fillColor color
+  colorPicker.onFinishChange (color) => @stage.fillColor color
+
+  folder = gui.addFolder 'stage'
+
+  range = folder.add @stage, 'frictionMag', 0.001, 0.1
+
+  range = folder.add @stage, 'entropy', 0, 2
+
+  range = folder.add @stage, 'nodeCount', 0, 500
+  range.onFinishChange (count) => @stage.updateNodeCount count
+
+  toggle = folder.add @stage, 'gravity'
   toggle.onFinishChange (toggled) =>
     @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL
     @stage.toggleForce PVector.GRAVITY, toggled
 
-  select = gui.add @stage, 'containment',
+  select = folder.add @stage, 'containment',
     'Reflective': Wrap.REFLECTIVE
     'Toroidal': Wrap.TOROIDAL
   select.onFinishChange (option) => @stage.containment = parseInt option, 10
 
-  range = gui.add @stage, 'nodeCount', 0, 500
-  range.onFinishChange (count) => @stage.updateNodeCount count
-
-  select = gui.add @stage.nodeParams, 'viewMode',
+  select = folder.add @stage.nodeParams, 'viewMode',
     'Ball': Node.BALL
     'Line': Node.LINE
   select.onFinishChange (option) => @stage.onNodeViewModeChange parseInt option, 10
-
-  # TODO: Still has issues.
-  colorPicker = gui.addColor @stage, 'fill'
-  colorPicker.onChange (color) => @stage.fillColor color
-  colorPicker.onFinishChange (color) => @stage.fillColor color
 
   dat.GUI.shared = gui
 
