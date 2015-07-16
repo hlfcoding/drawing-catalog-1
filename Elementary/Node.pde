@@ -59,7 +59,7 @@ class Node
     w: 10
     h: 10
     mMax: 5
-    vMax: 5
+    vMax: 3 # On one dimension.
     attractDistMin: 5 # Avoid applying huge attraction.
     attractDistMax: 25 # Avoid applying tiny attraction.
 
