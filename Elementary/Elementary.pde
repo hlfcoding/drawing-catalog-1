@@ -151,6 +151,9 @@ _setupGUI: ->
   range = folder.add @stage, 'nodeCount', 0, 500
   range.onFinishChange (count) => @stage.updateNodeCount count
 
+  range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
+  range.onFinishChange (magnitude) => n.vMax = magnitude for n in @stage.nodes
+
   toggle = folder.add @stage, 'gravity'
   toggle.onFinishChange (toggled) =>
     @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL

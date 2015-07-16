@@ -75,6 +75,7 @@ class Wrap extends Node
     @defaults.viewMode = Node.FORMLESS
 
     @defaults.nodeParams.viewMode = Node.BALL
+    @defaults.nodeParams.vMax = Node.defaults.vMax
 
     @defaults.frictionMag = 0.01 * sketch.state.speedFactor # constant * normal
 
