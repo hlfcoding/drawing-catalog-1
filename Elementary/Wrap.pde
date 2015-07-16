@@ -9,10 +9,6 @@ class Wrap extends Node
     @_isReady = no
     @_needsClear = no
 
-    @_screenStacks = {}
-    @_screenStacks[Wrap.TRACE] = []
-    @_screenStacks[Wrap.DEFAULT] = []
-
     @nodes = []
 
   # Static
@@ -89,7 +85,7 @@ class Wrap extends Node
     @trace = @nodeParams.viewMode is Node.LINE
 
     if tracePrev is on and @trace isnt tracePrev
-      @_pushScreen Wrap.TRACE
+      sketch.pushScreen Wrap.TRACE
 
     # 'Layer' the canvas if needed.
     isTraceFrame = millis() % (sketch.state.frameRate * 10) is 0
@@ -105,7 +101,7 @@ class Wrap extends Node
       # Sometimes when switching view modes, the canvas needs to be cleared and restored.
       if @_needsClear
         @_needsClear = no
-        @_popScreen()
+        sketch.popScreen()
 
     n.draw() for n in @nodes
 
@@ -214,8 +210,6 @@ class Wrap extends Node
   # Accessors
   # ---------
 
-  canvasElement: -> document.querySelector 'canvas'
-
   getTraceFillColor: -> @traceFill
 
   ready: (r) -> @_ready = r if r?; @onReady() if r; @_ready
@@ -240,28 +234,5 @@ class Wrap extends Node
 
   onReady: ->
     n.onWrapReady @ for n in @nodes
-    @canvasElement().focus()
     @onNodeViewModeChange()
     @log()
-
-  # Protected
-  # =========
-
-  # Canvas State
-  # ------------
-
-  _screenUpdateVars: ->
-    context = @canvasElement().getContext '2d'
-    stack = if @trace is on then Wrap.TRACE else Wrap.DEFAULT
-    [context, stack]
-
-  _pushScreen: (customStack) ->
-    [context, stack] = @_screenUpdateVars()
-    stack = customStack if customStack?
-    screen = context.getImageData @left(), @top(), @w, @h
-    @_screenStacks[stack].push screen
-
-  _popScreen: ->
-    [context, stack] = @_screenUpdateVars()
-    return unless @_screenStacks[stack].length
-    context.putImageData @_screenStacks[stack].pop(), @left(), @top()

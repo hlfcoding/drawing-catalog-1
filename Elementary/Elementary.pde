@@ -30,6 +30,8 @@ setup: ->
   
   @_setupStage()
 
+  @_setupScreens()
+
   @_setupGUI()
 
 _setupConstants: ->
@@ -173,6 +175,17 @@ _setupGUI: ->
 
   gui.open()
 
+_setupScreens: ->
+
+  ###
+  Screens can store and restore canvas state when switching between different
+  draw modes.
+  ###
+
+  @_screenStacks = {}
+  @_screenStacks[Wrap.TRACE] = []
+  @_screenStacks[Wrap.DEFAULT] = []
+
 _setupStage: ->
 
   ###
@@ -190,6 +203,7 @@ _setupStage: ->
   @stage.updateNodeCount()
 
   @stage.ready yes
+  @canvasElement().focus()
 
 # Updaters
 # --------
@@ -215,6 +229,28 @@ freeze: (frozen) ->
 _updateSpeedFactor: ->
   @state.speedFactor = frameRate.REAL / @state.frameRate
   frameRate @state.frameRate
+
+# Canvas State
+# ------------
+
+canvasElement: -> @contentElement().querySelector 'canvas'
+contentElement: -> document.getElementById 'content'
+
+pushScreen: (customStack) ->
+  [context, stack] = @_screenUpdateVars()
+  stack = customStack if customStack?
+  screen = context.getImageData 0, 0, width, height
+  @_screenStacks[stack].push screen
+
+popScreen: ->
+  [context, stack] = @_screenUpdateVars()
+  return unless @_screenStacks[stack].length
+  context.putImageData @_screenStacks[stack].pop(), 0, 0
+
+_screenUpdateVars: ->
+  context = @canvasElement().getContext '2d'
+  stack = if @stage.trace is on then Wrap.TRACE else Wrap.DEFAULT
+  [context, stack]
 
 # Responders
 # ----------
