@@ -29,6 +29,9 @@ class Node
     @_aCached = null
     @_pFill = null
 
+    # Manually set after others.
+    @isAttractor @attract
+
   # Static
   # ======
 
@@ -109,11 +112,6 @@ class Node
   drawBoundsRect: -> rect @top(), @left(), @width(), @height()
 
   shouldDrawLine: -> @pPrev? and @p.dist(@pPrev) < @w
-
-  toggleAttraction: ->
-    @attract = not @attract
-    @_pFill ?= @fill
-    @fillColor if @attract then color.RED else @_pFill
 
   updateAttraction: -> @attractNode n for n in @neighbors()
 
@@ -211,6 +209,14 @@ class Node
       @w = @h = @m / @w if @autoSize is on and @m?
     @m
 
+  isAttractor: (bool) ->
+    if bool?
+      @attract = bool
+      # Update fill.
+      @_pFill ?= @fill
+      @fillColor if @attract then color.RED else @_pFill
+    @attract
+
   ###
   As an exception, try to always use the position accessors, since they wrap a
   complex object.
@@ -249,6 +255,6 @@ class Node
   handleClick: (c) ->
     should = @overlapsWith c.mouseX, c.mouseY
     return no unless should
-    @toggleAttraction()
+    @isAttractor not @attract
 
   onWrapReady: (wrap) -> @neighbors wrap.nodes
