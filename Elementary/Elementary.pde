@@ -137,6 +137,8 @@ _setupGUI: ->
     'Real': frameRate.REAL
   select.onFinishChange (option) => @state.frameRate = parseInt option, 10
 
+  button = folder.add @, 'exportScreen'
+
   folder = gui.addFolder 'colors'
 
   # TODO: Still has issues.
@@ -237,6 +239,13 @@ _updateSpeedFactor: ->
 
 canvasElement: -> @contentElement().querySelector 'canvas'
 contentElement: -> document.getElementById 'content'
+
+exportScreen: ->
+  img = document.createElement 'img'
+  img.src = @canvasElement().toDataURL()
+  if @_imgPrev? then @contentElement().insertBefore img, @_imgPrev
+  else @contentElement().appendChild img
+  @_imgPrev = img
 
 pushScreen: (customStack) ->
   [context, stack] = @_screenUpdateVars()
