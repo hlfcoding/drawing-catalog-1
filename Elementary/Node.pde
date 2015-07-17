@@ -61,16 +61,18 @@ class Node
 
     w: 10
     h: 10
-    mMax: 5
+    m: null
+    mMax: 100
     vMax: 3 # On one dimension.
-    attractDistMin: 5 # Avoid applying huge attraction.
-    attractDistMax: 25 # Avoid applying tiny attraction.
+    density: 1
+    attractFieldMin: 40 # Avoid applying huge attraction.
+    attractFieldMax: 80 # Avoid applying tiny attraction.
 
     attract: off
     autoMass: on
     autoSize: on
     move: on
-    varyMass: on
+    varyMass: off
 
   @setup: ->
 
@@ -84,7 +86,7 @@ class Node
 
     @defaults.viewMode = @BALL
 
-    @defaults.attractConst = PVector.G / 10
+    @defaults.attractConst = PVector.G
 
   # Public
   # ======
@@ -146,7 +148,7 @@ class Node
   attractNode: (n) ->
     f = PVector.sub @p, n.p
     f.type = PVector.ATTRACTION
-    d = constrain f.mag(), @attractDistMin, @attractDistMax
+    d = constrain f.mag(), @attractFieldMin, @attractFieldMax
     strength = (@attractConst * @mass() * n.mass()) / sq(d)
     f.normalize()
     f.mult strength
@@ -188,8 +190,11 @@ class Node
 
   width: (w) ->
     if w?
+      wPrev = @w
       @w = w
       @mass Node.AUTO_MASS
+      @attractFieldMin *= @w / wPrev
+      @attractFieldMax *= @w / wPrev
     @w
 
   height: (h) ->
@@ -201,12 +206,13 @@ class Node
   mass: (m) ->
     if m?
       # Support autoMass.
+      # It's 2D 'mass', where the third size is 1.
       if m isnt Node.AUTO_MASS then @m = m
-      else if @autoMass is on then @m = @w * @h
-      # Support varySize.
-      @m *= random.dualScale @mMax if @varyMass in on
+      else if @autoMass is on then @m = @w * @h * @density
+      # Support varyMass.
+      @m *= sqrt random.dualScale(@mMax) if @varyMass is on
       # Support autoSize.
-      @w = @h = @m / @w if @autoSize is on and @m?
+      @w = @h = @m / @w / @density if @autoSize is on and @m?
     @m
 
   isAttractor: (bool) ->
