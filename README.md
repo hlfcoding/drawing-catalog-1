@@ -7,7 +7,7 @@ CoffeeScript sketches and boilerplate using Processing via
 
 Screenshot of HEAD, but with line view-mode in toroidal container:
 
-![Elemental](https://s3.amazonaws.com/f.cl.ly/items/2A1X0R3B0w0Y3q1P1J2V/Screen%20Shot%202012-10-22%20at%202.12.30%20AM.png)
+![image](https://cloud.githubusercontent.com/assets/100884/8743263/127cd304-2c22-11e5-9a8e-e088ac974123.png)
 
 ## Building
 
