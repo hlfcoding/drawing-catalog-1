@@ -38,7 +38,6 @@ class Wrap extends Node
 
   @defaults:
 
-    density: 1 / 6
     entropy: 1
 
     contain: on # Contain nodes.
@@ -51,6 +50,7 @@ class Wrap extends Node
     move: off
     trace: off
 
+    nodeDensity: 1 / 6
     nodeParams:
       varyMass: on
 
@@ -125,7 +125,7 @@ class Wrap extends Node
     @drawBoundsRect()
 
   updateNodeCount: (count, customNodeParams) ->
-    count ?= parseInt @width() * @density # Infer if needed.
+    count ?= parseInt @width() * @nodeDensity # Infer if needed.
     currentCount = @nodes.length
     # Contract if needed.
     if count < currentCount
