@@ -135,18 +135,16 @@ class Wrap extends Node
     # Or expand.
     hasGravity = !!(@forceOptions & PVector.GRAVITY)
     gravity = PVector.createGravity() if hasGravity
-    # TODO: Why 1-index?
-    for i in [1...(count - currentCount)]
-      do (i) =>
+    for i in [0..(count - currentCount)]
+      do (ordinal = i + 1) =>
         nodeParams = _.extend {}, @nodeParams, customNodeParams,
-          id: currentCount + i
+          id: currentCount + ordinal
           wrap: @
         n = new Node nodeParams
         n.p.randomize() if @layoutPattern is Wrap.RANDOM and not customNodeParams?.p?
         n.applyForce gravity if hasGravity
         n.applyForce f for f in @customForces
         n.cacheAcceleration()
-        n.log() if i is 1 # Log once.
         @nodes.push n
     # Observable value for datGUI
     @nodeCount ?= @nodes.length
