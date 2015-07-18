@@ -163,6 +163,9 @@ _setupGUI: ->
     @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL
     @stage.toggleForce PVector.GRAVITY, toggled
 
+  toggle = folder.add @stage.nodeParams, 'collide'
+  toggle = folder.add @stage.nodeParams, 'varyMass'
+
   select = folder.add @stage, 'containment',
     'Reflective': Wrap.REFLECTIVE
     'Toroidal': Wrap.TOROIDAL
