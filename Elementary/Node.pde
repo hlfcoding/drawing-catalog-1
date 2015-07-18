@@ -67,6 +67,7 @@ class Node
     density: 1
     attractFieldMin: 40 # Avoid applying huge attraction.
     attractFieldMax: 80 # Avoid applying tiny attraction.
+    attractDecayRate: 0.01
 
     attract: off
     autoMass: on
@@ -116,7 +117,11 @@ class Node
   shouldDrawLine: -> @pPrev? and @p.dist(@pPrev) < @w
 
   updateAttraction: ->
+    return @isAttractor off if @_attractLifespan <= 0
+
     @attractNode n for n in @getNeighbors()
+    # Decay.
+    @_attractLifespan -= @attractDecayRate * @_attractLifespan
 
   updateMovement: ->
     @v.add @a
@@ -222,6 +227,8 @@ class Node
       # Update fill.
       @_pFill ?= @fill
       @fillColor if @attract is on then color.RED else @_pFill
+      # Restart decay.
+      @_attractLifespan = 1.0 if @attract is on
     @attract
 
   ###
