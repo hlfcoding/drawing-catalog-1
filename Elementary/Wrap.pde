@@ -40,6 +40,7 @@ class Wrap extends Node
 
     entropy: 1
 
+    autoReplace: on # Re-add on remove node.
     contain: on # Contain nodes.
     drainAtEdge: on # Drain node inertia at edges.
     forceOptions: 0
@@ -53,6 +54,7 @@ class Wrap extends Node
 
     nodeDensity: 1 / 10
     nodeParams:
+      collide: on
       varyMass: on
 
   @setup: ->
@@ -104,7 +106,7 @@ class Wrap extends Node
         @_needsClear = no
         sketch.popScreen()
 
-    n.draw() for n in @nodes
+    n?.draw() for n in @nodes
 
   # Accessors
   # ---------
@@ -124,6 +126,11 @@ class Wrap extends Node
   clear: ->
     fill @fillColor()
     @drawBoundsRect()
+
+  removeNode: (n) ->
+    n.wrap = null
+    @nodes.splice @nodes.indexOf(n), 1
+    @updateNodeCount @nodes.length if @autoReplace
 
   updateNodeCount: (count, customNodeParams) ->
     count ?= parseInt @width() * @nodeDensity # Infer if needed.

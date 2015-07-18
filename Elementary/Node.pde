@@ -29,8 +29,12 @@ class Node
     @_aCached = null
     @_pFill = null
 
+    @attractorDist = null
+
     # Manually set after others.
     @isAttractor @attract
+
+  destroy: -> @wrap?.removeNode @
 
   # Static
   # ======
@@ -72,6 +76,7 @@ class Node
     attract: off
     autoMass: on
     autoSize: on
+    collide: on
     move: on
     varyMass: off
 
@@ -159,6 +164,8 @@ class Node
     f.normalize()
     f.mult strength
     n.applyForce f
+    n.attractorDist = PVector.dist @p, n.p
+    n.onAttract @
 
   refineVelocity: ->
     if @v.mag() > sq(@vMax) # Limit.
@@ -266,3 +273,11 @@ class Node
     return no unless should
     @isAttractor not @attract
 
+  onAttract: (attractor) ->
+    # Destroy if too close.
+    return unless @collide
+    d = @p.dist attractor.p
+    return unless d < @attractFieldMin
+    # Destroy the attractor with lesser mass.
+    if @isAttractor() and @m > attractor.mass then attractor.destroy()
+    else @destroy()
