@@ -115,7 +115,8 @@ class Node
 
   shouldDrawLine: -> @pPrev? and @p.dist(@pPrev) < @w
 
-  updateAttraction: -> @attractNode n for n in @neighbors()
+  updateAttraction: ->
+    @attractNode n for n in @getNeighbors()
 
   updateMovement: ->
     @v.add @a
@@ -248,12 +249,7 @@ class Node
   fillColor: (fc) -> @fill = color.ensure fc if fc?; @fill
   strokeColor: (sc) -> @stroke = color.ensure sc if sc?; @stroke
 
-  neighbors: (nodes) -> @_neighbors = (n for n in nodes when n isnt @) if nodes?; @_neighbors
-  wrap: (wrap) ->
-    if wrap?
-      @_wrap = wrap
-      if wrap.ready() then @onWrapReady wrap
-    @_wrap
+  getNeighbors: -> n for n in @wrap.nodes when n isnt @
 
   # Callbacks
   # ---------
@@ -263,4 +259,3 @@ class Node
     return no unless should
     @isAttractor not @attract
 
-  onWrapReady: (wrap) -> @neighbors wrap.nodes

@@ -244,6 +244,5 @@ class Wrap extends Node
     @draw()
 
   onReady: ->
-    n.onWrapReady @ for n in @nodes
     @onNodeViewModeChange()
     @log()
