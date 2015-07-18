@@ -63,7 +63,7 @@ class Node
     h: 10
     m: null
     mMax: 100
-    vMax: 3 # On one dimension.
+    vMax: 1 # On one dimension.
     density: 1
     attractFieldMin: 40 # Avoid applying huge attraction.
     attractFieldMax: 80 # Avoid applying tiny attraction.

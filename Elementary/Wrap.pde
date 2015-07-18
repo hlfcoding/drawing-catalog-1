@@ -51,7 +51,7 @@ class Wrap extends Node
     trace: off
     varyMass: off
 
-    nodeDensity: 1 / 6
+    nodeDensity: 1 / 10
     nodeParams:
       varyMass: on
 
