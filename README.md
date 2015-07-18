@@ -5,7 +5,11 @@ CoffeeScript sketches and boilerplate using Processing via
 
 ## I. Elementary
 
-Screenshot of HEAD, but with line view-mode in toroidal container:
+Screenshot of HEAD, but with many nodes, line view-mode with collisions:
+
+![image](https://cloud.githubusercontent.com/assets/100884/8760865/fae85cb0-2ce7-11e5-9cd6-b046690304b0.png)
+
+Screenshot of HEAD, but with few nodes, line view-mode in toroidal container:
 
 ![image](https://cloud.githubusercontent.com/assets/100884/8743263/127cd304-2c22-11e5-9a8e-e088ac974123.png)
 
