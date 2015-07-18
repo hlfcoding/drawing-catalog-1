@@ -106,7 +106,7 @@ class Node
     if @viewMode & Node.LINE and @shouldDrawLine()
       noFill()
       strokeWeight 0.1
-      stroke color.transparentize(@strokeColor(), 0.33)
+      stroke color.transparentize @strokeColor(), 0.33
       line @x(), @y(), @px(), @py()
 
     @updateStorage()
@@ -122,7 +122,7 @@ class Node
     @refineVelocity()
     @p.add @v
     @resetAcceleration()
-    @wrap().nodeMoved @ if @wrap()
+    @wrap?.nodeMoved @
 
   updateStorage: ->
     if @viewMode & Node.LINE
@@ -220,7 +220,7 @@ class Node
       @attract = bool
       # Update fill.
       @_pFill ?= @fill
-      @fillColor if @attract then color.RED else @_pFill
+      @fillColor if @attract is on then color.RED else @_pFill
     @attract
 
   ###
