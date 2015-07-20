@@ -167,10 +167,7 @@ class Node
     n.attractorDist = PVector.dist @p, n.p
     n.onAttract @
 
-  refineVelocity: ->
-    if @v.mag() > sq(@vMax) # Limit.
-      @v.normalize()
-      @v.mult @vMax
+  refineVelocity: -> @v.limit @vMax
 
   resetAcceleration: ->
     if @_aCached? then @a = @_aCached.get()

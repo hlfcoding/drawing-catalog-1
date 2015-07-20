@@ -194,8 +194,7 @@ class Wrap extends Node
   applyNodeFriction: (n) ->
     friction = n.v.get()
     friction.normalize()
-    friction.mult -1
-    friction.mult @frictionMag
+    friction.mult -1 * @frictionMag
     n.applyForce friction
 
   toggleForce: (f, toggled) ->
