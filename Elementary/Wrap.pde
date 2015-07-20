@@ -111,6 +111,8 @@ class Wrap extends Node
   # Accessors
   # ---------
 
+  radius: -> no
+
   left: -> @x()
   top: -> @y()
   right: -> @w + @left()

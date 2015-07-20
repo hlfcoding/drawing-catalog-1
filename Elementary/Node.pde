@@ -63,8 +63,10 @@ class Node
     v: [0, 0, 0]
     a: [0, 0, 0]
 
+    # TODO: Actually support rectangles.
     w: 10
     h: 10
+
     m: null
     mMax: 100
     vMax: 1 # On one dimension.
@@ -212,6 +214,12 @@ class Node
       @h = h
       @mass Node.AUTO_MASS
     @h
+
+  radius: (r) ->
+    if r?
+      @width r * 2
+      @h = @w
+    @w / 2 # Optimize if needed.
 
   mass: (m) ->
     if m?
