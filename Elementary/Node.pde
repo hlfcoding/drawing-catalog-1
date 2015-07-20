@@ -30,6 +30,7 @@ class Node
     @_pFill = null
 
     @attractorDist = null
+    @tempRepulsion = null
 
     # Manually set after others.
     @isAttractor @attract
@@ -74,6 +75,7 @@ class Node
     attractFieldMin: 40 # Avoid applying huge attraction.
     attractFieldMax: 80 # Avoid applying tiny attraction.
     attractDecayRate: 0.01
+    tempRepulsionDecayRate: 0.05
 
     attract: off
     autoMass: on
@@ -159,6 +161,13 @@ class Node
     if toggled is on then @a.add(vec) else @a.sub(vec)
 
   attractNode: (n) ->
+    if n.tempRepulsion?
+      n.applyForce n.tempRepulsion
+      n.attractorDist = PVector.dist @p, n.p
+      n.tempRepulsion.mult 1 - @tempRepulsionDecayRate
+      n.tempRepulsion = null if n.tempRepulsion.mag() < 0.01
+      return no
+
     f = PVector.sub @p, n.p
     f.type = PVector.ATTRACTION
     d = constrain f.mag(), @attractFieldMin, @attractFieldMax
@@ -167,7 +176,7 @@ class Node
     f.mult strength
     n.applyForce f
     n.attractorDist = PVector.dist @p, n.p
-    n.onAttract @
+    n.onAttract @, f
 
   refineVelocity: -> @v.limit @vMax
 
@@ -278,11 +287,15 @@ class Node
     return no unless should
     @isAttractor not @attract
 
-  onAttract: (attractor) ->
-    # Destroy if too close.
-    return unless @collide
+  onAttract: (attractor, f) ->
     d = @p.dist attractor.p
+
+    # Create temporary repulsion.
     return unless d < @attractFieldMin
-    # Destroy the attractor with lesser mass.
+    @tempRepulsion = f.get()
+    @tempRepulsion.mult -1
+
+    # Destroy if too close, but the attractor with less mass.
+    return if @collide is off or (d > @radius() and d > attractor.radius())
     if @isAttractor() and @m > attractor.mass then attractor.destroy()
     else @destroy()
