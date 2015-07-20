@@ -5,6 +5,12 @@ CoffeeScript sketches and boilerplate using Processing via
 
 ## I. Elementary
 
+### Attraction
+
+Screenshot of HEAD, but with many nodes, line view-mode with collisions and repulsions:
+
+![image](https://cloud.githubusercontent.com/assets/100884/8773653/b28b6f94-2e8a-11e5-9c07-8af75f4e391a.png)
+
 Screenshot of HEAD, but with many nodes, line view-mode with collisions:
 
 ![image](https://cloud.githubusercontent.com/assets/100884/8760865/fae85cb0-2ce7-11e5-9cd6-b046690304b0.png)
