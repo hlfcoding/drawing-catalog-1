@@ -148,6 +148,9 @@ _setupGUI: ->
 
   folder = gui.addFolder 'stage'
 
+  createNodeParamsUpdater = (attribute) =>
+    (value) => n[attribute] = value for n in @stage.nodes
+
   range = folder.add @stage, 'frictionMag', 0.001, 0.1
 
   range = folder.add @stage, 'entropy', 0, 2
@@ -156,7 +159,7 @@ _setupGUI: ->
   range.onFinishChange (count) => @stage.updateNodeCount count
 
   range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
-  range.onFinishChange (magnitude) => n.vMax = magnitude for n in @stage.nodes
+  range.onFinishChange createNodeParamsUpdater('vMax')
 
   toggle = folder.add @stage, 'gravity'
   toggle.onFinishChange (toggled) =>
@@ -164,7 +167,10 @@ _setupGUI: ->
     @stage.toggleForce PVector.GRAVITY, toggled
 
   toggle = folder.add @stage.nodeParams, 'collide'
+  toggle.onFinishChange createNodeParamsUpdater('collide')
+
   toggle = folder.add @stage.nodeParams, 'varyMass'
+  toggle.onFinishChange createNodeParamsUpdater('varyMass')
 
   select = folder.add @stage, 'containment',
     'Reflective': Wrap.REFLECTIVE
