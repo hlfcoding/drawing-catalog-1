@@ -7,15 +7,15 @@ CoffeeScript sketches and boilerplate using Processing via
 
 ### Attraction
 
-Screenshot of HEAD, but with many nodes, line view-mode with collisions and repulsions:
+Screenshot of f5a8a78, but with many nodes, line view-mode with collisions and repulsions:
 
 ![image](https://cloud.githubusercontent.com/assets/100884/8773653/b28b6f94-2e8a-11e5-9c07-8af75f4e391a.png)
 
-Screenshot of HEAD, but with many nodes, line view-mode with collisions:
+Screenshot of b0f777c, but with many nodes, line view-mode with collisions:
 
 ![image](https://cloud.githubusercontent.com/assets/100884/8760865/fae85cb0-2ce7-11e5-9cd6-b046690304b0.png)
 
-Screenshot of HEAD, but with few nodes, line view-mode in toroidal container:
+Screenshot of deacedc, but with few nodes, line view-mode in toroidal container:
 
 ![image](https://cloud.githubusercontent.com/assets/100884/8743263/127cd304-2c22-11e5-9a8e-e088ac974123.png)
 
