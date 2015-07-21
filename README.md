@@ -7,6 +7,10 @@ CoffeeScript sketches and boilerplate using Processing via
 
 ### Attraction
 
+Screenshot of f5a8a78, but with many nodes, line view-mode with collisions, repulsions, and initial gravity:
+
+![image](https://cloud.githubusercontent.com/assets/100884/8796279/63549bd0-2f48-11e5-843c-30b6b55d3464.png)
+
 Screenshot of f5a8a78, but with many nodes, line view-mode with collisions and repulsions:
 
 ![image](https://cloud.githubusercontent.com/assets/100884/8773653/b28b6f94-2e8a-11e5-9c07-8af75f4e391a.png)
