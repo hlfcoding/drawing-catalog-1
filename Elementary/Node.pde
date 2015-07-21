@@ -286,6 +286,7 @@ class Node
     should = @overlapsWith c.mouseX, c.mouseY
     return no unless should
     @isAttractor not @attract
+    yes
 
   onAttract: (attractor, f) ->
     d = @p.dist attractor.p
