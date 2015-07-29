@@ -28,8 +28,11 @@ class Node
 
     @_aCached = null
     @_pFill = null
+    @_repellent = null
+    @_repellentSelectedAt = 0
 
     @attractorDist = null
+    @repellentCandidates = []
     @tempRepulsion = null
 
     # Manually set after others.
@@ -75,6 +78,7 @@ class Node
     attractFieldMin: 40 # Avoid applying huge attraction.
     attractFieldMax: 80 # Avoid applying tiny attraction.
     attractDecayRate: 0.01
+    evadeLifespan: 5
     tempRepulsionDecayRate: 0.05
 
     attract: off
@@ -131,6 +135,12 @@ class Node
     @attractNode n for n in @getNeighbors()
     # Decay.
     @_attractLifespan -= @attractDecayRate * @_attractLifespan
+    # Evade.
+    if @repellentCandidates.length and
+       millis() - @_repellentSelectedAt > @evadeLifespan * 1000
+      @_repellent = random.item @repellentCandidates
+      @_repellentSelectedAt = millis()
+    @evadeNode @_repellent if @_repellent?
 
   updateMovement: ->
     @v.add @a
@@ -177,6 +187,11 @@ class Node
     n.applyForce f
     n.attractorDist = PVector.dist @p, n.p
     n.onAttract @, f
+
+  evadeNode: (n) ->
+    f = n.a.get()
+    f.add PVector.random2D()
+    @applyForce f
 
   refineVelocity: -> @v.limit @vMax
 
@@ -250,6 +265,8 @@ class Node
       @fillColor if @attract is on then color.RED else @_pFill
       # Restart decay.
       @_attractLifespan = 1.0 if @attract is on
+      # Update auto-evasion.
+      @evade = bool
     @attract
 
   ###
@@ -292,9 +309,15 @@ class Node
     d = @p.dist attractor.p
 
     # Create temporary repulsion.
-    return unless d < @attractFieldMin
-    @tempRepulsion = f.get()
-    @tempRepulsion.mult -1
+    if d < @attractFieldMin
+      @tempRepulsion = f.get()
+      @tempRepulsion.mult -1
+    else 
+      # Attractor should evade if needed.
+      if attractor.mass() < @m
+        attractor.repellentCandidates.push @ 
+      else if (i = attractor.repellentCandidates.indexOf(@)) and i isnt -1
+        attractor.repellentCandidates.splice i, 1
 
     # Destroy if too close, but the attractor with less mass.
     return if @collide is off or (d > @radius() and d > attractor.radius())

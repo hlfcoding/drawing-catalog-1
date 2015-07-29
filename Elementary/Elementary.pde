@@ -98,6 +98,7 @@ _setupExtensions: ->
   ###
 
   random.dualScale = (n) -> random(1, n) / random(1, n)
+  random.item = (list) -> list[_.random(list.length - 1)]
 
   ###
   Add core helpers.
