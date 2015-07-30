@@ -136,8 +136,11 @@ class Node
     # Decay.
     @_attractLifespan -= @attractDecayRate * @_attractLifespan
     # Evade.
-    if @repellentCandidates.length and
-       millis() - @_repellentSelectedAt > @evadeLifespan * 1000
+    updateRepellent = (
+      @repellentCandidates.length and
+      millis() - @_repellentSelectedAt > @evadeLifespan * 1000
+    )
+    if updateRepellent
       @_repellent = random.item @repellentCandidates
       @_repellentSelectedAt = millis()
     @evadeNode @_repellent if @_repellent?
