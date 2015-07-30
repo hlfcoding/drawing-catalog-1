@@ -132,7 +132,7 @@ class Node
   updateAttraction: ->
     return @isAttractor off if @_attractLifespan <= 0
 
-    @attractNode n for n in @getNeighbors()
+    @withNeighbors (n) => @attractNode n
     # Decay.
     @_attractLifespan -= @attractDecayRate * @_attractLifespan
     # Evade.
@@ -294,7 +294,7 @@ class Node
   fillColor: (fc) -> @fill = color.ensure fc if fc?; @fill
   strokeColor: (sc) -> @stroke = color.ensure sc if sc?; @stroke
 
-  getNeighbors: -> n for n in @wrap.nodes when n isnt @
+  withNeighbors: (fn) -> fn n for n in @wrap.nodes when n isnt @
 
   # Callbacks
   # ---------
