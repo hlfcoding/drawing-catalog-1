@@ -28,17 +28,22 @@ class Node
 
     @_aCached = null
     @_pFill = null
-    @_repellent = null
+    @_repellent = null # Reference.
     @_repellentSelectedAt = 0
 
     @attractorDist = null
-    @repellentCandidates = []
+    @repellentCandidates = [] # References.
     @tempRepulsion = null
 
     # Manually set after others.
     @isAttractor @attract
 
-  destroy: -> @wrap?.removeNode @
+  destroy: ->
+    @wrap?.removeNode @
+
+    # Remove node references.
+    @_repellent = null
+    @repellentCandidates = null
 
   # Static
   # ======
