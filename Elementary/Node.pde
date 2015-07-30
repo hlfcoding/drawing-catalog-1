@@ -320,9 +320,9 @@ class Node
     else 
       # Attractor should evade if needed.
       if attractor.mass() < @m
-        attractor.repellentCandidates.push @ 
-      else if (i = attractor.repellentCandidates.indexOf(@)) and i isnt -1
-        attractor.repellentCandidates.splice i, 1
+        attractor.repellentCandidates[@id] ?= @
+      else if attractor.repellentCandidates[@id]?
+        delete attractor.repellentCandidates[@id]
 
     # Destroy if too close, but the attractor with less mass.
     return if @collide is off or (d > @radius() and d > attractor.radius())
