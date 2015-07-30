@@ -190,7 +190,9 @@ class Node
 
   evadeNode: (n) ->
     f = n.a.get()
-    f.add PVector.random2D()
+    variance = new PVector random.signed(), random.signed()
+    variance.div 10
+    f.add variance
     @applyForce f
 
   refineVelocity: -> @v.limit @vMax
