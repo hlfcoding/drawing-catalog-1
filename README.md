@@ -49,6 +49,8 @@ $ source ./<sketch>/build.sh
       ],
       "folder_exclude_patterns": [
         "bower_components",
+        "docs",
+        "lib",
         "node_modules",
         "web-export-coffee"
       ]

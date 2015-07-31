@@ -2,3 +2,4 @@ bower_components
 node_modules
 web-export-coffee
 **/template-coffee/*.js
+/.grunt
