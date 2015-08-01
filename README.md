@@ -27,13 +27,17 @@ Screenshot of deacedc, but with few nodes, line view-mode in toroidal container:
 
 ![image](https://cloud.githubusercontent.com/assets/100884/8743263/127cd304-2c22-11e5-9a8e-e088ac974123.png)
 
-## Building
-
-Very simple for now:
+## Building [![devDependency Status](https://img.shields.io/david/dev/hlfcoding/drawing-catalog-1.svg)](https://david-dm.org/hlfcoding/drawing-catalog-1#info=devDependencies)
 
 ```bash
-$ bower install
-$ source ./<sketch>/build.sh
+hlf-jquery> npm install
+hlf-jquery> grunt install
+
+# to run (open and build in Processing)
+hlf-jquery> grunt lib
+
+# to read some docs
+hlf-jquery> grunt docs
 ```
 
 ## Sample ST2 Project File
