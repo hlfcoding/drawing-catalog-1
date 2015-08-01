@@ -1,0 +1,33 @@
+{
+  "name": "processing-coffee-sketches",
+  "version": "0.0.0",
+  "authors": [
+    "Peng Wang <peng@pengxwang.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "coffeescript": "~1.9.3",
+    "dat-gui": "~0.5.1",
+    "Processing.js": "1.4.1",
+    "underscore": "~1.8.3"
+  },
+  "exportsOverride": {
+    "coffeescript": {
+      ".": "extras/coffee-script.js"
+    },
+    "dat-gui": {
+      ".": "build/dat.gui.min.js"
+    },
+    "Processing.js": {
+      ".": "processing.js"
+    },
+    "underscore": {
+      ".": "underscore-min.js"
+    }
+  }
+}
