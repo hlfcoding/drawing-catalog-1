@@ -1,9 +1,9 @@
 # Drawing Catalog #1
 
 CoffeeScript sketches and boilerplate using Processing via
-[fjenett/coffeescript-mode-processing](http://github.com/fjenett/coffeescript-mode-processing).
+[fjenett/coffeescript-mode-processing][]. [Annotated source code] also available.
 
-## I. Elementary
+## I. [Elementary][]
 
 ### Attraction
 
@@ -54,6 +54,7 @@ hlf-jquery> grunt docs
       "folder_exclude_patterns": [
         "bower_components",
         "docs",
+        "gh-pages",
         "lib",
         "node_modules",
         "web-export-coffee"
@@ -62,3 +63,7 @@ hlf-jquery> grunt docs
   ]
 }
 ```
+
+[fjenett/coffeescript-mode-processing]: http://github.com/fjenett/coffeescript-mode-processing
+[Annotated source code]: http://hlfcoding.github.io/drawing-catalog-1/docs/index.html
+[Elementary]: http://hlfcoding.github.io/drawing-catalog-1/sketches/Elementary/web-export-coffee/index.html
