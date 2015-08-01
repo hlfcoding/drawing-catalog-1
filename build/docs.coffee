@@ -2,23 +2,24 @@ grunt = require 'grunt'
 
 # For working docs generation, disable automatic trailing whitespace trimming.
 
-src = [
-  'sketches/**/*.pde'
-  'docs/README.md'
-]
-
 module.exports =
 
   clean: [
+    'docs/*'
     'docs/*/**'
     '!docs/.gitignore'
-    '!docs/README.md'
+    '!docs/languages.coffee'
   ],
 
   groc:
-    src: src
+    src: [
+      'README.md'
+      'sketches/**/*.pde'
+      '!sketches/**/web-export-coffee/*.pde'
+    ]
     options:
-      index: 'docs/README.md'
+      index: 'README.md'
       out: 'docs/'
+      languages: 'docs/languages.coffee'
 
   task: -> grunt.registerTask 'docs', ['clean:docs', 'groc:docs']
