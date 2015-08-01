@@ -1,6 +1,3 @@
-# Wrap
-# ====
-
 class Wrap extends Node
 
   constructor: (params = Wrap.defaults) ->

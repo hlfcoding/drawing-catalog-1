@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="en"><head><title>sketches/Elementary/Wrap</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="sketches/Elementary/Wrap"><meta name="groc-project-path" content="sketches/Elementary/Wrap.pde"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">sketches/Elementary/Wrap.pde</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="wrap">Wrap</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Wrap</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Node</span></span>
+
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(params = Wrap.defaults)</span> -&gt;</span>
+
+    _.defaults params, Wrap.defaults <span class="hljs-keyword">unless</span> params <span class="hljs-keyword">is</span> Wrap.defaults
+    <span class="hljs-keyword">super</span> params
+
+    <span class="hljs-property">@_allForces</span> = <span class="hljs-literal">null</span>
+    <span class="hljs-property">@_isReady</span> = <span class="hljs-literal">no</span>
+    <span class="hljs-property">@_needsClear</span> = <span class="hljs-literal">no</span>
+
+    <span class="hljs-property">@nodes</span> = []</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h1 id="static">Static</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap can contain its nodes using distinct modes.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-property">@UNCONTAINED</span>: <span class="hljs-number">0</span>
+  <span class="hljs-property">@REFLECTIVE</span>: <span class="hljs-number">1</span>
+  <span class="hljs-property">@TOROIDAL</span>: <span class="hljs-number">2</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap can render its nodes to screen in distinct states.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-property">@DEFAULT</span>: <span class="hljs-number">0</span>
+  <span class="hljs-property">@TRACE</span>: <span class="hljs-number">1</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap can layout its nodes in distinct patterns.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-property">@UNIFORM</span>: <span class="hljs-number">0</span>
+  <span class="hljs-property">@RANDOM</span>: <span class="hljs-number">1</span>
+
+  <span class="hljs-property">@defaults</span>:
+
+    <span class="hljs-attribute">entropy</span>: <span class="hljs-number">1</span>
+
+    <span class="hljs-attribute">autoReplace</span>: <span class="hljs-literal">on</span> <span class="hljs-comment"># Re-add on remove node.</span>
+    <span class="hljs-attribute">contain</span>: <span class="hljs-literal">on</span> <span class="hljs-comment"># Contain nodes.</span>
+    <span class="hljs-attribute">drainAtEdge</span>: <span class="hljs-literal">on</span> <span class="hljs-comment"># Drain node inertia at edges.</span>
+    <span class="hljs-attribute">forceOptions</span>: <span class="hljs-number">0</span>
+    <span class="hljs-attribute">customForces</span>: []
+
+    <span class="hljs-attribute">autoMass</span>: <span class="hljs-literal">off</span>
+    <span class="hljs-attribute">gravity</span>: <span class="hljs-literal">off</span>
+    <span class="hljs-attribute">move</span>: <span class="hljs-literal">off</span>
+    <span class="hljs-attribute">trace</span>: <span class="hljs-literal">off</span>
+    <span class="hljs-attribute">varyMass</span>: <span class="hljs-literal">off</span>
+
+    <span class="hljs-attribute">nodeDensity</span>: <span class="hljs-number">1</span> / <span class="hljs-number">10</span>
+    <span class="hljs-attribute">nodeParams</span>:
+      <span class="hljs-attribute">collide</span>: <span class="hljs-literal">on</span>
+      <span class="hljs-attribute">varyMass</span>: <span class="hljs-literal">on</span>
+
+  <span class="hljs-property">@setup</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This needs to be called for the class to be ready for use. Some default
+attributes reference other values not ready on initial declaration.</p></div></div><div class="code"><div class="wrapper">    _.defaults <span class="hljs-property">@defaults</span>, Node.defaults
+
+    <span class="hljs-property">@defaults</span>.fill = color.WHITE
+    <span class="hljs-property">@defaults</span>.traceFill = <span class="hljs-property">@traceFillColor</span> <span class="hljs-property">@defaults</span>.fill
+
+    <span class="hljs-property">@defaults</span>.containment = Wrap.REFLECTIVE
+    <span class="hljs-property">@defaults</span>.layoutPattern = Wrap.RANDOM
+    <span class="hljs-property">@defaults</span>.viewMode = Node.FORMLESS
+
+    <span class="hljs-property">@defaults</span>.nodeParams.viewMode = Node.BALL
+    <span class="hljs-property">@defaults</span>.nodeParams.vMax = Node.defaults.vMax
+
+    <span class="hljs-property">@defaults</span>.frictionMag = <span class="hljs-number">0.01</span> * sketch.state.speedFactor <span class="hljs-comment"># constant * normal</span>
+
+  <span class="hljs-property">@traceFillColor</span>: <span class="hljs-function"><span class="hljs-params">(fc)</span> -&gt;</span> color.transparentize fc, <span class="hljs-number">0.01</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h1 id="inherited">Inherited</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-attribute">draw</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    tracePrev = <span class="hljs-property">@trace</span>
+    <span class="hljs-property">@trace</span> = <span class="hljs-property">@nodeParams</span>.viewMode <span class="hljs-keyword">is</span> Node.LINE
+
+    <span class="hljs-keyword">if</span> tracePrev <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">and</span> <span class="hljs-property">@trace</span> <span class="hljs-keyword">isnt</span> tracePrev
+      sketch.pushScreen Wrap.TRACE</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>&#39;Layer&#39; the canvas if needed.</p></div></div><div class="code"><div class="wrapper">    isTraceFrame = millis() % (sketch.state.frameRate * <span class="hljs-number">10</span>) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@trace</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">and</span> isTraceFrame
+      fill <span class="hljs-property">@getTraceFillColor</span>()
+      <span class="hljs-property">@drawBoundsRect</span>()
+      noFill()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Clear the canvas if needed.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> <span class="hljs-property">@trace</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">off</span> <span class="hljs-keyword">or</span> <span class="hljs-property">@_needsClear</span>
+      fill <span class="hljs-property">@fillColor</span>()
+      <span class="hljs-property">@drawBoundsRect</span>()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Sometimes when switching view modes, the canvas needs to be cleared and restored.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> <span class="hljs-property">@_needsClear</span>
+        <span class="hljs-property">@_needsClear</span> = <span class="hljs-literal">no</span>
+        sketch.popScreen()
+
+    n?.draw() <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-property">@nodes</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="accessors">Accessors</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-attribute">radius</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-literal">no</span>
+
+  <span class="hljs-attribute">left</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@x</span>()
+  <span class="hljs-attribute">top</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@y</span>()
+  <span class="hljs-attribute">right</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@w</span> + <span class="hljs-property">@left</span>()
+  <span class="hljs-attribute">bottom</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@h</span> + <span class="hljs-property">@top</span>()
+
+  <span class="hljs-attribute">fillColor</span>: <span class="hljs-function"><span class="hljs-params">(fc)</span> -&gt;</span>
+    <span class="hljs-property">@traceFill</span> = Wrap.traceFillColor fc <span class="hljs-keyword">if</span> fc?
+    <span class="hljs-keyword">super</span> fc</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h1 id="public">Public</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-attribute">clear</span>: <span class="hljs-function">-&gt;</span>
+    fill <span class="hljs-property">@fillColor</span>()
+    <span class="hljs-property">@drawBoundsRect</span>()
+
+  <span class="hljs-attribute">removeNode</span>: <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+    n.wrap = <span class="hljs-literal">null</span>
+    <span class="hljs-property">@nodes</span>.splice <span class="hljs-property">@nodes</span>.indexOf(n), <span class="hljs-number">1</span>
+    <span class="hljs-property">@updateNodeCount</span> <span class="hljs-property">@nodes</span>.length <span class="hljs-keyword">if</span> <span class="hljs-property">@autoReplace</span>
+
+  <span class="hljs-attribute">updateNodeCount</span>: <span class="hljs-function"><span class="hljs-params">(count, customNodeParams)</span> -&gt;</span>
+    count ?= parseInt <span class="hljs-property">@width</span>() * <span class="hljs-property">@nodeDensity</span> <span class="hljs-comment"># Infer if needed.</span>
+    currentCount = <span class="hljs-property">@nodes</span>.length</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Contract if needed.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> count &lt; currentCount</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Return nodes removed.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">return</span> (<span class="hljs-property">@nodes</span>.pop() <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [(currentCount - <span class="hljs-number">1</span>)...count])</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Or expand.</p></div></div><div class="code"><div class="wrapper">    hasGravity = !!(<span class="hljs-property">@forceOptions</span> &amp; PVector.GRAVITY)
+    gravity = PVector.createGravity() <span class="hljs-keyword">if</span> hasGravity
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>.(count - currentCount)]
+      <span class="hljs-keyword">do</span> (ordinal = i + <span class="hljs-number">1</span>) =&gt;
+        nodeParams = _.extend {}, <span class="hljs-property">@nodeParams</span>, customNodeParams,
+          <span class="hljs-attribute">id</span>: currentCount + ordinal
+          <span class="hljs-attribute">wrap</span>: @
+        n = <span class="hljs-keyword">new</span> Node nodeParams
+        n.p.randomize() <span class="hljs-keyword">if</span> <span class="hljs-property">@layoutPattern</span> <span class="hljs-keyword">is</span> Wrap.RANDOM <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> customNodeParams?.p?
+        n.applyForce gravity <span class="hljs-keyword">if</span> hasGravity
+        n.applyForce f <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> <span class="hljs-property">@customForces</span>
+        n.cacheAcceleration()
+        <span class="hljs-property">@nodes</span>.push n</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Observable value for datGUI</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@nodeCount</span> ?= <span class="hljs-property">@nodes</span>.length
+
+  <span class="hljs-attribute">updateNodeContainment</span>: <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+    shift = <span class="hljs-keyword">if</span> <span class="hljs-property">@gravity</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">then</span> <span class="hljs-number">1</span> <span class="hljs-keyword">else</span> (<span class="hljs-number">1</span> - <span class="hljs-property">@entropy</span>)
+
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@containment</span> <span class="hljs-keyword">is</span> Wrap.REFLECTIVE
+      <span class="hljs-keyword">do</span> (v = n.v) =&gt;
+        <span class="hljs-keyword">if</span> n.right() &gt; <span class="hljs-property">@right</span>()
+          n.right <span class="hljs-property">@right</span>()
+          v.x *= -shift <span class="hljs-keyword">if</span> v.x &gt; <span class="hljs-number">0</span>
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> n.left() &lt; <span class="hljs-property">@left</span>()
+          n.left <span class="hljs-property">@left</span>()
+          v.x *= -shift <span class="hljs-keyword">if</span> v.x &lt; <span class="hljs-number">0</span>
+        <span class="hljs-keyword">if</span> n.bottom() &gt; <span class="hljs-property">@bottom</span>()
+          n.bottom <span class="hljs-property">@bottom</span>()
+          v.y *= -shift <span class="hljs-keyword">if</span> v.y &gt; <span class="hljs-number">0</span>
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> n.y() &lt; <span class="hljs-property">@top</span>()
+          n.top <span class="hljs-property">@top</span>()
+          v.y *= -shift <span class="hljs-keyword">if</span> v.y &lt; <span class="hljs-number">0</span>
+
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@containment</span> <span class="hljs-keyword">is</span> Wrap.TOROIDAL
+      contained = { <span class="hljs-attribute">x</span>: <span class="hljs-literal">yes</span>, <span class="hljs-attribute">y</span>: <span class="hljs-literal">yes</span> }
+
+      <span class="hljs-keyword">if</span> n.left() &gt; <span class="hljs-property">@right</span>() <span class="hljs-keyword">then</span> n.right <span class="hljs-property">@left</span>()
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> n.right() &lt; <span class="hljs-property">@left</span>() <span class="hljs-keyword">then</span> n.left <span class="hljs-property">@right</span>()
+      <span class="hljs-keyword">else</span> contained.x = <span class="hljs-literal">no</span>
+      <span class="hljs-keyword">if</span> n.top() &gt; <span class="hljs-property">@bottom</span>() <span class="hljs-keyword">then</span> n.bottom <span class="hljs-property">@top</span>()
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> n.bottom() &lt; <span class="hljs-property">@top</span>() <span class="hljs-keyword">then</span> n.top <span class="hljs-property">@bottom</span>()
+      <span class="hljs-keyword">else</span> contained.y = <span class="hljs-literal">no</span>
+
+      <span class="hljs-keyword">if</span> <span class="hljs-property">@drainAtEdge</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">and</span> (contained.x <span class="hljs-keyword">or</span> contained.y)
+        n.v.normalize()
+        n.a.normalize()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="physics">Physics</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-attribute">applyNodeFriction</span>: <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+    friction = n.v.get()
+    friction.normalize()
+    friction.mult -<span class="hljs-number">1</span> * <span class="hljs-property">@frictionMag</span>
+    n.applyForce friction
+
+  <span class="hljs-attribute">toggleForce</span>: <span class="hljs-function"><span class="hljs-params">(f, toggled)</span> -&gt;</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">no</span> <span class="hljs-keyword">unless</span> toggled?
+    <span class="hljs-property">@_allForces</span> ?= <span class="hljs-property">@customForces</span>
+    isForceOption = <span class="hljs-keyword">typeof</span> f <span class="hljs-keyword">is</span> <span class="hljs-string">'number'</span>
+    isForceName = f <span class="hljs-keyword">in</span> <span class="hljs-property">@_allForces</span>
+
+    <span class="hljs-keyword">if</span> isForceOption
+      vec = PVector.createGravity() <span class="hljs-keyword">if</span> f <span class="hljs-keyword">is</span> PVector.GRAVITY
+      <span class="hljs-keyword">if</span> toggled <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@forceOptions</span> |= f <span class="hljs-keyword">else</span> <span class="hljs-property">@forceOptions</span> ^= f
+
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> isForceName
+      vec = <span class="hljs-property">@_allForces</span>[f]
+      <span class="hljs-keyword">if</span> toggled <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@customForces</span>.push vec
+      <span class="hljs-keyword">else</span> <span class="hljs-property">@customForces</span>.splice <span class="hljs-property">@customForces</span>.indexOf(vec), <span class="hljs-number">1</span>
+
+    <span class="hljs-keyword">if</span> vec? <span class="hljs-keyword">then</span> <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-property">@nodes</span>
+      n.applyForce vec, toggled
+      n.cacheAcceleration()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="accessors">Accessors</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-attribute">getTraceFillColor</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@traceFill</span>
+
+  <span class="hljs-attribute">ready</span>: <span class="hljs-function"><span class="hljs-params">(r)</span> -&gt;</span> <span class="hljs-property">@_ready</span> = r <span class="hljs-keyword">if</span> r?; <span class="hljs-property">@onReady</span>() <span class="hljs-keyword">if</span> r; <span class="hljs-property">@_ready</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="callbacks">Callbacks</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-attribute">mouseClicked</span>: <span class="hljs-function">-&gt;</span>
+    handled = _.any <span class="hljs-property">@nodes</span>, <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+      n.handleClick { mouseX, mouseY }
+    , @
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> handled</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add attractor node in empty space.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@updateNodeCount</span> <span class="hljs-property">@nodes</span>.length,
+      <span class="hljs-attribute">attract</span>: <span class="hljs-literal">on</span>
+      <span class="hljs-attribute">p</span>: [ mouseX, mouseY, <span class="hljs-number">0</span> ]
+
+  <span class="hljs-attribute">nodeMoved</span>: <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+    <span class="hljs-property">@applyNodeFriction</span> n
+    <span class="hljs-property">@updateNodeContainment</span> n <span class="hljs-keyword">if</span> <span class="hljs-property">@contain</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span>
+
+  <span class="hljs-attribute">onNodeViewModeChange</span>: <span class="hljs-function"><span class="hljs-params">(vm)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> vm?
+      <span class="hljs-property">@nodeParams</span>.viewMode = vm
+      n.viewMode = vm <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-property">@nodes</span>
+    <span class="hljs-property">@_needsClear</span> = <span class="hljs-property">@nodeParams</span>.viewMode <span class="hljs-keyword">is</span> Node.LINE
+    <span class="hljs-property">@draw</span>()
+
+  <span class="hljs-attribute">onReady</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@onNodeViewModeChange</span>()
+    <span class="hljs-property">@log</span>()</div></div></div></div></body></html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="en"><head><title>sketches/Elementary/Node</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="sketches/Elementary/Node"><meta name="groc-project-path" content="sketches/Elementary/Node.pde"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">sketches/Elementary/Node.pde</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="node">Node</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Node</span></span>
+
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(params = Node.defaults)</span> -&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Node constructs as dynamically as possible, and has a large set of default
+params. Vectors are auto-constructed and typed. Size and mass are calculated
+automatically if possible.</p></div></div><div class="code"><div class="wrapper">    _.defaults params, Node.defaults <span class="hljs-keyword">unless</span> params <span class="hljs-keyword">is</span> Node.defaults
+
+    <span class="hljs-keyword">for</span> attribute, value <span class="hljs-keyword">of</span> params</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Account for constructing.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> value <span class="hljs-keyword">instanceof</span> Array <span class="hljs-keyword">and</span> value.length <span class="hljs-keyword">is</span> <span class="hljs-number">3</span>
+        [x, y, z] = value
+        value = <span class="hljs-keyword">new</span> PVector x, y, z</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Account for accessors.</p></div></div><div class="code"><div class="wrapper">      accessor = <span class="hljs-property">@getAccessor</span> attribute
+      <span class="hljs-keyword">if</span> accessor? <span class="hljs-keyword">then</span> accessor value
+      <span class="hljs-keyword">else</span> @[attribute] = value
+
+    <span class="hljs-property">@p</span>.type = PVector.POSITION
+    <span class="hljs-property">@v</span>.type = PVector.VELOCITY
+    <span class="hljs-property">@a</span>.type = PVector.ACCELERATION
+
+    <span class="hljs-property">@mass</span> Node.AUTO_MASS <span class="hljs-keyword">unless</span> <span class="hljs-property">@m</span>?
+
+    <span class="hljs-property">@_aCached</span> = <span class="hljs-literal">null</span>
+    <span class="hljs-property">@_pFill</span> = <span class="hljs-literal">null</span>
+    <span class="hljs-property">@_repellent</span> = <span class="hljs-literal">null</span> <span class="hljs-comment"># Reference.</span>
+    <span class="hljs-property">@_repellentSelectedAt</span> = <span class="hljs-number">0</span>
+
+    <span class="hljs-property">@attractorDist</span> = <span class="hljs-literal">null</span>
+    <span class="hljs-property">@repellentCandidates</span> = [] <span class="hljs-comment"># References.</span>
+    <span class="hljs-property">@tempRepulsion</span> = <span class="hljs-literal">null</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Manually set after others.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@isAttractor</span> <span class="hljs-property">@attract</span>
+
+  <span class="hljs-attribute">destroy</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@wrap</span>?.removeNode @</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Remove node references.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@_repellent</span> = <span class="hljs-literal">null</span>
+    <span class="hljs-property">@repellentCandidates</span> = <span class="hljs-literal">null</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h1 id="static">Static</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Node can render using one or more different view modes.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-property">@FORMLESS</span>: <span class="hljs-number">0</span>
+  <span class="hljs-property">@BALL</span>: <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">0</span>
+  <span class="hljs-property">@LINE</span>: <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">1</span>
+
+  <span class="hljs-property">@AUTO_MASS</span>: <span class="hljs-number">1</span>
+
+  <span class="hljs-property">@ATTRIBUTE_TO_ACCESSOR</span>:
+    <span class="hljs-attribute">w</span>: <span class="hljs-string">'width'</span>
+    <span class="hljs-attribute">h</span>: <span class="hljs-string">'height'</span>
+    <span class="hljs-attribute">m</span>: <span class="hljs-string">'mass'</span>
+
+  <span class="hljs-property">@defaults</span>:
+
+    <span class="hljs-attribute">id</span>: -<span class="hljs-number">1</span>
+    <span class="hljs-attribute">wrap</span>: <span class="hljs-literal">null</span>
+
+    <span class="hljs-attribute">p</span>: [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
+    <span class="hljs-attribute">v</span>: [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
+    <span class="hljs-attribute">a</span>: [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
+
+    <span class="hljs-comment">#-<span class="hljs-doctag">TODO:</span> Actually support rectangles.</span>
+    <span class="hljs-attribute">w</span>: <span class="hljs-number">10</span>
+    <span class="hljs-attribute">h</span>: <span class="hljs-number">10</span>
+
+    <span class="hljs-attribute">m</span>: <span class="hljs-literal">null</span>
+    <span class="hljs-attribute">mMax</span>: <span class="hljs-number">100</span>
+    <span class="hljs-attribute">vMax</span>: <span class="hljs-number">1</span> <span class="hljs-comment"># On one dimension.</span>
+    <span class="hljs-attribute">density</span>: <span class="hljs-number">1</span>
+    <span class="hljs-attribute">attractFieldMin</span>: <span class="hljs-number">40</span> <span class="hljs-comment"># Avoid applying huge attraction.</span>
+    <span class="hljs-attribute">attractFieldMax</span>: <span class="hljs-number">80</span> <span class="hljs-comment"># Avoid applying tiny attraction.</span>
+    <span class="hljs-attribute">attractDecayRate</span>: <span class="hljs-number">0.01</span>
+    <span class="hljs-attribute">evadeLifespan</span>: <span class="hljs-number">5</span>
+    <span class="hljs-attribute">tempRepulsionDecayRate</span>: <span class="hljs-number">0.05</span>
+
+    <span class="hljs-attribute">attract</span>: <span class="hljs-literal">off</span>
+    <span class="hljs-attribute">autoMass</span>: <span class="hljs-literal">on</span>
+    <span class="hljs-attribute">autoSize</span>: <span class="hljs-literal">on</span>
+    <span class="hljs-attribute">collide</span>: <span class="hljs-literal">on</span>
+    <span class="hljs-attribute">move</span>: <span class="hljs-literal">on</span>
+    <span class="hljs-attribute">varyMass</span>: <span class="hljs-literal">off</span>
+
+  <span class="hljs-property">@setup</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This needs to be called for the class to be ready for use. Some default
+attributes reference other values not ready on initial declaration.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@defaults</span>.fill = color.BLACK
+    <span class="hljs-property">@defaults</span>.stroke = color.BLACK
+
+    <span class="hljs-property">@defaults</span>.viewMode = <span class="hljs-property">@BALL</span>
+
+    <span class="hljs-property">@defaults</span>.attractConst = PVector.G</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h1 id="public">Public</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-comment">#-<span class="hljs-doctag">TODO:</span> Better freezing.</span>
+  <span class="hljs-attribute">draw</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@updateMovement</span>() <span class="hljs-keyword">if</span> <span class="hljs-property">@move</span>
+    <span class="hljs-property">@updateAttraction</span>() <span class="hljs-keyword">if</span> <span class="hljs-property">@attract</span>
+    <span class="hljs-comment">#-<span class="hljs-doctag">NOTE:</span> PJS shortcoming.</span>
+    <span class="hljs-comment">#-@mousePressed() if mousePressed</span>
+
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@viewMode</span> &amp; Node.BALL
+      noStroke()
+      fill <span class="hljs-property">@fillColor</span>() <span class="hljs-keyword">unless</span> <span class="hljs-property">@fill</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">no</span>
+      ellipse <span class="hljs-property">@x</span>(), <span class="hljs-property">@y</span>(), <span class="hljs-property">@w</span>, <span class="hljs-property">@h</span>
+
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@viewMode</span> &amp; Node.LINE <span class="hljs-keyword">and</span> <span class="hljs-property">@shouldDrawLine</span>()
+      noFill()
+      strokeWeight <span class="hljs-number">0.1</span>
+      stroke color.transparentize <span class="hljs-property">@strokeColor</span>(), <span class="hljs-number">0.33</span>
+      line <span class="hljs-property">@x</span>(), <span class="hljs-property">@y</span>(), <span class="hljs-property">@px</span>(), <span class="hljs-property">@py</span>()
+
+    <span class="hljs-property">@updateStorage</span>()
+
+  <span class="hljs-attribute">drawBoundsRect</span>: <span class="hljs-function">-&gt;</span> rect <span class="hljs-property">@top</span>(), <span class="hljs-property">@left</span>(), <span class="hljs-property">@width</span>(), <span class="hljs-property">@height</span>()
+
+  <span class="hljs-attribute">shouldDrawLine</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@pPrev</span>? <span class="hljs-keyword">and</span> <span class="hljs-property">@p</span>.dist(<span class="hljs-property">@pPrev</span>) &lt; <span class="hljs-property">@w</span>
+
+  <span class="hljs-attribute">updateAttraction</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-property">@isAttractor</span> <span class="hljs-literal">off</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@_attractLifespan</span> &lt;= <span class="hljs-number">0</span>
+
+    <span class="hljs-property">@withNeighbors</span> (n) =&gt; <span class="hljs-property">@attractNode</span> n</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Decay.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@_attractLifespan</span> -= <span class="hljs-property">@attractDecayRate</span> * <span class="hljs-property">@_attractLifespan</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Evade.</p></div></div><div class="code"><div class="wrapper">    updateRepellent = (
+      <span class="hljs-property">@repellentCandidates</span>.length <span class="hljs-keyword">and</span>
+      millis() - <span class="hljs-property">@_repellentSelectedAt</span> &gt; <span class="hljs-property">@evadeLifespan</span> * <span class="hljs-number">1000</span>
+    )
+    <span class="hljs-keyword">if</span> updateRepellent
+      <span class="hljs-property">@_repellent</span> = random.item <span class="hljs-property">@repellentCandidates</span>
+      <span class="hljs-property">@_repellentSelectedAt</span> = millis()
+    <span class="hljs-property">@evadeNode</span> <span class="hljs-property">@_repellent</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@_repellent</span>?
+
+  <span class="hljs-attribute">updateMovement</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@v</span>.add <span class="hljs-property">@a</span>
+    <span class="hljs-property">@refineVelocity</span>()
+    <span class="hljs-property">@p</span>.add <span class="hljs-property">@v</span>
+    <span class="hljs-property">@resetAcceleration</span>()
+    <span class="hljs-property">@wrap</span>?.nodeMoved @
+
+  <span class="hljs-attribute">updateStorage</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@viewMode</span> &amp; Node.LINE
+      <span class="hljs-keyword">if</span> <span class="hljs-property">@shouldDrawLine</span>() <span class="hljs-keyword">then</span> <span class="hljs-property">@pPrev</span>.set <span class="hljs-property">@p</span> <span class="hljs-keyword">else</span> <span class="hljs-property">@pPrev</span> = <span class="hljs-property">@p</span>.get()
+
+  <span class="hljs-attribute">log</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-built_in">console</span>.info @</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="geometry">Geometry</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-comment">#-<span class="hljs-doctag">TODO:</span> Configurable hit area.</span>
+  <span class="hljs-attribute">overlapsWith</span>: <span class="hljs-function"><span class="hljs-params">(x, y)</span> -&gt;</span>
+    abs(<span class="hljs-property">@x</span>() - x) &lt; (<span class="hljs-property">@w</span> / <span class="hljs-number">2</span>) <span class="hljs-keyword">and</span> abs(<span class="hljs-property">@y</span>() - y) &lt; (<span class="hljs-property">@h</span> / <span class="hljs-number">2</span>)</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="physics">Physics</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-attribute">applyForce</span>: <span class="hljs-function"><span class="hljs-params">(vec, toggled = <span class="hljs-literal">on</span>)</span> -&gt;</span>
+    mutableVec = vec.get()
+    mutableVec.div <span class="hljs-property">@m</span> <span class="hljs-keyword">if</span> vec.type <span class="hljs-keyword">isnt</span> PVector.GRAVITY
+    <span class="hljs-keyword">if</span> toggled <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@a</span>.add(vec) <span class="hljs-keyword">else</span> <span class="hljs-property">@a</span>.sub(vec)
+
+  <span class="hljs-attribute">attractNode</span>: <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> n.tempRepulsion?
+      n.applyForce n.tempRepulsion
+      n.attractorDist = PVector.dist <span class="hljs-property">@p</span>, n.p
+      n.tempRepulsion.mult <span class="hljs-number">1</span> - <span class="hljs-property">@tempRepulsionDecayRate</span>
+      n.tempRepulsion = <span class="hljs-literal">null</span> <span class="hljs-keyword">if</span> n.tempRepulsion.mag() &lt; <span class="hljs-number">0.01</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">no</span>
+
+    f = PVector.sub <span class="hljs-property">@p</span>, n.p
+    f.type = PVector.ATTRACTION
+    d = constrain f.mag(), <span class="hljs-property">@attractFieldMin</span>, <span class="hljs-property">@attractFieldMax</span>
+    strength = (<span class="hljs-property">@attractConst</span> * <span class="hljs-property">@mass</span>() * n.mass()) / sq(d)
+    f.normalize()
+    f.mult strength
+    n.applyForce f
+    n.attractorDist = PVector.dist <span class="hljs-property">@p</span>, n.p
+    n.onAttract @, f
+
+  <span class="hljs-attribute">evadeNode</span>: <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+    f = n.a.get()
+    variance = <span class="hljs-keyword">new</span> PVector random.signed(), random.signed()
+    variance.div <span class="hljs-number">10</span>
+    f.add variance
+    <span class="hljs-property">@applyForce</span> f
+
+  <span class="hljs-attribute">refineVelocity</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@v</span>.limit <span class="hljs-property">@vMax</span>
+
+  <span class="hljs-attribute">resetAcceleration</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@_aCached</span>? <span class="hljs-keyword">then</span> <span class="hljs-property">@a</span> = <span class="hljs-property">@_aCached</span>.get()
+    <span class="hljs-keyword">else</span> <span class="hljs-property">@a</span>.mult <span class="hljs-number">0</span> <span class="hljs-comment"># Clear if nothing to reset to.</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Caching allows the resulting acceleration to be committed into cache and
+reused later as base.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-attribute">cacheAcceleration</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@_aCached</span> = <span class="hljs-property">@a</span>.get()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="accessors">Accessors</h2></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Use accessors for public access when possible instead of the attributes, which
+are generally private outside of construction. Also note accessor names are
+adjusted, so they don&#39;t conflict with their respective attributes. Lastly, the
+main reason to wrap attributes in accessors is to allow for will-set and
+did-set behaviors, as well as additional transformations.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-attribute">getAccessor</span>: <span class="hljs-function"><span class="hljs-params">(attribute)</span> -&gt;</span>
+    accessor = @[attribute]
+    accessor ?= @[Node.ATTRIBUTE_TO_ACCESSOR[attribute]]
+    accessor ?= @[<span class="hljs-string">"<span class="hljs-subst">#{attribute}</span>Color"</span>]
+    <span class="hljs-keyword">return</span> accessor.bind @ <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> accessor <span class="hljs-keyword">is</span> <span class="hljs-string">'function'</span>
+    <span class="hljs-literal">undefined</span>
+
+  <span class="hljs-attribute">width</span>: <span class="hljs-function"><span class="hljs-params">(w)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> w?
+      wPrev = <span class="hljs-property">@w</span>
+      <span class="hljs-property">@w</span> = w
+      <span class="hljs-property">@mass</span> Node.AUTO_MASS
+      <span class="hljs-property">@attractFieldMin</span> *= <span class="hljs-property">@w</span> / wPrev
+      <span class="hljs-property">@attractFieldMax</span> *= <span class="hljs-property">@w</span> / wPrev
+    <span class="hljs-property">@w</span>
+
+  <span class="hljs-attribute">height</span>: <span class="hljs-function"><span class="hljs-params">(h)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> h?
+      <span class="hljs-property">@h</span> = h
+      <span class="hljs-property">@mass</span> Node.AUTO_MASS
+    <span class="hljs-property">@h</span>
+
+  <span class="hljs-attribute">radius</span>: <span class="hljs-function"><span class="hljs-params">(r)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> r?
+      <span class="hljs-property">@width</span> r * <span class="hljs-number">2</span>
+      <span class="hljs-property">@h</span> = <span class="hljs-property">@w</span>
+    <span class="hljs-property">@w</span> / <span class="hljs-number">2</span> <span class="hljs-comment"># Optimize if needed.</span>
+
+  <span class="hljs-attribute">mass</span>: <span class="hljs-function"><span class="hljs-params">(m)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> m?</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Support autoMass.
+It&#39;s 2D &#39;mass&#39;, where the third size is 1.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> m <span class="hljs-keyword">isnt</span> Node.AUTO_MASS <span class="hljs-keyword">then</span> <span class="hljs-property">@m</span> = m
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@autoMass</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@m</span> = <span class="hljs-property">@w</span> * <span class="hljs-property">@h</span> * <span class="hljs-property">@density</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Support varyMass.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-property">@m</span> *= sqrt random.dualScale(<span class="hljs-property">@mMax</span>) <span class="hljs-keyword">if</span> <span class="hljs-property">@varyMass</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Support autoSize.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-property">@w</span> = <span class="hljs-property">@h</span> = <span class="hljs-property">@m</span> / <span class="hljs-property">@w</span> / <span class="hljs-property">@density</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@autoSize</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">and</span> <span class="hljs-property">@m</span>?
+    <span class="hljs-property">@m</span>
+
+  <span class="hljs-attribute">isAttractor</span>: <span class="hljs-function"><span class="hljs-params">(bool)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> bool?
+      <span class="hljs-property">@attract</span> = bool</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Update fill.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-property">@_pFill</span> ?= <span class="hljs-property">@fill</span>
+      <span class="hljs-property">@fillColor</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@attract</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">then</span> color.RED <span class="hljs-keyword">else</span> <span class="hljs-property">@_pFill</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Restart decay.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-property">@_attractLifespan</span> = <span class="hljs-number">1.0</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@attract</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Update auto-evasion.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-property">@evade</span> = bool
+    <span class="hljs-property">@attract</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>As an exception, try to always use the position accessors, since they wrap a
+complex object.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-attribute">x</span>: <span class="hljs-function"><span class="hljs-params">(x)</span> -&gt;</span> <span class="hljs-property">@p</span>.x = x <span class="hljs-keyword">if</span> x?; <span class="hljs-property">@p</span>.x
+  <span class="hljs-attribute">y</span>: <span class="hljs-function"><span class="hljs-params">(y)</span> -&gt;</span> <span class="hljs-property">@p</span>.y = y <span class="hljs-keyword">if</span> y?; <span class="hljs-property">@p</span>.y
+  <span class="hljs-attribute">z</span>: <span class="hljs-function"><span class="hljs-params">(z)</span> -&gt;</span> <span class="hljs-property">@p</span>.z = z <span class="hljs-keyword">if</span> z?; <span class="hljs-property">@p</span>.z
+
+  <span class="hljs-attribute">px</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@pPrev</span>.x
+  <span class="hljs-attribute">py</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@pPrev</span>.y
+  <span class="hljs-attribute">pz</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@pPrev</span>.z</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Note these assume ellipseMode or rectMode is CENTER.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-attribute">top</span>: <span class="hljs-function"><span class="hljs-params">(t)</span> -&gt;</span> <span class="hljs-property">@y</span> (t + <span class="hljs-property">@h</span> / <span class="hljs-number">2</span>) <span class="hljs-keyword">if</span> t?; <span class="hljs-property">@y</span>() - <span class="hljs-property">@h</span> / <span class="hljs-number">2</span>
+  <span class="hljs-attribute">bottom</span>: <span class="hljs-function"><span class="hljs-params">(b)</span> -&gt;</span> <span class="hljs-property">@y</span> (b - <span class="hljs-property">@h</span> / <span class="hljs-number">2</span>) <span class="hljs-keyword">if</span> b?; <span class="hljs-property">@y</span>() + <span class="hljs-property">@h</span> / <span class="hljs-number">2</span>
+  <span class="hljs-attribute">left</span>: <span class="hljs-function"><span class="hljs-params">(l)</span> -&gt;</span> <span class="hljs-property">@x</span> (l + <span class="hljs-property">@w</span> / <span class="hljs-number">2</span>) <span class="hljs-keyword">if</span> l?; <span class="hljs-property">@x</span>() - <span class="hljs-property">@w</span> / <span class="hljs-number">2</span>
+  <span class="hljs-attribute">right</span>: <span class="hljs-function"><span class="hljs-params">(r)</span> -&gt;</span> <span class="hljs-property">@x</span> (r - <span class="hljs-property">@w</span> / <span class="hljs-number">2</span>) <span class="hljs-keyword">if</span> r?; <span class="hljs-property">@x</span>() + <span class="hljs-property">@w</span> / <span class="hljs-number">2</span>
+
+  <span class="hljs-attribute">fillColor</span>: <span class="hljs-function"><span class="hljs-params">(fc)</span> -&gt;</span> <span class="hljs-property">@fill</span> = color.ensure fc <span class="hljs-keyword">if</span> fc?; <span class="hljs-property">@fill</span>
+  <span class="hljs-attribute">strokeColor</span>: <span class="hljs-function"><span class="hljs-params">(sc)</span> -&gt;</span> <span class="hljs-property">@stroke</span> = color.ensure sc <span class="hljs-keyword">if</span> sc?; <span class="hljs-property">@stroke</span>
+
+  <span class="hljs-attribute">withNeighbors</span>: <span class="hljs-function"><span class="hljs-params">(fn)</span> -&gt;</span> fn n <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-property">@wrap</span>.nodes <span class="hljs-keyword">when</span> n <span class="hljs-keyword">isnt</span> @</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="callbacks">Callbacks</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="hljs-attribute">handleClick</span>: <span class="hljs-function"><span class="hljs-params">(c)</span> -&gt;</span>
+    should = <span class="hljs-property">@overlapsWith</span> c.mouseX, c.mouseY
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">no</span> <span class="hljs-keyword">unless</span> should
+    <span class="hljs-property">@isAttractor</span> <span class="hljs-keyword">not</span> <span class="hljs-property">@attract</span>
+    <span class="hljs-literal">yes</span>
+
+  <span class="hljs-attribute">onAttract</span>: <span class="hljs-function"><span class="hljs-params">(attractor, f)</span> -&gt;</span>
+    d = <span class="hljs-property">@p</span>.dist attractor.p</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create temporary repulsion.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> d &lt; <span class="hljs-property">@attractFieldMin</span>
+      <span class="hljs-property">@tempRepulsion</span> = f.get()
+      <span class="hljs-property">@tempRepulsion</span>.mult -<span class="hljs-number">1</span>
+    <span class="hljs-keyword">else</span> </div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Attractor should evade if needed.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> attractor.mass() &lt; <span class="hljs-property">@m</span>
+        attractor.repellentCandidates[<span class="hljs-property">@id</span>] ?= @
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> attractor.repellentCandidates[<span class="hljs-property">@id</span>]?
+        <span class="hljs-keyword">delete</span> attractor.repellentCandidates[<span class="hljs-property">@id</span>]</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Destroy if too close, but the attractor with less mass.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@collide</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">off</span> <span class="hljs-keyword">or</span> (d &gt; <span class="hljs-property">@radius</span>() <span class="hljs-keyword">and</span> d &gt; attractor.radius())
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@isAttractor</span>() <span class="hljs-keyword">and</span> <span class="hljs-property">@m</span> &gt; attractor.mass <span class="hljs-keyword">then</span> attractor.destroy()
+    <span class="hljs-keyword">else</span> <span class="hljs-property">@destroy</span>()</div></div></div></div></body></html>

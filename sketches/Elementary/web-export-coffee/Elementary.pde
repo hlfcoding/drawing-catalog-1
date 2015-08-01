@@ -1,66 +1,39 @@
-###
-Elementary
-==========
-###
-
 sketch = null
 
 # Initializers
 # ------------
 
-# Initialize:
 setup: ->   
+  # Required for CS-P5-mode parser.
+  # size(720, 480);
 
-  #-Required for CS-P5-mode parser.
-  #-size(720, 480);
-
-  # The `sketch` global is actually a reference to the sketch instance. This
-  # approach is unique to the CS-P5 mode implementation. It acts as a namespace
-  # for other globals, to make globals more apparent.
   sketch = @
-
-  # The sketch instance also keeps a `state` namespace with attributes related
-  # to sketch state. Aside from the sketch, it should be read-only.
   @state =
     frozen: no
     speedFactor: 0
 
-  # First, initialize constants and extensions. These make the Processing API
-  # even better.
   @_setupConstants()
   @_setupExtensions()
 
-  # Next, update any globals required for initializing classes. Class defaults
-  # may require additional globals.
   @state.frameRate = frameRate.FILM
   @_updateSpeedFactor()
-
-  # Next, initialize classes, including setting any less-static defaults.
+  # Class defaults may require additional globals.
   @_setupClasses()
 
-  # Next, initialize Processing sketch settings.
   colorMode RGB, 255
   noStroke()
-  [w, h] = size.MEDIUM # Update size here.
+
+  [w, h] = size.MEDIUM
   size w, h
+
   background color.WHITE
   
-  # Next, initialize, along with its `Node`s, a single instance of `Wrap` called
-  # `stage`, and keep it on `sketch`.
   @_setupStage()
 
-  # Next, initialize the stores for canvas image data, ie. to store screens so
-  # view modes can be toggled non-destructively, and so image data can be
-  # exported.
   @_setupScreens()
 
-  # Last, initialize the controls for any mutable, configurable values in the
-  # sketch, making the sketch much more interactive and powerful.
   @_setupGUI()
 
-# §
-
-# An initializer for constants:
 _setupConstants: ->
 
   ###
@@ -84,12 +57,11 @@ _setupConstants: ->
   size.MEDIUM = [720, 480]
   size.TWITTER = [1252, 626]
 
-# An initializer for extensions:
 _setupExtensions: ->
 
   ###
-  * PVector extension to add helper constants and methods for the sketch. The main
-    addition is the concept of a vector type.
+  PVector extension to add helper constants and methods for the sketch. The main
+  addition is the concept of a vector type.
   ###
 
   PVector.G = 0.01
@@ -113,16 +85,16 @@ _setupExtensions: ->
     @y = random height
 
   ###
-  * Add helpers to the color API methods, mainly for conversion.
+  Add helpers to the color API methods, mainly for conversion.
   ###
 
-  #-This should be less magical.
+  # This should be less magical.
   color.ensure = (c) -> if c > 0 then c - 16777216 else c
 
   color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
 
   ###
-  * Add helpers to number methods, mainly for macro-calculations.
+  Add helpers to number methods, mainly for macro-calculations.
   ###
 
   random.dualScale = (n) -> random(1, n) / random(1, n)
@@ -130,23 +102,21 @@ _setupExtensions: ->
   random.signed = -> random -1, 1
 
   ###
-  * Add core helpers.
+  Add core helpers.
   ###
 
-  #-Currently unused.
+  # Currently unused.
   Processing.isKindOfClass = (obj, aClass) ->
     test = obj.constructor is aClass
     if not bool and obj.constructor.__super__?
       test = isKindOfClass obj.constructor.__super__, aClass
     test
 
-# An initializer for classes:
 _setupClasses: ->
 
   Node.setup()
   Wrap.setup()
 
-# An initializer for controls:
 _setupGUI: ->
 
   ###
@@ -173,7 +143,7 @@ _setupGUI: ->
 
   folder = gui.addFolder 'colors'
 
-  #-TODO: Still has issues.
+  # TODO: Still has issues.
   colorPicker = folder.addColor @stage, 'fill'
   colorPicker.onChange (color) => @stage.fillColor color
   colorPicker.onFinishChange (color) => @stage.fillColor color
@@ -220,7 +190,6 @@ _setupGUI: ->
 
   gui.open()
 
-# An initializer for image data storage:
 _setupScreens: ->
 
   ###
@@ -232,7 +201,6 @@ _setupScreens: ->
   @_screenStacks[Wrap.TRACE] = []
   @_screenStacks[Wrap.DEFAULT] = []
 
-# An initializer for the stage and its nodes:
 _setupStage: ->
 
   ###
@@ -255,10 +223,8 @@ _setupStage: ->
 # Updaters
 # --------
 
-# Update loop:
 draw: -> @stage.draw()
 
-# Stop updating:
 freeze: (frozen) ->
 
   ###
@@ -281,7 +247,6 @@ _updateSpeedFactor: ->
 
 # Canvas State
 # ------------
-# Some DOM-related logic:
 
 canvasElement: -> @contentElement().querySelector 'canvas'
 contentElement: -> document.getElementById 'content'
@@ -311,6 +276,5 @@ _screenUpdateVars: ->
 
 # Responders
 # ----------
-# Some ad-hoc user input handling. Not as good as DOM events.
 
 mouseClicked: -> @stage.mouseClicked()

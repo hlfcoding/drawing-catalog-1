@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Elementary : Built with Processing and Processing.js</title>
+  <link rel="icon"  type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAQAAVzABAEAjBQAaDwYAWjUGAGE6CQBrQQ0ATS8PAFhAJwBUQC8AbFI6AHVXPACBZk4A4NrWAPb19QAAAAAAAMmZmZmZmgAJIwAAAAAAcMIjPjA+PjAKpxIuMDMzMAm0Ii4zMzMACaIiLt3dMAAJtyIuIzPQAAm0Un5yM+IzKLRkfncy4iIotRF+dyLkIiq0QX53F+EiGrQUTkd34iIatEVu7u5iIVrBVVRBRFRVbAtGZGZla2uwAMu7u7u8vADAAwAAgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIABAADAAwAA" />
+  <meta name="Generator" content="Processing" />
+  <!-- + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+  +
+  +   This is CoffeeScript running on Processing.js through Processing
+  +
+  +   See: https://github.com/fjenett/coffeescript-mode-processing
+  +
+  +   http://processing.org/
+  +   http://processingjs.org/
+  +   http://coffeescript.org/
+  +
+  L + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + -->
+  <link rel="stylesheet" type="text/css" href="theme.css">
+  <style type="text/css">
+    /* Dynamic */
+    #content { width: 720px; }
+  </style>
+  <!--[if lt IE 9]>
+    <script type="text/javascript">alert("Your browser does not support the canvas tag.");</script>
+  <![endif]-->
+  <script src="processing.js" type="text/javascript"></script>
+  <script src="dat.gui.min.js" type="text/javascript"></script>
+  <script src="underscore-min.js" type="text/javascript"></script>
+  <script src="Elementary-compiled.js" type="text/javascript"></script>
+  <script type="text/javascript">function getProcessingSketchID () { return 'Elementary'; }</script>
+
+</head>
+<body>
+  <div id="content">
+    <div>
+      <canvas id="Elementary" width="720" height="480">
+        <p>Your browser does not support the canvas tag.</p>
+        <!-- Note: you can put any alternative content here. -->
+      </canvas>
+      <noscript>
+        <p>JavaScript is required to view the contents of this page.</p>
+      </noscript>
+      </div>
+    <h1>Elementary</h1>
+      <p id="description"></p>
+    <p id="sources">Source code: <a href="Elementary.pde">Elementary</a> <a href="Node.pde">Node</a> <a href="Wrap.pde">Wrap</a> </p>
+    <p id="">
+    Written in <a href="http://coffeescript.org/" title="CoffeeScript">CoffeeScript</a> 
+    on <a href="http://processing.org" title="Processing">Processing</a>
+    and <a href="http://processingjs.org" title="Processing.js">Processing.js</a>
+    </p>
+  </div>
+  <script type="text/coffeescript-processing">
+class SketchElementary
+  sketch = null
+  
+  # Initializers
+  # ------------
+  
+  setup: ->   
+    "Processing API injection iffy goes here";
+    # Required for CS-P5-mode parser.
+    # size(720, 480);
+  
+    sketch = @
+    @state =
+      frozen: no
+      speedFactor: 0
+  
+    @_setupConstants()
+    @_setupExtensions()
+  
+    @state.frameRate = frameRate.FILM
+    @_updateSpeedFactor()
+    # Class defaults may require additional globals.
+    @_setupClasses()
+  
+    colorMode RGB, 255
+    noStroke()
+  
+    [w, h] = size.MEDIUM
+    size w, h
+  
+    background color.WHITE
+    
+    @_setupStage()
+  
+    @_setupScreens()
+  
+    @_setupGUI()
+  
+  _setupConstants: ->
+  
+    ###
+    Constants, when possible, are attached to the Processing (sketch) API methods.
+    This is because scope globals are of limited use in CS mode, and globalized
+    methods are conveniently fitting as namespaces, despite being a little risky
+    to modify.
+    ###
+  
+    color.BLACK = color 0
+    color.WHITE = color 255
+    color.RED = color 255, 0, 0
+  
+    frameRate.DEBUG = 1
+    frameRate.ANIMATION = 12
+    frameRate.FILM = 24
+    frameRate.VIDEO = 30
+    frameRate.REAL = 60
+  
+    size.SMALL = [300, 300]
+    size.MEDIUM = [720, 480]
+    size.TWITTER = [1252, 626]
+  
+  _setupExtensions: ->
+  
+    ###
+    PVector extension to add helper constants and methods for the sketch. The main
+    addition is the concept of a vector type.
+    ###
+  
+    PVector.G = 0.01
+  
+    PVector.GENERIC = 0
+    PVector.POSITION = 1
+    PVector.VELOCITY = 2
+    PVector.ACCELERATION = 3
+  
+    PVector.GRAVITY = 1 << 0
+    PVector.ATTRACTION = 1 << 1
+  
+    PVector.createGravity = =>
+      vec = new PVector 0, @state.speedFactor / 2
+      vec.type = PVector.GRAVITY
+      vec
+  
+    PVector::randomize = ->
+      return unless @type is PVector.POSITION
+      @x = random width
+      @y = random height
+  
+    ###
+    Add helpers to the color API methods, mainly for conversion.
+    ###
+  
+    # This should be less magical.
+    color.ensure = (c) -> if c > 0 then c - 16777216 else c
+  
+    color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
+  
+    ###
+    Add helpers to number methods, mainly for macro-calculations.
+    ###
+  
+    random.dualScale = (n) -> random(1, n) / random(1, n)
+    random.item = (list) -> list[_.random(list.length - 1)]
+    random.signed = -> random -1, 1
+  
+    ###
+    Add core helpers.
+    ###
+  
+    # Currently unused.
+    Processing.isKindOfClass = (obj, aClass) ->
+      test = obj.constructor is aClass
+      if not bool and obj.constructor.__super__?
+        test = isKindOfClass obj.constructor.__super__, aClass
+      test
+  
+  _setupClasses: ->
+  
+    Node.setup()
+    Wrap.setup()
+  
+  _setupGUI: ->
+  
+    ###
+    The sketch has state and the datGUI library builds an interface to manipulate
+    and tune that state for various results.
+    ###
+  
+    gui = new dat.GUI()
+  
+    folder = gui.addFolder 'sketch'
+  
+    toggle = folder.add @state, 'frozen'
+    toggle.onFinishChange (toggled) => @freeze toggled
+  
+    select = folder.add @state, 'frameRate',
+      'Debug': frameRate.DEBUG
+      'Animation': frameRate.ANIMATION
+      'Film': frameRate.FILM
+      'Video': frameRate.VIDEO
+      'Real': frameRate.REAL
+    select.onFinishChange (option) => @state.frameRate = parseInt option, 10
+  
+    button = folder.add @, 'exportScreen'
+  
+    folder = gui.addFolder 'colors'
+  
+    # TODO: Still has issues.
+    colorPicker = folder.addColor @stage, 'fill'
+    colorPicker.onChange (color) => @stage.fillColor color
+    colorPicker.onFinishChange (color) => @stage.fillColor color
+  
+    folder = gui.addFolder 'stage'
+  
+    createNodeParamsUpdater = (attribute) =>
+      (value) => n[attribute] = value for n in @stage.nodes
+  
+    range = folder.add @stage, 'frictionMag', 0.001, 0.1
+  
+    range = folder.add @stage, 'entropy', 0, 2
+  
+    range = folder.add @stage, 'nodeCount', 0, 500
+    range.onFinishChange (count) => @stage.updateNodeCount count
+  
+    range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
+    range.onFinishChange createNodeParamsUpdater('vMax')
+  
+    toggle = folder.add @stage, 'gravity'
+    toggle.onFinishChange (toggled) =>
+      @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL
+      @stage.toggleForce PVector.GRAVITY, toggled
+  
+    toggle = folder.add @stage.nodeParams, 'collide'
+    toggle.onFinishChange createNodeParamsUpdater('collide')
+  
+    toggle = folder.add @stage.nodeParams, 'varyMass'
+    toggle.onFinishChange createNodeParamsUpdater('varyMass')
+  
+    select = folder.add @stage, 'containment',
+      'Reflective': Wrap.REFLECTIVE
+      'Toroidal': Wrap.TOROIDAL
+    select.onFinishChange (option) => @stage.containment = parseInt option, 10
+  
+    select = folder.add @stage.nodeParams, 'viewMode',
+      'Ball': Node.BALL
+      'Line': Node.LINE
+    select.onFinishChange (option) => @stage.onNodeViewModeChange parseInt option, 10
+  
+    button = folder.add @stage, 'clear'
+  
+    dat.GUI.shared = gui
+  
+    gui.open()
+  
+  _setupScreens: ->
+  
+    ###
+    Screens can store and restore canvas state when switching between different
+    draw modes.
+    ###
+  
+    @_screenStacks = {}
+    @_screenStacks[Wrap.TRACE] = []
+    @_screenStacks[Wrap.DEFAULT] = []
+  
+  _setupStage: ->
+  
+    ###
+    The sketch only has one Wrap, and filling the sketch, it acts like a 'stage'.
+    ###
+  
+    wind = new PVector 0.001, 0
+    @stage = new Wrap
+      id: 1
+      containment: Wrap.TOROIDAL
+      customForces: [ wind ]
+      h: height
+      w: width
+  
+    @stage.updateNodeCount()
+  
+    @stage.ready yes
+    @canvasElement().focus()
+  
+  # Updaters
+  # --------
+  
+  draw: -> @stage.draw()
+  
+  freeze: (frozen) ->
+  
+    ###
+    One of the first things we need to do is to be able to control the cycle-
+    expensive run state without stopping the server. This is especially handy when
+    LiveReload is used.
+    ###
+  
+    frozen ?= @state.frozen
+  
+    n.move = !frozen for n in @stage.nodes
+    if frozen then noLoop()
+    else @loop()
+  
+    @state.frozen = frozen
+  
+  _updateSpeedFactor: ->
+    @state.speedFactor = frameRate.REAL / @state.frameRate
+    frameRate @state.frameRate
+  
+  # Canvas State
+  # ------------
+  
+  canvasElement: -> @contentElement().querySelector 'canvas'
+  contentElement: -> document.getElementById 'content'
+  
+  exportScreen: ->
+    img = document.createElement 'img'
+    img.src = @canvasElement().toDataURL()
+    if @_imgPrev? then @contentElement().insertBefore img, @_imgPrev
+    else @contentElement().appendChild img
+    @_imgPrev = img
+  
+  pushScreen: (customStack) ->
+    [context, stack] = @_screenUpdateVars()
+    stack = customStack if customStack?
+    screen = context.getImageData 0, 0, width, height
+    @_screenStacks[stack].push screen
+  
+  popScreen: ->
+    [context, stack] = @_screenUpdateVars()
+    return unless @_screenStacks[stack].length
+    context.putImageData @_screenStacks[stack].pop(), 0, 0
+  
+  _screenUpdateVars: ->
+    context = @canvasElement().getContext '2d'
+    stack = if @stage.trace is on then Wrap.TRACE else Wrap.DEFAULT
+    [context, stack]
+  
+  # Responders
+  # ----------
+  
+  mouseClicked: -> @stage.mouseClicked()
+  class Node
+  
+    constructor: (params = Node.defaults) ->
+  
+      ###
+      Node constructs as dynamically as possible, and has a large set of default
+      params. Vectors are auto-constructed and typed. Size and mass are calculated
+      automatically if possible.
+      ###
+  
+      _.defaults params, Node.defaults unless params is Node.defaults
+  
+      for attribute, value of params
+        # Account for constructing.
+        if value instanceof Array and value.length is 3
+          [x, y, z] = value
+          value = new PVector x, y, z
+        # Account for accessors.
+        accessor = @getAccessor attribute
+        if accessor? then accessor value
+        else @[attribute] = value
+  
+      @p.type = PVector.POSITION
+      @v.type = PVector.VELOCITY
+      @a.type = PVector.ACCELERATION
+  
+      @mass Node.AUTO_MASS unless @m?
+  
+      @_aCached = null
+      @_pFill = null
+      @_repellent = null # Reference.
+      @_repellentSelectedAt = 0
+  
+      @attractorDist = null
+      @repellentCandidates = [] # References.
+      @tempRepulsion = null
+  
+      # Manually set after others.
+      @isAttractor @attract
+  
+    destroy: ->
+      @wrap?.removeNode @
+  
+      # Remove node references.
+      @_repellent = null
+      @repellentCandidates = null
+  
+    # Static
+    # ======
+  
+    ###
+    Node can render using one or more different view modes.
+    ###
+  
+    @FORMLESS: 0
+    @BALL: 1 << 0
+    @LINE: 1 << 1
+  
+    @AUTO_MASS: 1
+  
+    @ATTRIBUTE_TO_ACCESSOR:
+      w: 'width'
+      h: 'height'
+      m: 'mass'
+  
+    @defaults:
+  
+      id: -1
+      wrap: null
+  
+      p: [0, 0, 0]
+      v: [0, 0, 0]
+      a: [0, 0, 0]
+  
+      # TODO: Actually support rectangles.
+      w: 10
+      h: 10
+  
+      m: null
+      mMax: 100
+      vMax: 1 # On one dimension.
+      density: 1
+      attractFieldMin: 40 # Avoid applying huge attraction.
+      attractFieldMax: 80 # Avoid applying tiny attraction.
+      attractDecayRate: 0.01
+      evadeLifespan: 5
+      tempRepulsionDecayRate: 0.05
+  
+      attract: off
+      autoMass: on
+      autoSize: on
+      collide: on
+      move: on
+      varyMass: off
+  
+    @setup: ->
+  
+      ###
+      This needs to be called for the class to be ready for use. Some default
+      attributes reference other values not ready on initial declaration.
+      ###
+  
+      @defaults.fill = color.BLACK
+      @defaults.stroke = color.BLACK
+  
+      @defaults.viewMode = @BALL
+  
+      @defaults.attractConst = PVector.G
+  
+    # Public
+    # ======
+  
+    # TODO: Better freezing.
+    draw: ->
+      @updateMovement() if @move
+      @updateAttraction() if @attract
+      # Note: PJS shortcoming.
+      # @mousePressed() if mousePressed
+  
+      if @viewMode & Node.BALL
+        noStroke()
+        fill @fillColor() unless @fill is no
+        ellipse @x(), @y(), @w, @h
+  
+      if @viewMode & Node.LINE and @shouldDrawLine()
+        noFill()
+        strokeWeight 0.1
+        stroke color.transparentize @strokeColor(), 0.33
+        line @x(), @y(), @px(), @py()
+  
+      @updateStorage()
+  
+    drawBoundsRect: -> rect @top(), @left(), @width(), @height()
+  
+    shouldDrawLine: -> @pPrev? and @p.dist(@pPrev) < @w
+  
+    updateAttraction: ->
+      return @isAttractor off if @_attractLifespan <= 0
+  
+      @withNeighbors (n) => @attractNode n
+      # Decay.
+      @_attractLifespan -= @attractDecayRate * @_attractLifespan
+      # Evade.
+      updateRepellent = (
+        @repellentCandidates.length and
+        millis() - @_repellentSelectedAt > @evadeLifespan * 1000
+      )
+      if updateRepellent
+        @_repellent = random.item @repellentCandidates
+        @_repellentSelectedAt = millis()
+      @evadeNode @_repellent if @_repellent?
+  
+    updateMovement: ->
+      @v.add @a
+      @refineVelocity()
+      @p.add @v
+      @resetAcceleration()
+      @wrap?.nodeMoved @
+  
+    updateStorage: ->
+      if @viewMode & Node.LINE
+        if @shouldDrawLine() then @pPrev.set @p else @pPrev = @p.get()
+  
+    log: -> console.info @
+  
+    # Geometry
+    # --------
+  
+    # TODO - Configurable hit area.
+    overlapsWith: (x, y) ->
+      abs(@x() - x) < (@w / 2) and abs(@y() - y) < (@h / 2)
+  
+    # Physics
+    # -------
+  
+    applyForce: (vec, toggled = on) ->
+      mutableVec = vec.get()
+      mutableVec.div @m if vec.type isnt PVector.GRAVITY
+      if toggled is on then @a.add(vec) else @a.sub(vec)
+  
+    attractNode: (n) ->
+      if n.tempRepulsion?
+        n.applyForce n.tempRepulsion
+        n.attractorDist = PVector.dist @p, n.p
+        n.tempRepulsion.mult 1 - @tempRepulsionDecayRate
+        n.tempRepulsion = null if n.tempRepulsion.mag() < 0.01
+        return no
+  
+      f = PVector.sub @p, n.p
+      f.type = PVector.ATTRACTION
+      d = constrain f.mag(), @attractFieldMin, @attractFieldMax
+      strength = (@attractConst * @mass() * n.mass()) / sq(d)
+      f.normalize()
+      f.mult strength
+      n.applyForce f
+      n.attractorDist = PVector.dist @p, n.p
+      n.onAttract @, f
+  
+    evadeNode: (n) ->
+      f = n.a.get()
+      variance = new PVector random.signed(), random.signed()
+      variance.div 10
+      f.add variance
+      @applyForce f
+  
+    refineVelocity: -> @v.limit @vMax
+  
+    resetAcceleration: ->
+      if @_aCached? then @a = @_aCached.get()
+      else @a.mult 0 # Clear if nothing to reset to.
+  
+    ###
+    Caching allows the resulting acceleration to be committed into cache and
+    reused later as base.
+    ###
+  
+    cacheAcceleration: -> @_aCached = @a.get()
+  
+    # Accessors
+    # ---------
+  
+    ###
+    Use accessors for public access when possible instead of the attributes, which
+    are generally private outside of construction. Also note accessor names are
+    adjusted, so they don't conflict with their respective attributes. Lastly, the
+    main reason to wrap attributes in accessors is to allow for will-set and
+    did-set behaviors, as well as additional transformations.
+    ###
+  
+    getAccessor: (attribute) ->
+      accessor = @[attribute]
+      accessor ?= @[Node.ATTRIBUTE_TO_ACCESSOR[attribute]]
+      accessor ?= @["#{attribute}Color"]
+      return accessor.bind @ if typeof accessor is 'function'
+      undefined
+  
+    width: (w) ->
+      if w?
+        wPrev = @w
+        @w = w
+        @mass Node.AUTO_MASS
+        @attractFieldMin *= @w / wPrev
+        @attractFieldMax *= @w / wPrev
+      @w
+  
+    height: (h) ->
+      if h?
+        @h = h
+        @mass Node.AUTO_MASS
+      @h
+  
+    radius: (r) ->
+      if r?
+        @width r * 2
+        @h = @w
+      @w / 2 # Optimize if needed.
+  
+    mass: (m) ->
+      if m?
+        # Support autoMass.
+        # It's 2D 'mass', where the third size is 1.
+        if m isnt Node.AUTO_MASS then @m = m
+        else if @autoMass is on then @m = @w * @h * @density
+        # Support varyMass.
+        @m *= sqrt random.dualScale(@mMax) if @varyMass is on
+        # Support autoSize.
+        @w = @h = @m / @w / @density if @autoSize is on and @m?
+      @m
+  
+    isAttractor: (bool) ->
+      if bool?
+        @attract = bool
+        # Update fill.
+        @_pFill ?= @fill
+        @fillColor if @attract is on then color.RED else @_pFill
+        # Restart decay.
+        @_attractLifespan = 1.0 if @attract is on
+        # Update auto-evasion.
+        @evade = bool
+      @attract
+  
+    ###
+    As an exception, try to always use the position accessors, since they wrap a
+    complex object.
+    ###
+  
+    x: (x) -> @p.x = x if x?; @p.x
+    y: (y) -> @p.y = y if y?; @p.y
+    z: (z) -> @p.z = z if z?; @p.z
+  
+    px: -> @pPrev.x
+    py: -> @pPrev.y
+    pz: -> @pPrev.z
+  
+    ###
+    Note these assume ellipseMode or rectMode is CENTER.
+    ###
+  
+    top: (t) -> @y (t + @h / 2) if t?; @y() - @h / 2
+    bottom: (b) -> @y (b - @h / 2) if b?; @y() + @h / 2
+    left: (l) -> @x (l + @w / 2) if l?; @x() - @w / 2
+    right: (r) -> @x (r - @w / 2) if r?; @x() + @w / 2
+  
+    fillColor: (fc) -> @fill = color.ensure fc if fc?; @fill
+    strokeColor: (sc) -> @stroke = color.ensure sc if sc?; @stroke
+  
+    withNeighbors: (fn) -> fn n for n in @wrap.nodes when n isnt @
+  
+    # Callbacks
+    # ---------
+  
+    handleClick: (c) ->
+      should = @overlapsWith c.mouseX, c.mouseY
+      return no unless should
+      @isAttractor not @attract
+      yes
+  
+    onAttract: (attractor, f) ->
+      d = @p.dist attractor.p
+  
+      # Create temporary repulsion.
+      if d < @attractFieldMin
+        @tempRepulsion = f.get()
+        @tempRepulsion.mult -1
+      else 
+        # Attractor should evade if needed.
+        if attractor.mass() < @m
+          attractor.repellentCandidates[@id] ?= @
+        else if attractor.repellentCandidates[@id]?
+          delete attractor.repellentCandidates[@id]
+  
+      # Destroy if too close, but the attractor with less mass.
+      return if @collide is off or (d > @radius() and d > attractor.radius())
+      if @isAttractor() and @m > attractor.mass then attractor.destroy()
+      else @destroy()
+  class Wrap extends Node
+  
+    constructor: (params = Wrap.defaults) ->
+  
+      _.defaults params, Wrap.defaults unless params is Wrap.defaults
+      super params
+  
+      @_allForces = null
+      @_isReady = no
+      @_needsClear = no
+  
+      @nodes = []
+  
+    # Static
+    # ======
+  
+    ###
+    Wrap can contain its nodes using distinct modes.
+    ###
+  
+    @UNCONTAINED: 0
+    @REFLECTIVE: 1
+    @TOROIDAL: 2
+  
+    ###
+    Wrap can render its nodes to screen in distinct states.
+    ###
+  
+    @DEFAULT: 0
+    @TRACE: 1
+  
+    ###
+    Wrap can layout its nodes in distinct patterns.
+    ###
+  
+    @UNIFORM: 0
+    @RANDOM: 1
+  
+    @defaults:
+  
+      entropy: 1
+  
+      autoReplace: on # Re-add on remove node.
+      contain: on # Contain nodes.
+      drainAtEdge: on # Drain node inertia at edges.
+      forceOptions: 0
+      customForces: []
+  
+      autoMass: off
+      gravity: off
+      move: off
+      trace: off
+      varyMass: off
+  
+      nodeDensity: 1 / 10
+      nodeParams:
+        collide: on
+        varyMass: on
+  
+    @setup: ->
+  
+      ###
+      This needs to be called for the class to be ready for use. Some default
+      attributes reference other values not ready on initial declaration.
+      ###
+  
+      _.defaults @defaults, Node.defaults
+  
+      @defaults.fill = color.WHITE
+      @defaults.traceFill = @traceFillColor @defaults.fill
+  
+      @defaults.containment = Wrap.REFLECTIVE
+      @defaults.layoutPattern = Wrap.RANDOM
+      @defaults.viewMode = Node.FORMLESS
+  
+      @defaults.nodeParams.viewMode = Node.BALL
+      @defaults.nodeParams.vMax = Node.defaults.vMax
+  
+      @defaults.frictionMag = 0.01 * sketch.state.speedFactor # constant * normal
+  
+    @traceFillColor: (fc) -> color.transparentize fc, 0.01
+  
+    # Inherited
+    # =========
+  
+    draw: () ->
+      tracePrev = @trace
+      @trace = @nodeParams.viewMode is Node.LINE
+  
+      if tracePrev is on and @trace isnt tracePrev
+        sketch.pushScreen Wrap.TRACE
+  
+      # 'Layer' the canvas if needed.
+      isTraceFrame = millis() % (sketch.state.frameRate * 10) is 0
+      if @trace is on and isTraceFrame
+        fill @getTraceFillColor()
+        @drawBoundsRect()
+        noFill()
+  
+      # Clear the canvas if needed.
+      if @trace is off or @_needsClear
+        fill @fillColor()
+        @drawBoundsRect()
+        # Sometimes when switching view modes, the canvas needs to be cleared and restored.
+        if @_needsClear
+          @_needsClear = no
+          sketch.popScreen()
+  
+      n?.draw() for n in @nodes
+  
+    # Accessors
+    # ---------
+  
+    radius: -> no
+  
+    left: -> @x()
+    top: -> @y()
+    right: -> @w + @left()
+    bottom: -> @h + @top()
+  
+    fillColor: (fc) ->
+      @traceFill = Wrap.traceFillColor fc if fc?
+      super fc
+  
+    # Public
+    # ======
+  
+    clear: ->
+      fill @fillColor()
+      @drawBoundsRect()
+  
+    removeNode: (n) ->
+      n.wrap = null
+      @nodes.splice @nodes.indexOf(n), 1
+      @updateNodeCount @nodes.length if @autoReplace
+  
+    updateNodeCount: (count, customNodeParams) ->
+      count ?= parseInt @width() * @nodeDensity # Infer if needed.
+      currentCount = @nodes.length
+      # Contract if needed.
+      if count < currentCount
+        # Return nodes removed.
+        return (@nodes.pop() for i in [(currentCount - 1)...count])
+      # Or expand.
+      hasGravity = !!(@forceOptions & PVector.GRAVITY)
+      gravity = PVector.createGravity() if hasGravity
+      for i in [0..(count - currentCount)]
+        do (ordinal = i + 1) =>
+          nodeParams = _.extend {}, @nodeParams, customNodeParams,
+            id: currentCount + ordinal
+            wrap: @
+          n = new Node nodeParams
+          n.p.randomize() if @layoutPattern is Wrap.RANDOM and not customNodeParams?.p?
+          n.applyForce gravity if hasGravity
+          n.applyForce f for f in @customForces
+          n.cacheAcceleration()
+          @nodes.push n
+      # Observable value for datGUI
+      @nodeCount ?= @nodes.length
+  
+    updateNodeContainment: (n) ->
+      shift = if @gravity is on then 1 else (1 - @entropy)
+  
+      if @containment is Wrap.REFLECTIVE
+        do (v = n.v) =>
+          if n.right() > @right()
+            n.right @right()
+            v.x *= -shift if v.x > 0
+          else if n.left() < @left()
+            n.left @left()
+            v.x *= -shift if v.x < 0
+          if n.bottom() > @bottom()
+            n.bottom @bottom()
+            v.y *= -shift if v.y > 0
+          else if n.y() < @top()
+            n.top @top()
+            v.y *= -shift if v.y < 0
+  
+      else if @containment is Wrap.TOROIDAL
+        contained = { x: yes, y: yes }
+  
+        if n.left() > @right() then n.right @left()
+        else if n.right() < @left() then n.left @right()
+        else contained.x = no
+        if n.top() > @bottom() then n.bottom @top()
+        else if n.bottom() < @top() then n.top @bottom()
+        else contained.y = no
+  
+        if @drainAtEdge is on and (contained.x or contained.y)
+          n.v.normalize()
+          n.a.normalize()
+  
+    # Physics
+    # -------
+  
+    applyNodeFriction: (n) ->
+      friction = n.v.get()
+      friction.normalize()
+      friction.mult -1 * @frictionMag
+      n.applyForce friction
+  
+    toggleForce: (f, toggled) ->
+      return no unless toggled?
+      @_allForces ?= @customForces
+      isForceOption = typeof f is 'number'
+      isForceName = f in @_allForces
+  
+      if isForceOption
+        vec = PVector.createGravity() if f is PVector.GRAVITY
+        if toggled is on then @forceOptions |= f else @forceOptions ^= f
+  
+      else if isForceName
+        vec = @_allForces[f]
+        if toggled is on then @customForces.push vec
+        else @customForces.splice @customForces.indexOf(vec), 1
+  
+      if vec? then for n in @nodes
+        n.applyForce vec, toggled
+        n.cacheAcceleration()
+  
+    # Accessors
+    # ---------
+  
+    getTraceFillColor: -> @traceFill
+  
+    ready: (r) -> @_ready = r if r?; @onReady() if r; @_ready
+  
+    # Callbacks
+    # ---------
+  
+    mouseClicked: ->
+      handled = _.any @nodes, (n) ->
+        n.handleClick { mouseX, mouseY }
+      , @
+      return if handled
+      # Add attractor node in empty space.
+      @updateNodeCount @nodes.length,
+        attract: on
+        p: [ mouseX, mouseY, 0 ]
+  
+    nodeMoved: (n) ->
+      @applyNodeFriction n
+      @updateNodeContainment n if @contain is on
+  
+    onNodeViewModeChange: (vm) ->
+      if vm?
+        @nodeParams.viewMode = vm
+        n.viewMode = vm for n in @nodes
+      @_needsClear = @nodeParams.viewMode is Node.LINE
+      @draw()
+  
+    onReady: ->
+      @onNodeViewModeChange()
+      @log()
+
+</script>
+  
+  <script type="text/javascript">
+  /* + + + + + + + + + + + + + + + + + + + + + + + + + +
+   +
+   +    Your CoffeeScript code has been precompiled to 
+   +    JavaScript. Below it is being mixed into a naked
+   +    Processing.js object to make it dance ...
+   +    Simple as that!
+   +
+   + + + + + + + + + + + + + + + + + + + + + + + + + + */
+  window.onload = function(){
+    if ( ! 'SketchElementary' in window ) {
+      alert('Something went awfully wrong. Please check file SketchElementary-compiled.js');
+      return;
+    }
+    var p5 = new Processing(
+      document.getElementById("Elementary"),
+      function ( processing ) {
+        var sketchObj = new SketchElementary();
+        for ( var name in sketchObj ) {
+          processing[name] = sketchObj[name];
+        }
+      }
+    );
+    p5['isMousePressed'] =   function(){ return p5.__mousePressed; }; 
+    p5['isKeyPressed'] =   function(){ return p5.__keyPressed;   }; 
+    p5['currentFrameRate'] = function(){ return p5.__frameRate;    };
+  }
+  </script>
+</body>
+</html>

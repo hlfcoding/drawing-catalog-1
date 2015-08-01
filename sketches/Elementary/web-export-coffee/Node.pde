@@ -1,6 +1,3 @@
-# Node
-# ====
-
 class Node
 
   constructor: (params = Node.defaults) ->
@@ -75,7 +72,7 @@ class Node
     v: [0, 0, 0]
     a: [0, 0, 0]
 
-    #-TODO: Actually support rectangles.
+    # TODO: Actually support rectangles.
     w: 10
     h: 10
 
@@ -113,12 +110,12 @@ class Node
   # Public
   # ======
 
-  #-TODO: Better freezing.
+  # TODO: Better freezing.
   draw: ->
     @updateMovement() if @move
     @updateAttraction() if @attract
-    #-NOTE: PJS shortcoming.
-    #-@mousePressed() if mousePressed
+    # Note: PJS shortcoming.
+    # @mousePressed() if mousePressed
 
     if @viewMode & Node.BALL
       noStroke()
@@ -169,7 +166,7 @@ class Node
   # Geometry
   # --------
 
-  #-TODO: Configurable hit area.
+  # TODO - Configurable hit area.
   overlapsWith: (x, y) ->
     abs(@x() - x) < (@w / 2) and abs(@y() - y) < (@h / 2)
 
