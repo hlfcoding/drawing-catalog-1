@@ -13,6 +13,7 @@
     "grunt-gh-pages": "^0.10.0",
     "grunt-groc": "^0.6.0",
     "grunt-markdown": "^0.7.0",
-    "matchdep": "^0.3.0"
+    "matchdep": "^0.3.0",
+    "merlot": "^0.1.7"
   }
 }

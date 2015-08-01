@@ -5,7 +5,6 @@ module.exports =
   'gh-pages': 
     options:
       base: 'gh-pages'
-      add: yes
     src: [
       '**'
       '!template.jst.html'
@@ -24,14 +23,23 @@ module.exports =
         expand: yes
         src: [
           'docs/**/*'
-          'sketches/**/*'
+          'sketches/**/web-export-coffee/*'
+          '!sketches/**/{code,template-coffee}/*'
           'README.md'
         ]
         dest: 'gh-pages/'
+        filter: 'isFile'
       }
       {
-        src: 'node_modules/merlot/template.jst.html'
+        expand: yes
+        cwd: 'node_modules/merlot'
+        src: [
+          'images/*'
+          'stylesheets/*.{css,map}'
+          'template.jst.html'
+        ]
         dest: 'gh-pages/'
+        filter: 'isFile'
       }
     ]
 
@@ -43,7 +51,7 @@ module.exports =
       template: 'gh-pages/template.jst.html'
       templateContext:
         githubAuthor: 'hlfcoding'
-        githubPath: 'hlfcoding/hlf-jquery'
+        githubPath: 'hlfcoding/drawing-catalog-1'
         headline: 'Drawing Catalog #1'
         pageTitle: 'Drawing Catalog #1 by hlfcoding'
         subHeadline: 'CoffeeScript Processing Sketches'
