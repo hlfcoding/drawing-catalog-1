@@ -65,5 +65,5 @@ hlf-jquery> grunt docs
 ```
 
 [fjenett/coffeescript-mode-processing]: http://github.com/fjenett/coffeescript-mode-processing
-[Annotated source code]: http://hlfcoding.github.io/hlf-jquery/docs/index.html
+[Annotated source code]: http://hlfcoding.github.io/drawing-catalog-1/docs/index.html
 [Elementary]: http://hlfcoding.github.io/drawing-catalog-1/sketches/Elementary/web-export-coffee/index.html
