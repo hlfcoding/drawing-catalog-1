@@ -179,21 +179,14 @@ _setupGUI: ->
   button = folder.add @, 'exportScreen'
 
   ###
-  * Add colors controls.
-  ###
-
-  folder = gui.addFolder 'colors'
-
-  #-TODO: Still has issues.
-  colorPicker = folder.addColor @stage, 'fill'
-  colorPicker.onChange (color) => @stage.fillColor color
-  colorPicker.onFinishChange (color) => @stage.fillColor color
-
-  ###
   * Add stage controls.
   ###
 
   folder = gui.addFolder 'stage'
+
+  colorPicker = folder.addColor @stage, 'fill'
+  #-NOTE: onFinishChange somehow doesn't work.
+  colorPicker.onChange (color) => @stage.fillColor color
 
   range = folder.add @stage, 'entropy', 0, 2
 
