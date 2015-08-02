@@ -11,8 +11,8 @@ sketch = null
 # Initialize:
 setup: ->   
 
-  #-Required for CS-P5-mode parser.
-  #-size(720, 480);
+  #- Required for CS-P5-mode parser.
+  #- size(720, 480);
 
   # The `sketch` global is actually a reference to the sketch instance. This
   # approach is unique to the CS-P5 mode implementation. It acts as a namespace
