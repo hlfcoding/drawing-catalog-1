@@ -3,6 +3,9 @@ Elementary
 ==========
 ###
 
+# In addition to the sketch, this file houses various other support code and
+# helpers.
+
 sketch = null
 
 # Initializers
@@ -156,6 +159,10 @@ _setupGUI: ->
 
   gui = new dat.GUI()
 
+  ###
+  * Add sketch controls.
+  ###
+
   folder = gui.addFolder 'sketch'
 
   toggle = folder.add @state, 'frozen'
@@ -171,6 +178,10 @@ _setupGUI: ->
 
   button = folder.add @, 'exportScreen'
 
+  ###
+  * Add colors controls.
+  ###
+
   folder = gui.addFolder 'colors'
 
   #-TODO: Still has issues.
@@ -178,25 +189,39 @@ _setupGUI: ->
   colorPicker.onChange (color) => @stage.fillColor color
   colorPicker.onFinishChange (color) => @stage.fillColor color
 
+  ###
+  * Add stage controls.
+  ###
+
   folder = gui.addFolder 'stage'
-
-  createNodeParamsUpdater = (attribute) =>
-    (value) => n[attribute] = value for n in @stage.nodes
-
-  range = folder.add @stage, 'frictionMag', 0.001, 0.1
 
   range = folder.add @stage, 'entropy', 0, 2
 
+  range = folder.add @stage, 'frictionMag', 0.001, 0.1
+
   range = folder.add @stage, 'nodeCount', 0, 500
   range.onFinishChange (count) => @stage.updateNodeCount count
-
-  range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
-  range.onFinishChange createNodeParamsUpdater('vMax')
 
   toggle = folder.add @stage, 'gravity'
   toggle.onFinishChange (toggled) =>
     @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL
     @stage.toggleForce PVector.GRAVITY, toggled
+
+  select = folder.add @stage, 'containment',
+    'Reflective': Wrap.REFLECTIVE
+    'Toroidal': Wrap.TOROIDAL
+  select.onFinishChange (option) => @stage.containment = parseInt option, 10
+
+  button = folder.add @stage, 'clear'
+
+  ###
+  * Add node controls.
+  ###
+
+  folder = gui.addFolder 'node'
+
+  createNodeParamsUpdater = (attribute) =>
+    (value) => n[attribute] = value for n in @stage.nodes
 
   toggle = folder.add @stage.nodeParams, 'collide'
   toggle.onFinishChange createNodeParamsUpdater('collide')
@@ -204,18 +229,15 @@ _setupGUI: ->
   toggle = folder.add @stage.nodeParams, 'varyMass'
   toggle.onFinishChange createNodeParamsUpdater('varyMass')
 
-  select = folder.add @stage, 'containment',
-    'Reflective': Wrap.REFLECTIVE
-    'Toroidal': Wrap.TOROIDAL
-  select.onFinishChange (option) => @stage.containment = parseInt option, 10
+  range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
+  range.onFinishChange createNodeParamsUpdater('vMax')
 
   select = folder.add @stage.nodeParams, 'viewMode',
     'Ball': Node.BALL
     'Line': Node.LINE
   select.onFinishChange (option) => @stage.onNodeViewModeChange parseInt option, 10
 
-  button = folder.add @stage, 'clear'
-
+  # Export as a global onto the library itself.
   dat.GUI.shared = gui
 
   gui.open()
