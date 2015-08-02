@@ -226,17 +226,17 @@ _setupGUI: ->
         if accessor? then n[accessor] value
         else n[attribute] = value
 
-  toggle = folder.add @stage.nodeParams, 'collide'
-  toggle.onFinishChange createNodeParamsUpdater('collide')
+  range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
+  range.onFinishChange createNodeParamsUpdater('vMax')
 
   toggle = folder.add @stage.nodeParams, 'attract'
   toggle.onFinishChange createNodeParamsUpdater('attract', 'isAttractor')
 
+  toggle = folder.add @stage.nodeParams, 'collide'
+  toggle.onFinishChange createNodeParamsUpdater('collide')
+
   toggle = folder.add @stage.nodeParams, 'varyMass'
   toggle.onFinishChange createNodeParamsUpdater('varyMass')
-
-  range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
-  range.onFinishChange createNodeParamsUpdater('vMax')
 
   select = folder.add @stage.nodeParams, 'viewMode',
     'Ball': Node.BALL
