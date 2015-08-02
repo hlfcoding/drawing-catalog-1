@@ -30,6 +30,11 @@ SketchElementary = (function() {
   function(){return a.width})};
 
 
+  /*
+    Elementary
+    ==========
+  */
+
   var Node, Wrap, sketch;
 
   SketchElementary.name = 'SketchElementary';
@@ -84,8 +89,8 @@ SketchElementary = (function() {
 
   SketchElementary.prototype._setupExtensions = function() {
     /*
-        PVector extension to add helper constants and methods for the sketch. The main
-        addition is the concept of a vector type.
+        * PVector extension to add helper constants and methods for the sketch. The main
+          addition is the concept of a vector type.
     */
 
     var _this = this;
@@ -110,7 +115,7 @@ SketchElementary = (function() {
       return this.y = random(height);
     };
     /*
-        Add helpers to the color API methods, mainly for conversion.
+        * Add helpers to the color API methods, mainly for conversion.
     */
 
     color.ensure = function(c) {
@@ -124,7 +129,7 @@ SketchElementary = (function() {
       return color(red(c), green(c), blue(c), alpha(c) * ratio);
     };
     /*
-        Add helpers to number methods, mainly for macro-calculations.
+        * Add helpers to number methods, mainly for macro-calculations.
     */
 
     random.dualScale = function(n) {
@@ -137,7 +142,7 @@ SketchElementary = (function() {
       return random(-1, 1);
     };
     /*
-        Add core helpers.
+        * Add core helpers.
     */
 
     return Processing.isKindOfClass = function(obj, aClass) {
@@ -157,13 +162,17 @@ SketchElementary = (function() {
 
   SketchElementary.prototype._setupGUI = function() {
     /*
-        The sketch has state and the datGUI library builds an interface to manipulate
+        The sketch has state and the dat.GUI library builds an interface to manipulate
         and tune that state for various results.
     */
 
     var button, colorPicker, createNodeParamsUpdater, folder, gui, range, select, toggle,
       _this = this;
     gui = new dat.GUI();
+    /*
+        * Add sketch controls.
+    */
+
     folder = gui.addFolder('sketch');
     toggle = folder.add(this.state, 'frozen');
     toggle.onFinishChange(function(toggled) {
@@ -180,6 +189,10 @@ SketchElementary = (function() {
       return _this.state.frameRate = parseInt(option, 10);
     });
     button = folder.add(this, 'exportScreen');
+    /*
+        * Add colors controls.
+    */
+
     folder = gui.addFolder('colors');
     colorPicker = folder.addColor(this.stage, 'fill');
     colorPicker.onChange(function(color) {
@@ -188,36 +201,23 @@ SketchElementary = (function() {
     colorPicker.onFinishChange(function(color) {
       return _this.stage.fillColor(color);
     });
+    /*
+        * Add stage controls.
+    */
+
     folder = gui.addFolder('stage');
-    createNodeParamsUpdater = function(attribute) {
-      return function(value) {
-        var n, _i, _len, _ref, _results;
-        _ref = _this.stage.nodes;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          n = _ref[_i];
-          _results.push(n[attribute] = value);
-        }
-        return _results;
-      };
-    };
-    range = folder.add(this.stage, 'frictionMag', 0.001, 0.1);
     range = folder.add(this.stage, 'entropy', 0, 2);
+    range = folder.add(this.stage, 'frictionMag', 0.001, 0.1);
     range = folder.add(this.stage, 'nodeCount', 0, 500);
     range.onFinishChange(function(count) {
       return _this.stage.updateNodeCount(count);
     });
-    range = folder.add(this.stage.nodeParams, 'vMax', 0, this.stage.nodeParams.vMax * 2);
-    range.onFinishChange(createNodeParamsUpdater('vMax'));
+    range.listen();
     toggle = folder.add(this.stage, 'gravity');
     toggle.onFinishChange(function(toggled) {
       _this.stage.containment = toggled ? Wrap.REFLECTIVE : Wrap.TOROIDAL;
       return _this.stage.toggleForce(PVector.GRAVITY, toggled);
     });
-    toggle = folder.add(this.stage.nodeParams, 'collide');
-    toggle.onFinishChange(createNodeParamsUpdater('collide'));
-    toggle = folder.add(this.stage.nodeParams, 'varyMass');
-    toggle.onFinishChange(createNodeParamsUpdater('varyMass'));
     select = folder.add(this.stage, 'containment', {
       'Reflective': Wrap.REFLECTIVE,
       'Toroidal': Wrap.TOROIDAL
@@ -225,6 +225,42 @@ SketchElementary = (function() {
     select.onFinishChange(function(option) {
       return _this.stage.containment = parseInt(option, 10);
     });
+    button = folder.add(this.stage, 'clear');
+    /*
+        * Add node controls.
+    */
+
+    folder = gui.addFolder('node');
+    createNodeParamsUpdater = function(attribute, accessor) {
+      return function(value) {
+        var n, _i, _len, _ref, _results;
+        _ref = _this.stage.nodes;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          n = _ref[_i];
+          if (accessor != null) {
+            _results.push(n[accessor](value));
+          } else {
+            _results.push(n[attribute] = value);
+          }
+        }
+        return _results;
+      };
+    };
+    range = folder.add(this.stage.nodeParams, 'vMax', 0, this.stage.nodeParams.vMax * 2);
+    range.onFinishChange(createNodeParamsUpdater('vMax'));
+    range = folder.add(this.stage.nodeParams, 'attractDecayRate', 0, this.stage.nodeParams.attractDecayRate * 2);
+    range.onFinishChange(createNodeParamsUpdater('attractDecayRate'));
+    range = folder.add(this.stage.nodeParams, 'evadeLifespan', 0, this.stage.nodeParams.evadeLifespan * 2);
+    range.onFinishChange(createNodeParamsUpdater('evadeLifespan'));
+    range = folder.add(this.stage.nodeParams, 'tempRepulsionDecayRate', 0, this.stage.nodeParams.tempRepulsionDecayRate * 2);
+    range.onFinishChange(createNodeParamsUpdater('tempRepulsionDecayRate'));
+    toggle = folder.add(this.stage.nodeParams, 'attract');
+    toggle.onFinishChange(createNodeParamsUpdater('attract', 'isAttractor'));
+    toggle = folder.add(this.stage.nodeParams, 'collide');
+    toggle.onFinishChange(createNodeParamsUpdater('collide'));
+    toggle = folder.add(this.stage.nodeParams, 'varyMass');
+    toggle.onFinishChange(createNodeParamsUpdater('varyMass'));
     select = folder.add(this.stage.nodeParams, 'viewMode', {
       'Ball': Node.BALL,
       'Line': Node.LINE
@@ -232,7 +268,6 @@ SketchElementary = (function() {
     select.onFinishChange(function(option) {
       return _this.stage.onNodeViewModeChange(parseInt(option, 10));
     });
-    button = folder.add(this.stage, 'clear');
     dat.GUI.shared = gui;
     return gui.open();
   };
@@ -783,7 +818,7 @@ SketchElementary = (function() {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         n = _ref[_i];
-        if (n !== this) {
+        if ((n != null) && n !== this) {
           _results.push(fn(n));
         }
       }
@@ -891,10 +926,7 @@ SketchElementary = (function() {
       trace: false,
       varyMass: false,
       nodeDensity: 1 / 10,
-      nodeParams: {
-        collide: true,
-        varyMass: true
-      }
+      nodeParams: _.pick(Node.defaults, 'vMax', 'attractDecayRate', 'evadeLifespan', 'tempRepulsionDecayRate', 'attract', 'collide', 'varyMass')
     };
 
     Wrap.setup = function() {
@@ -988,51 +1020,51 @@ SketchElementary = (function() {
     };
 
     Wrap.prototype.updateNodeCount = function(count, customNodeParams) {
-      var currentCount, gravity, hasGravity, i, _fn, _i, _ref, _ref1,
-        _this = this;
+      var f, gravity, hasGravity, n, nodeParams, nodes, _i, _len, _ref;
       if (count == null) {
-        count = parseInt(this.width() * this.nodeDensity);
+        count = this.width() * this.nodeDensity;
       }
-      currentCount = this.nodes.length;
-      if (count < currentCount) {
-        return (function() {
-          var _i, _ref, _results;
+      count = parseInt(count);
+      if (this.nodes.length > count) {
+        nodes = ((function() {
+          var _results;
           _results = [];
-          for (i = _i = _ref = currentCount - 1; _ref <= count ? _i < count : _i > count; i = _ref <= count ? ++_i : --_i) {
+          while (this.nodes.length !== count) {
             _results.push(this.nodes.pop());
           }
           return _results;
-        }).call(this);
+        }).call(this));
+        this.nodeCount = this.nodes.length;
+        return nodes;
       }
       hasGravity = !!(this.forceOptions & PVector.GRAVITY);
       if (hasGravity) {
         gravity = PVector.createGravity();
       }
-      _fn = function(ordinal) {
-        var f, n, nodeParams, _j, _len, _ref1;
-        nodeParams = _.extend({}, _this.nodeParams, customNodeParams, {
-          id: currentCount + ordinal,
-          wrap: _this
+      nodes = [];
+      while (this.nodes.length !== count) {
+        nodeParams = _.extend({}, this.nodeParams, customNodeParams, {
+          id: this.nodes.length,
+          wrap: this
         });
         n = new Node(nodeParams);
-        if (_this.layoutPattern === Wrap.RANDOM && !((customNodeParams != null ? customNodeParams.p : void 0) != null)) {
+        if (this.layoutPattern === Wrap.RANDOM && !((customNodeParams != null ? customNodeParams.p : void 0) != null)) {
           n.p.randomize();
         }
         if (hasGravity) {
           n.applyForce(gravity);
         }
-        _ref1 = _this.customForces;
-        for (_j = 0, _len = _ref1.length; _j < _len; _j++) {
-          f = _ref1[_j];
+        _ref = this.customForces;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          f = _ref[_i];
           n.applyForce(f);
         }
         n.cacheAcceleration();
-        return _this.nodes.push(n);
-      };
-      for (i = _i = 0, _ref = count - currentCount; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        _fn(i + 1);
+        this.nodes.push(n);
+        nodes.push(n);
       }
-      return (_ref1 = this.nodeCount) != null ? _ref1 : this.nodeCount = this.nodes.length;
+      this.nodeCount = this.nodes.length;
+      return nodes;
     };
 
     Wrap.prototype.updateNodeContainment = function(n) {
@@ -1162,7 +1194,7 @@ SketchElementary = (function() {
       if (handled) {
         return;
       }
-      return this.updateNodeCount(this.nodes.length, {
+      return this.updateNodeCount(this.nodes.length + 1, {
         attract: true,
         p: [mouseX, mouseY, 0]
       });

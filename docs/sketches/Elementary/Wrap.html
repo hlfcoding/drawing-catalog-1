@@ -32,9 +32,9 @@
     <span class="hljs-attribute">varyMass</span>: <span class="hljs-literal">off</span>
 
     <span class="hljs-attribute">nodeDensity</span>: <span class="hljs-number">1</span> / <span class="hljs-number">10</span>
-    <span class="hljs-attribute">nodeParams</span>:
-      <span class="hljs-attribute">collide</span>: <span class="hljs-literal">on</span>
-      <span class="hljs-attribute">varyMass</span>: <span class="hljs-literal">on</span>
+    <span class="hljs-attribute">nodeParams</span>: _.pick(Node.defaults,
+      <span class="hljs-string">'vMax'</span>, <span class="hljs-string">'attractDecayRate'</span>, <span class="hljs-string">'evadeLifespan'</span>, <span class="hljs-string">'tempRepulsionDecayRate'</span>,
+      <span class="hljs-string">'attract'</span>, <span class="hljs-string">'collide'</span>, <span class="hljs-string">'varyMass'</span>)
 
   <span class="hljs-property">@setup</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This needs to be called for the class to be ready for use. Some default
 attributes reference other values not ready on initial declaration.</p></div></div><div class="code"><div class="wrapper">    _.defaults <span class="hljs-property">@defaults</span>, Node.defaults
@@ -85,20 +85,25 @@ attributes reference other values not ready on initial declaration.</p></div></d
     <span class="hljs-property">@updateNodeCount</span> <span class="hljs-property">@nodes</span>.length <span class="hljs-keyword">if</span> <span class="hljs-property">@autoReplace</span>
 
   <span class="hljs-attribute">updateNodeCount</span>: <span class="hljs-function"><span class="hljs-params">(count, customNodeParams)</span> -&gt;</span>
-    count ?= parseInt <span class="hljs-property">@width</span>() * <span class="hljs-property">@nodeDensity</span> <span class="hljs-comment"># Infer if needed.</span>
-    currentCount = <span class="hljs-property">@nodes</span>.length</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Contract if needed.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> count &lt; currentCount</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Return nodes removed.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">return</span> (<span class="hljs-property">@nodes</span>.pop() <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [(currentCount - <span class="hljs-number">1</span>)...count])</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Or expand.</p></div></div><div class="code"><div class="wrapper">    hasGravity = !!(<span class="hljs-property">@forceOptions</span> &amp; PVector.GRAVITY)
+    count ?= <span class="hljs-property">@width</span>() * <span class="hljs-property">@nodeDensity</span> <span class="hljs-comment"># Infer if needed.</span>
+    count = parseInt count</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Contract if needed.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> <span class="hljs-property">@nodes</span>.length &gt; count</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Return nodes removed.</p></div></div><div class="code"><div class="wrapper">      nodes = (<span class="hljs-property">@nodes</span>.pop() <span class="hljs-keyword">until</span> <span class="hljs-property">@nodes</span>.length <span class="hljs-keyword">is</span> count)
+      <span class="hljs-property">@nodeCount</span> = <span class="hljs-property">@nodes</span>.length
+      <span class="hljs-keyword">return</span> nodes</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Or expand.</p></div></div><div class="code"><div class="wrapper">    hasGravity = !!(<span class="hljs-property">@forceOptions</span> &amp; PVector.GRAVITY)
     gravity = PVector.createGravity() <span class="hljs-keyword">if</span> hasGravity
-    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>.(count - currentCount)]
-      <span class="hljs-keyword">do</span> (ordinal = i + <span class="hljs-number">1</span>) =&gt;
-        nodeParams = _.extend {}, <span class="hljs-property">@nodeParams</span>, customNodeParams,
-          <span class="hljs-attribute">id</span>: currentCount + ordinal
-          <span class="hljs-attribute">wrap</span>: @
-        n = <span class="hljs-keyword">new</span> Node nodeParams
-        n.p.randomize() <span class="hljs-keyword">if</span> <span class="hljs-property">@layoutPattern</span> <span class="hljs-keyword">is</span> Wrap.RANDOM <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> customNodeParams?.p?
-        n.applyForce gravity <span class="hljs-keyword">if</span> hasGravity
-        n.applyForce f <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> <span class="hljs-property">@customForces</span>
-        n.cacheAcceleration()
-        <span class="hljs-property">@nodes</span>.push n</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Observable value for datGUI</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@nodeCount</span> ?= <span class="hljs-property">@nodes</span>.length
+    nodes = []
+    <span class="hljs-keyword">until</span> <span class="hljs-property">@nodes</span>.length <span class="hljs-keyword">is</span> count
+      nodeParams = _.extend {}, <span class="hljs-property">@nodeParams</span>, customNodeParams,
+        <span class="hljs-attribute">id</span>: <span class="hljs-property">@nodes</span>.length
+        <span class="hljs-attribute">wrap</span>: @
+      n = <span class="hljs-keyword">new</span> Node nodeParams
+      n.p.randomize() <span class="hljs-keyword">if</span> <span class="hljs-property">@layoutPattern</span> <span class="hljs-keyword">is</span> Wrap.RANDOM <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> customNodeParams?.p?
+      n.applyForce gravity <span class="hljs-keyword">if</span> hasGravity
+      n.applyForce f <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> <span class="hljs-property">@customForces</span>
+      n.cacheAcceleration()
+      <span class="hljs-property">@nodes</span>.push n
+      nodes.push n
+    <span class="hljs-property">@nodeCount</span> = <span class="hljs-property">@nodes</span>.length <span class="hljs-comment"># Observable value for dat.GUI.</span>
+    <span class="hljs-keyword">return</span> nodes
 
   <span class="hljs-attribute">updateNodeContainment</span>: <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
     shift = <span class="hljs-keyword">if</span> <span class="hljs-property">@gravity</span> <span class="hljs-keyword">is</span> <span class="hljs-literal">on</span> <span class="hljs-keyword">then</span> <span class="hljs-number">1</span> <span class="hljs-keyword">else</span> (<span class="hljs-number">1</span> - <span class="hljs-property">@entropy</span>)
@@ -159,7 +164,7 @@ attributes reference other values not ready on initial declaration.</p></div></d
     handled = _.any <span class="hljs-property">@nodes</span>, <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
       n.handleClick { mouseX, mouseY }
     , @
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> handled</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add attractor node in empty space.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@updateNodeCount</span> <span class="hljs-property">@nodes</span>.length,
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> handled</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add attractor node in empty space.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-property">@updateNodeCount</span> <span class="hljs-property">@nodes</span>.length + <span class="hljs-number">1</span>,
       <span class="hljs-attribute">attract</span>: <span class="hljs-literal">on</span>
       <span class="hljs-attribute">p</span>: [ mouseX, mouseY, <span class="hljs-number">0</span> ]
 

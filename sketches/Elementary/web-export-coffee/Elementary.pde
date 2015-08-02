@@ -1,39 +1,69 @@
+###
+Elementary
+==========
+###
+
+# In addition to the sketch, this file houses various other support code and
+# helpers.
+
 sketch = null
 
 # Initializers
 # ------------
 
+# Initialize:
 setup: ->   
-  # Required for CS-P5-mode parser.
-  # size(720, 480);
 
+  #- Required for CS-P5-mode parser.
+  #- size(720, 480);
+
+  # The `sketch` global is actually a reference to the sketch instance. This
+  # approach is unique to the CS-P5 mode implementation. It acts as a namespace
+  # for other globals, to make globals more apparent.
   sketch = @
+
+  # The sketch instance also keeps a `state` namespace with attributes related
+  # to sketch state. Aside from the sketch, it should be read-only.
   @state =
     frozen: no
     speedFactor: 0
 
+  # First, initialize constants and extensions. These make the Processing API
+  # even better.
   @_setupConstants()
   @_setupExtensions()
 
+  # Next, update any globals required for initializing classes. Class defaults
+  # may require additional globals.
   @state.frameRate = frameRate.FILM
   @_updateSpeedFactor()
-  # Class defaults may require additional globals.
+
+  # Next, initialize classes, including setting any less-static defaults.
   @_setupClasses()
 
+  # Next, initialize Processing sketch settings.
   colorMode RGB, 255
   noStroke()
-
-  [w, h] = size.MEDIUM
+  [w, h] = size.MEDIUM # Update size here.
   size w, h
-
   background color.WHITE
   
+  # Next, initialize, along with its `Node`s, a single instance of `Wrap` called
+  # `stage`, and keep it on `sketch`.
   @_setupStage()
 
+  # Next, initialize the stores for canvas image data, ie. to store screens so
+  # view modes can be toggled non-destructively, and so image data can be
+  # exported.
   @_setupScreens()
 
+  # Last, initialize the controls for any mutable, configurable values in the
+  # sketch, making the sketch much more interactive and powerful.
   @_setupGUI()
 
+# §
+
+# An initializer for constants:
 _setupConstants: ->
 
   ###
@@ -57,11 +87,12 @@ _setupConstants: ->
   size.MEDIUM = [720, 480]
   size.TWITTER = [1252, 626]
 
+# An initializer for extensions:
 _setupExtensions: ->
 
   ###
-  PVector extension to add helper constants and methods for the sketch. The main
-  addition is the concept of a vector type.
+  * PVector extension to add helper constants and methods for the sketch. The main
+    addition is the concept of a vector type.
   ###
 
   PVector.G = 0.01
@@ -85,16 +116,16 @@ _setupExtensions: ->
     @y = random height
 
   ###
-  Add helpers to the color API methods, mainly for conversion.
+  * Add helpers to the color API methods, mainly for conversion.
   ###
 
-  # This should be less magical.
+  #-This should be less magical.
   color.ensure = (c) -> if c > 0 then c - 16777216 else c
 
   color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
 
   ###
-  Add helpers to number methods, mainly for macro-calculations.
+  * Add helpers to number methods, mainly for macro-calculations.
   ###
 
   random.dualScale = (n) -> random(1, n) / random(1, n)
@@ -102,29 +133,35 @@ _setupExtensions: ->
   random.signed = -> random -1, 1
 
   ###
-  Add core helpers.
+  * Add core helpers.
   ###
 
-  # Currently unused.
+  #-Currently unused.
   Processing.isKindOfClass = (obj, aClass) ->
     test = obj.constructor is aClass
     if not bool and obj.constructor.__super__?
       test = isKindOfClass obj.constructor.__super__, aClass
     test
 
+# An initializer for classes:
 _setupClasses: ->
 
   Node.setup()
   Wrap.setup()
 
+# An initializer for controls:
 _setupGUI: ->
 
   ###
-  The sketch has state and the datGUI library builds an interface to manipulate
+  The sketch has state and the dat.GUI library builds an interface to manipulate
   and tune that state for various results.
   ###
 
   gui = new dat.GUI()
+
+  ###
+  * Add sketch controls.
+  ###
 
   folder = gui.addFolder 'sketch'
 
@@ -141,32 +178,69 @@ _setupGUI: ->
 
   button = folder.add @, 'exportScreen'
 
+  ###
+  * Add colors controls.
+  ###
+
   folder = gui.addFolder 'colors'
 
-  # TODO: Still has issues.
+  #-TODO: Still has issues.
   colorPicker = folder.addColor @stage, 'fill'
   colorPicker.onChange (color) => @stage.fillColor color
   colorPicker.onFinishChange (color) => @stage.fillColor color
 
+  ###
+  * Add stage controls.
+  ###
+
   folder = gui.addFolder 'stage'
-
-  createNodeParamsUpdater = (attribute) =>
-    (value) => n[attribute] = value for n in @stage.nodes
-
-  range = folder.add @stage, 'frictionMag', 0.001, 0.1
 
   range = folder.add @stage, 'entropy', 0, 2
 
+  range = folder.add @stage, 'frictionMag', 0.001, 0.1
+
   range = folder.add @stage, 'nodeCount', 0, 500
   range.onFinishChange (count) => @stage.updateNodeCount count
-
-  range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
-  range.onFinishChange createNodeParamsUpdater('vMax')
+  range.listen()
 
   toggle = folder.add @stage, 'gravity'
   toggle.onFinishChange (toggled) =>
     @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL
     @stage.toggleForce PVector.GRAVITY, toggled
+
+  select = folder.add @stage, 'containment',
+    'Reflective': Wrap.REFLECTIVE
+    'Toroidal': Wrap.TOROIDAL
+  select.onFinishChange (option) => @stage.containment = parseInt option, 10
+
+  button = folder.add @stage, 'clear'
+
+  ###
+  * Add node controls.
+  ###
+
+  folder = gui.addFolder 'node'
+
+  createNodeParamsUpdater = (attribute, accessor) =>
+    (value) =>
+      for n in @stage.nodes
+        if accessor? then n[accessor] value
+        else n[attribute] = value
+
+  range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
+  range.onFinishChange createNodeParamsUpdater('vMax')
+
+  range = folder.add @stage.nodeParams, 'attractDecayRate', 0, @stage.nodeParams.attractDecayRate * 2
+  range.onFinishChange createNodeParamsUpdater('attractDecayRate')
+
+  range = folder.add @stage.nodeParams, 'evadeLifespan', 0, @stage.nodeParams.evadeLifespan * 2
+  range.onFinishChange createNodeParamsUpdater('evadeLifespan')
+
+  range = folder.add @stage.nodeParams, 'tempRepulsionDecayRate', 0, @stage.nodeParams.tempRepulsionDecayRate * 2
+  range.onFinishChange createNodeParamsUpdater('tempRepulsionDecayRate')
+
+  toggle = folder.add @stage.nodeParams, 'attract'
+  toggle.onFinishChange createNodeParamsUpdater('attract', 'isAttractor')
 
   toggle = folder.add @stage.nodeParams, 'collide'
   toggle.onFinishChange createNodeParamsUpdater('collide')
@@ -174,22 +248,17 @@ _setupGUI: ->
   toggle = folder.add @stage.nodeParams, 'varyMass'
   toggle.onFinishChange createNodeParamsUpdater('varyMass')
 
-  select = folder.add @stage, 'containment',
-    'Reflective': Wrap.REFLECTIVE
-    'Toroidal': Wrap.TOROIDAL
-  select.onFinishChange (option) => @stage.containment = parseInt option, 10
-
   select = folder.add @stage.nodeParams, 'viewMode',
     'Ball': Node.BALL
     'Line': Node.LINE
   select.onFinishChange (option) => @stage.onNodeViewModeChange parseInt option, 10
 
-  button = folder.add @stage, 'clear'
-
+  # Export as a global onto the library itself.
   dat.GUI.shared = gui
 
   gui.open()
 
+# An initializer for image data storage:
 _setupScreens: ->
 
   ###
@@ -201,6 +270,7 @@ _setupScreens: ->
   @_screenStacks[Wrap.TRACE] = []
   @_screenStacks[Wrap.DEFAULT] = []
 
+# An initializer for the stage and its nodes:
 _setupStage: ->
 
   ###
@@ -223,8 +293,10 @@ _setupStage: ->
 # Updaters
 # --------
 
+# Update loop:
 draw: -> @stage.draw()
 
+# Stop updating:
 freeze: (frozen) ->
 
   ###
@@ -247,6 +319,7 @@ _updateSpeedFactor: ->
 
 # Canvas State
 # ------------
+# Some DOM-related logic:
 
 canvasElement: -> @contentElement().querySelector 'canvas'
 contentElement: -> document.getElementById 'content'
@@ -276,5 +349,6 @@ _screenUpdateVars: ->
 
 # Responders
 # ----------
+# Some ad-hoc user input handling. Not as good as DOM events.
 
 mouseClicked: -> @stage.mouseClicked()

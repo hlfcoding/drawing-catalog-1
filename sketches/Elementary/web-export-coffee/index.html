@@ -52,43 +52,73 @@
   </div>
   <script type="text/coffeescript-processing">
 class SketchElementary
+  ###
+  Elementary
+  ==========
+  ###
+  
+  # In addition to the sketch, this file houses various other support code and
+  # helpers.
+  
   sketch = null
   
   # Initializers
   # ------------
   
+  # Initialize:
   setup: ->   
     "Processing API injection iffy goes here";
-    # Required for CS-P5-mode parser.
-    # size(720, 480);
   
+    #- Required for CS-P5-mode parser.
+    #- size(720, 480);
+  
+    # The `sketch` global is actually a reference to the sketch instance. This
+    # approach is unique to the CS-P5 mode implementation. It acts as a namespace
+    # for other globals, to make globals more apparent.
     sketch = @
+  
+    # The sketch instance also keeps a `state` namespace with attributes related
+    # to sketch state. Aside from the sketch, it should be read-only.
     @state =
       frozen: no
       speedFactor: 0
   
+    # First, initialize constants and extensions. These make the Processing API
+    # even better.
     @_setupConstants()
     @_setupExtensions()
   
+    # Next, update any globals required for initializing classes. Class defaults
+    # may require additional globals.
     @state.frameRate = frameRate.FILM
     @_updateSpeedFactor()
-    # Class defaults may require additional globals.
+  
+    # Next, initialize classes, including setting any less-static defaults.
     @_setupClasses()
   
+    # Next, initialize Processing sketch settings.
     colorMode RGB, 255
     noStroke()
-  
-    [w, h] = size.MEDIUM
+    [w, h] = size.MEDIUM # Update size here.
     size w, h
-  
     background color.WHITE
     
+    # Next, initialize, along with its `Node`s, a single instance of `Wrap` called
+    # `stage`, and keep it on `sketch`.
     @_setupStage()
   
+    # Next, initialize the stores for canvas image data, ie. to store screens so
+    # view modes can be toggled non-destructively, and so image data can be
+    # exported.
     @_setupScreens()
   
+    # Last, initialize the controls for any mutable, configurable values in the
+    # sketch, making the sketch much more interactive and powerful.
     @_setupGUI()
   
+  # §
+  
+  # An initializer for constants:
   _setupConstants: ->
   
     ###
@@ -112,11 +142,12 @@ class SketchElementary
     size.MEDIUM = [720, 480]
     size.TWITTER = [1252, 626]
   
+  # An initializer for extensions:
   _setupExtensions: ->
   
     ###
-    PVector extension to add helper constants and methods for the sketch. The main
-    addition is the concept of a vector type.
+    * PVector extension to add helper constants and methods for the sketch. The main
+      addition is the concept of a vector type.
     ###
   
     PVector.G = 0.01
@@ -140,16 +171,16 @@ class SketchElementary
       @y = random height
   
     ###
-    Add helpers to the color API methods, mainly for conversion.
+    * Add helpers to the color API methods, mainly for conversion.
     ###
   
-    # This should be less magical.
+    #-This should be less magical.
     color.ensure = (c) -> if c > 0 then c - 16777216 else c
   
     color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
   
     ###
-    Add helpers to number methods, mainly for macro-calculations.
+    * Add helpers to number methods, mainly for macro-calculations.
     ###
   
     random.dualScale = (n) -> random(1, n) / random(1, n)
@@ -157,29 +188,35 @@ class SketchElementary
     random.signed = -> random -1, 1
   
     ###
-    Add core helpers.
+    * Add core helpers.
     ###
   
-    # Currently unused.
+    #-Currently unused.
     Processing.isKindOfClass = (obj, aClass) ->
       test = obj.constructor is aClass
       if not bool and obj.constructor.__super__?
         test = isKindOfClass obj.constructor.__super__, aClass
       test
   
+  # An initializer for classes:
   _setupClasses: ->
   
     Node.setup()
     Wrap.setup()
   
+  # An initializer for controls:
   _setupGUI: ->
   
     ###
-    The sketch has state and the datGUI library builds an interface to manipulate
+    The sketch has state and the dat.GUI library builds an interface to manipulate
     and tune that state for various results.
     ###
   
     gui = new dat.GUI()
+  
+    ###
+    * Add sketch controls.
+    ###
   
     folder = gui.addFolder 'sketch'
   
@@ -196,32 +233,69 @@ class SketchElementary
   
     button = folder.add @, 'exportScreen'
   
+    ###
+    * Add colors controls.
+    ###
+  
     folder = gui.addFolder 'colors'
   
-    # TODO: Still has issues.
+    #-TODO: Still has issues.
     colorPicker = folder.addColor @stage, 'fill'
     colorPicker.onChange (color) => @stage.fillColor color
     colorPicker.onFinishChange (color) => @stage.fillColor color
   
+    ###
+    * Add stage controls.
+    ###
+  
     folder = gui.addFolder 'stage'
-  
-    createNodeParamsUpdater = (attribute) =>
-      (value) => n[attribute] = value for n in @stage.nodes
-  
-    range = folder.add @stage, 'frictionMag', 0.001, 0.1
   
     range = folder.add @stage, 'entropy', 0, 2
   
+    range = folder.add @stage, 'frictionMag', 0.001, 0.1
+  
     range = folder.add @stage, 'nodeCount', 0, 500
     range.onFinishChange (count) => @stage.updateNodeCount count
-  
-    range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
-    range.onFinishChange createNodeParamsUpdater('vMax')
+    range.listen()
   
     toggle = folder.add @stage, 'gravity'
     toggle.onFinishChange (toggled) =>
       @stage.containment = if toggled then Wrap.REFLECTIVE else Wrap.TOROIDAL
       @stage.toggleForce PVector.GRAVITY, toggled
+  
+    select = folder.add @stage, 'containment',
+      'Reflective': Wrap.REFLECTIVE
+      'Toroidal': Wrap.TOROIDAL
+    select.onFinishChange (option) => @stage.containment = parseInt option, 10
+  
+    button = folder.add @stage, 'clear'
+  
+    ###
+    * Add node controls.
+    ###
+  
+    folder = gui.addFolder 'node'
+  
+    createNodeParamsUpdater = (attribute, accessor) =>
+      (value) =>
+        for n in @stage.nodes
+          if accessor? then n[accessor] value
+          else n[attribute] = value
+  
+    range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
+    range.onFinishChange createNodeParamsUpdater('vMax')
+  
+    range = folder.add @stage.nodeParams, 'attractDecayRate', 0, @stage.nodeParams.attractDecayRate * 2
+    range.onFinishChange createNodeParamsUpdater('attractDecayRate')
+  
+    range = folder.add @stage.nodeParams, 'evadeLifespan', 0, @stage.nodeParams.evadeLifespan * 2
+    range.onFinishChange createNodeParamsUpdater('evadeLifespan')
+  
+    range = folder.add @stage.nodeParams, 'tempRepulsionDecayRate', 0, @stage.nodeParams.tempRepulsionDecayRate * 2
+    range.onFinishChange createNodeParamsUpdater('tempRepulsionDecayRate')
+  
+    toggle = folder.add @stage.nodeParams, 'attract'
+    toggle.onFinishChange createNodeParamsUpdater('attract', 'isAttractor')
   
     toggle = folder.add @stage.nodeParams, 'collide'
     toggle.onFinishChange createNodeParamsUpdater('collide')
@@ -229,22 +303,17 @@ class SketchElementary
     toggle = folder.add @stage.nodeParams, 'varyMass'
     toggle.onFinishChange createNodeParamsUpdater('varyMass')
   
-    select = folder.add @stage, 'containment',
-      'Reflective': Wrap.REFLECTIVE
-      'Toroidal': Wrap.TOROIDAL
-    select.onFinishChange (option) => @stage.containment = parseInt option, 10
-  
     select = folder.add @stage.nodeParams, 'viewMode',
       'Ball': Node.BALL
       'Line': Node.LINE
     select.onFinishChange (option) => @stage.onNodeViewModeChange parseInt option, 10
   
-    button = folder.add @stage, 'clear'
-  
+    # Export as a global onto the library itself.
     dat.GUI.shared = gui
   
     gui.open()
   
+  # An initializer for image data storage:
   _setupScreens: ->
   
     ###
@@ -256,6 +325,7 @@ class SketchElementary
     @_screenStacks[Wrap.TRACE] = []
     @_screenStacks[Wrap.DEFAULT] = []
   
+  # An initializer for the stage and its nodes:
   _setupStage: ->
   
     ###
@@ -278,8 +348,10 @@ class SketchElementary
   # Updaters
   # --------
   
+  # Update loop:
   draw: -> @stage.draw()
   
+  # Stop updating:
   freeze: (frozen) ->
   
     ###
@@ -302,6 +374,7 @@ class SketchElementary
   
   # Canvas State
   # ------------
+  # Some DOM-related logic:
   
   canvasElement: -> @contentElement().querySelector 'canvas'
   contentElement: -> document.getElementById 'content'
@@ -331,8 +404,12 @@ class SketchElementary
   
   # Responders
   # ----------
+  # Some ad-hoc user input handling. Not as good as DOM events.
   
   mouseClicked: -> @stage.mouseClicked()
+  # Node
+  # ====
+  
   class Node
   
     constructor: (params = Node.defaults) ->
@@ -407,7 +484,7 @@ class SketchElementary
       v: [0, 0, 0]
       a: [0, 0, 0]
   
-      # TODO: Actually support rectangles.
+      #-TODO: Actually support rectangles.
       w: 10
       h: 10
   
@@ -445,12 +522,12 @@ class SketchElementary
     # Public
     # ======
   
-    # TODO: Better freezing.
+    #-TODO: Better freezing.
     draw: ->
       @updateMovement() if @move
       @updateAttraction() if @attract
-      # Note: PJS shortcoming.
-      # @mousePressed() if mousePressed
+      #-NOTE: PJS shortcoming.
+      #-@mousePressed() if mousePressed
   
       if @viewMode & Node.BALL
         noStroke()
@@ -501,7 +578,7 @@ class SketchElementary
     # Geometry
     # --------
   
-    # TODO - Configurable hit area.
+    #-TODO: Configurable hit area.
     overlapsWith: (x, y) ->
       abs(@x() - x) < (@w / 2) and abs(@y() - y) < (@h / 2)
   
@@ -639,7 +716,8 @@ class SketchElementary
     fillColor: (fc) -> @fill = color.ensure fc if fc?; @fill
     strokeColor: (sc) -> @stroke = color.ensure sc if sc?; @stroke
   
-    withNeighbors: (fn) -> fn n for n in @wrap.nodes when n isnt @
+    #- FIXME: Guarding against optional value shouldn't be needed.
+    withNeighbors: (fn) -> fn n for n in @wrap.nodes when n? and n isnt @
   
     # Callbacks
     # ---------
@@ -668,6 +746,9 @@ class SketchElementary
       return if @collide is off or (d > @radius() and d > attractor.radius())
       if @isAttractor() and @m > attractor.mass then attractor.destroy()
       else @destroy()
+  # Wrap
+  # ====
+  
   class Wrap extends Node
   
     constructor: (params = Wrap.defaults) ->
@@ -723,9 +804,9 @@ class SketchElementary
       varyMass: off
   
       nodeDensity: 1 / 10
-      nodeParams:
-        collide: on
-        varyMass: on
+      nodeParams: _.pick(Node.defaults,
+        'vMax', 'attractDecayRate', 'evadeLifespan', 'tempRepulsionDecayRate',
+        'attract', 'collide', 'varyMass')
   
     @setup: ->
   
@@ -805,28 +886,31 @@ class SketchElementary
       @updateNodeCount @nodes.length if @autoReplace
   
     updateNodeCount: (count, customNodeParams) ->
-      count ?= parseInt @width() * @nodeDensity # Infer if needed.
-      currentCount = @nodes.length
+      count ?= @width() * @nodeDensity # Infer if needed.
+      count = parseInt count
       # Contract if needed.
-      if count < currentCount
+      if @nodes.length > count
         # Return nodes removed.
-        return (@nodes.pop() for i in [(currentCount - 1)...count])
+        nodes = (@nodes.pop() until @nodes.length is count)
+        @nodeCount = @nodes.length
+        return nodes
       # Or expand.
       hasGravity = !!(@forceOptions & PVector.GRAVITY)
       gravity = PVector.createGravity() if hasGravity
-      for i in [0..(count - currentCount)]
-        do (ordinal = i + 1) =>
-          nodeParams = _.extend {}, @nodeParams, customNodeParams,
-            id: currentCount + ordinal
-            wrap: @
-          n = new Node nodeParams
-          n.p.randomize() if @layoutPattern is Wrap.RANDOM and not customNodeParams?.p?
-          n.applyForce gravity if hasGravity
-          n.applyForce f for f in @customForces
-          n.cacheAcceleration()
-          @nodes.push n
-      # Observable value for datGUI
-      @nodeCount ?= @nodes.length
+      nodes = []
+      until @nodes.length is count
+        nodeParams = _.extend {}, @nodeParams, customNodeParams,
+          id: @nodes.length
+          wrap: @
+        n = new Node nodeParams
+        n.p.randomize() if @layoutPattern is Wrap.RANDOM and not customNodeParams?.p?
+        n.applyForce gravity if hasGravity
+        n.applyForce f for f in @customForces
+        n.cacheAcceleration()
+        @nodes.push n
+        nodes.push n
+      @nodeCount = @nodes.length # Observable value for dat.GUI.
+      return nodes
   
     updateNodeContainment: (n) ->
       shift = if @gravity is on then 1 else (1 - @entropy)
@@ -904,7 +988,7 @@ class SketchElementary
       , @
       return if handled
       # Add attractor node in empty space.
-      @updateNodeCount @nodes.length,
+      @updateNodeCount @nodes.length + 1,
         attract: on
         p: [ mouseX, mouseY, 0 ]
   

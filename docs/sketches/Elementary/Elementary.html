@@ -1,7 +1,8 @@
-<!DOCTYPE html><html lang="en"><head><title>sketches/Elementary/Elementary</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="sketches/Elementary/Elementary"><meta name="groc-project-path" content="sketches/Elementary/Elementary.pde"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">sketches/Elementary/Elementary.pde</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="elementary">Elementary</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper">sketch = <span class="hljs-literal">null</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="initializers">Initializers</h2></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Initialize:</p></div></div><div class="code"><div class="wrapper"><span class="hljs-attribute">setup</span>: <span class="hljs-function">-&gt;</span>   
+<!DOCTYPE html><html lang="en"><head><title>sketches/Elementary/Elementary</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="sketches/Elementary/Elementary"><meta name="groc-project-path" content="sketches/Elementary/Elementary.pde"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">sketches/Elementary/Elementary.pde</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="elementary">Elementary</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>In addition to the sketch, this file houses various other support code and
+helpers.</p></div></div><div class="code"><div class="wrapper">sketch = <span class="hljs-literal">null</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="initializers">Initializers</h2></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Initialize:</p></div></div><div class="code"><div class="wrapper"><span class="hljs-attribute">setup</span>: <span class="hljs-function">-&gt;</span>   
 
-  <span class="hljs-comment">#-Required for CS-P5-mode parser.</span>
-  <span class="hljs-comment">#-size(720, 480);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The <code>sketch</code> global is actually a reference to the sketch instance. This
+  <span class="hljs-comment">#- Required for CS-P5-mode parser.</span>
+  <span class="hljs-comment">#- size(720, 480);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The <code>sketch</code> global is actually a reference to the sketch instance. This
 approach is unique to the CS-P5 mode implementation. It acts as a namespace
 for other globals, to make globals more apparent.</p></div></div><div class="code"><div class="wrapper">  sketch = @</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The sketch instance also keeps a <code>state</code> namespace with attributes related
 to sketch state. Aside from the sketch, it should be read-only.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-property">@state</span> =
@@ -74,10 +75,10 @@ addition is the concept of a vector type.</li>
     test</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>An initializer for classes:</p></div></div><div class="code"><div class="wrapper"><span class="hljs-attribute">_setupClasses</span>: <span class="hljs-function">-&gt;</span>
 
   Node.setup()
-  Wrap.setup()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>An initializer for controls:</p></div></div><div class="code"><div class="wrapper"><span class="hljs-attribute">_setupGUI</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The sketch has state and the datGUI library builds an interface to manipulate
-and tune that state for various results.</p></div></div><div class="code"><div class="wrapper">  gui = <span class="hljs-keyword">new</span> dat.GUI()
-
-  folder = gui.addFolder <span class="hljs-string">'sketch'</span>
+  Wrap.setup()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>An initializer for controls:</p></div></div><div class="code"><div class="wrapper"><span class="hljs-attribute">_setupGUI</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The sketch has state and the dat.GUI library builds an interface to manipulate
+and tune that state for various results.</p></div></div><div class="code"><div class="wrapper">  gui = <span class="hljs-keyword">new</span> dat.GUI()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
+<li>Add sketch controls.</li>
+</ul></div></div><div class="code"><div class="wrapper">  folder = gui.addFolder <span class="hljs-string">'sketch'</span>
 
   toggle = folder.add <span class="hljs-property">@state</span>, <span class="hljs-string">'frozen'</span>
   toggle.onFinishChange (toggled) =&gt; <span class="hljs-property">@freeze</span> toggled
@@ -90,34 +91,59 @@ and tune that state for various results.</p></div></div><div class="code"><div c
     <span class="hljs-string">'Real'</span>: frameRate.REAL
   select.onFinishChange (option) =&gt; <span class="hljs-property">@state</span>.frameRate = parseInt option, <span class="hljs-number">10</span>
 
-  button = folder.add @, <span class="hljs-string">'exportScreen'</span>
-
-  folder = gui.addFolder <span class="hljs-string">'colors'</span>
+  button = folder.add @, <span class="hljs-string">'exportScreen'</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
+<li>Add colors controls.</li>
+</ul></div></div><div class="code"><div class="wrapper">  folder = gui.addFolder <span class="hljs-string">'colors'</span>
 
   <span class="hljs-comment">#-<span class="hljs-doctag">TODO:</span> Still has issues.</span>
   colorPicker = folder.addColor <span class="hljs-property">@stage</span>, <span class="hljs-string">'fill'</span>
   colorPicker.onChange (color) =&gt; <span class="hljs-property">@stage</span>.fillColor color
-  colorPicker.onFinishChange (color) =&gt; <span class="hljs-property">@stage</span>.fillColor color
-
-  folder = gui.addFolder <span class="hljs-string">'stage'</span>
-<span class="hljs-function">
-  <span class="hljs-title">createNodeParamsUpdater</span> = <span class="hljs-params">(attribute)</span> =&gt;</span>
-    (value) =&gt; n[attribute] = value <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-property">@stage</span>.nodes
-
-  range = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'frictionMag'</span>, <span class="hljs-number">0.001</span>, <span class="hljs-number">0.1</span>
+  colorPicker.onFinishChange (color) =&gt; <span class="hljs-property">@stage</span>.fillColor color</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
+<li>Add stage controls.</li>
+</ul></div></div><div class="code"><div class="wrapper">  folder = gui.addFolder <span class="hljs-string">'stage'</span>
 
   range = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'entropy'</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>
 
+  range = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'frictionMag'</span>, <span class="hljs-number">0.001</span>, <span class="hljs-number">0.1</span>
+
   range = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'nodeCount'</span>, <span class="hljs-number">0</span>, <span class="hljs-number">500</span>
   range.onFinishChange (count) =&gt; <span class="hljs-property">@stage</span>.updateNodeCount count
-
-  range = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'vMax'</span>, <span class="hljs-number">0</span>, <span class="hljs-property">@stage</span>.nodeParams.vMax * <span class="hljs-number">2</span>
-  range.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'vMax'</span>)
+  range.listen()
 
   toggle = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'gravity'</span>
   toggle.onFinishChange (toggled) =&gt;
     <span class="hljs-property">@stage</span>.containment = <span class="hljs-keyword">if</span> toggled <span class="hljs-keyword">then</span> Wrap.REFLECTIVE <span class="hljs-keyword">else</span> Wrap.TOROIDAL
     <span class="hljs-property">@stage</span>.toggleForce PVector.GRAVITY, toggled
+
+  select = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'containment'</span>,
+    <span class="hljs-string">'Reflective'</span>: Wrap.REFLECTIVE
+    <span class="hljs-string">'Toroidal'</span>: Wrap.TOROIDAL
+  select.onFinishChange (option) =&gt; <span class="hljs-property">@stage</span>.containment = parseInt option, <span class="hljs-number">10</span>
+
+  button = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'clear'</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
+<li>Add node controls.</li>
+</ul></div></div><div class="code"><div class="wrapper">  folder = gui.addFolder <span class="hljs-string">'node'</span>
+<span class="hljs-function">
+  <span class="hljs-title">createNodeParamsUpdater</span> = <span class="hljs-params">(attribute, accessor)</span> =&gt;</span>
+    (value) =&gt;
+      <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-property">@stage</span>.nodes
+        <span class="hljs-keyword">if</span> accessor? <span class="hljs-keyword">then</span> n[accessor] value
+        <span class="hljs-keyword">else</span> n[attribute] = value
+
+  range = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'vMax'</span>, <span class="hljs-number">0</span>, <span class="hljs-property">@stage</span>.nodeParams.vMax * <span class="hljs-number">2</span>
+  range.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'vMax'</span>)
+
+  range = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'attractDecayRate'</span>, <span class="hljs-number">0</span>, <span class="hljs-property">@stage</span>.nodeParams.attractDecayRate * <span class="hljs-number">2</span>
+  range.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'attractDecayRate'</span>)
+
+  range = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'evadeLifespan'</span>, <span class="hljs-number">0</span>, <span class="hljs-property">@stage</span>.nodeParams.evadeLifespan * <span class="hljs-number">2</span>
+  range.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'evadeLifespan'</span>)
+
+  range = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'tempRepulsionDecayRate'</span>, <span class="hljs-number">0</span>, <span class="hljs-property">@stage</span>.nodeParams.tempRepulsionDecayRate * <span class="hljs-number">2</span>
+  range.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'tempRepulsionDecayRate'</span>)
+
+  toggle = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'attract'</span>
+  toggle.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'attract'</span>, <span class="hljs-string">'isAttractor'</span>)
 
   toggle = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'collide'</span>
   toggle.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'collide'</span>)
@@ -125,19 +151,10 @@ and tune that state for various results.</p></div></div><div class="code"><div c
   toggle = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'varyMass'</span>
   toggle.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'varyMass'</span>)
 
-  select = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'containment'</span>,
-    <span class="hljs-string">'Reflective'</span>: Wrap.REFLECTIVE
-    <span class="hljs-string">'Toroidal'</span>: Wrap.TOROIDAL
-  select.onFinishChange (option) =&gt; <span class="hljs-property">@stage</span>.containment = parseInt option, <span class="hljs-number">10</span>
-
   select = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'viewMode'</span>,
     <span class="hljs-string">'Ball'</span>: Node.BALL
     <span class="hljs-string">'Line'</span>: Node.LINE
-  select.onFinishChange (option) =&gt; <span class="hljs-property">@stage</span>.onNodeViewModeChange parseInt option, <span class="hljs-number">10</span>
-
-  button = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'clear'</span>
-
-  dat.GUI.shared = gui
+  select.onFinishChange (option) =&gt; <span class="hljs-property">@stage</span>.onNodeViewModeChange parseInt option, <span class="hljs-number">10</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Export as a global onto the library itself.</p></div></div><div class="code"><div class="wrapper">  dat.GUI.shared = gui
 
   gui.open()</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>An initializer for image data storage:</p></div></div><div class="code"><div class="wrapper"><span class="hljs-attribute">_setupScreens</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Screens can store and restore canvas state when switching between different
 draw modes.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-property">@_screenStacks</span> = {}

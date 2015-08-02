@@ -1,3 +1,6 @@
+# Node
+# ====
+
 class Node
 
   constructor: (params = Node.defaults) ->
@@ -72,7 +75,7 @@ class Node
     v: [0, 0, 0]
     a: [0, 0, 0]
 
-    # TODO: Actually support rectangles.
+    #-TODO: Actually support rectangles.
     w: 10
     h: 10
 
@@ -110,12 +113,12 @@ class Node
   # Public
   # ======
 
-  # TODO: Better freezing.
+  #-TODO: Better freezing.
   draw: ->
     @updateMovement() if @move
     @updateAttraction() if @attract
-    # Note: PJS shortcoming.
-    # @mousePressed() if mousePressed
+    #-NOTE: PJS shortcoming.
+    #-@mousePressed() if mousePressed
 
     if @viewMode & Node.BALL
       noStroke()
@@ -166,7 +169,7 @@ class Node
   # Geometry
   # --------
 
-  # TODO - Configurable hit area.
+  #-TODO: Configurable hit area.
   overlapsWith: (x, y) ->
     abs(@x() - x) < (@w / 2) and abs(@y() - y) < (@h / 2)
 
@@ -304,7 +307,8 @@ class Node
   fillColor: (fc) -> @fill = color.ensure fc if fc?; @fill
   strokeColor: (sc) -> @stroke = color.ensure sc if sc?; @stroke
 
-  withNeighbors: (fn) -> fn n for n in @wrap.nodes when n isnt @
+  #- FIXME: Guarding against optional value shouldn't be needed.
+  withNeighbors: (fn) -> fn n for n in @wrap.nodes when n? and n isnt @
 
   # Callbacks
   # ---------

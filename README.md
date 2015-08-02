@@ -52,7 +52,7 @@ hlf-jquery> grunt docs
         "template-coffee/*.js"
       ],
       "folder_exclude_patterns": [
-        "bower_components",
+        ".grunt",
         "docs",
         "gh-pages",
         "lib",
