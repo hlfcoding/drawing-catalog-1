@@ -190,22 +190,14 @@ SketchElementary = (function() {
     });
     button = folder.add(this, 'exportScreen');
     /*
-        * Add colors controls.
-    */
-
-    folder = gui.addFolder('colors');
-    colorPicker = folder.addColor(this.stage, 'fill');
-    colorPicker.onChange(function(color) {
-      return _this.stage.fillColor(color);
-    });
-    colorPicker.onFinishChange(function(color) {
-      return _this.stage.fillColor(color);
-    });
-    /*
         * Add stage controls.
     */
 
     folder = gui.addFolder('stage');
+    colorPicker = folder.addColor(this.stage, 'fill');
+    colorPicker.onChange(function(color) {
+      return _this.stage.fillColor(color);
+    });
     range = folder.add(this.stage, 'entropy', 0, 2);
     range = folder.add(this.stage, 'frictionMag', 0.001, 0.1);
     range = folder.add(this.stage, 'nodeCount', 0, 500);
@@ -247,6 +239,8 @@ SketchElementary = (function() {
         return _results;
       };
     };
+    colorPicker = folder.addColor(this.stage.nodeParams, 'stroke');
+    colorPicker.onChange(createNodeParamsUpdater('stroke', 'strokeColor'));
     range = folder.add(this.stage.nodeParams, 'vMax', 0, this.stage.nodeParams.vMax * 2);
     range.onFinishChange(createNodeParamsUpdater('vMax'));
     range = folder.add(this.stage.nodeParams, 'attractDecayRate', 0, this.stage.nodeParams.attractDecayRate * 2);
@@ -941,7 +935,7 @@ SketchElementary = (function() {
       this.defaults.layoutPattern = Wrap.RANDOM;
       this.defaults.viewMode = Node.FORMLESS;
       this.defaults.nodeParams.viewMode = Node.BALL;
-      this.defaults.nodeParams.vMax = Node.defaults.vMax;
+      _.extend(this.defaults.nodeParams, _.pick(Node.defaults, 'stroke', 'viewMode'));
       return this.defaults.frictionMag = 0.01 * sketch.state.speedFactor;
     };
 

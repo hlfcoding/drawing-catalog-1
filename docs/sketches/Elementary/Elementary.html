@@ -92,15 +92,12 @@ and tune that state for various results.</p></div></div><div class="code"><div c
   select.onFinishChange (option) =&gt; <span class="hljs-property">@state</span>.frameRate = parseInt option, <span class="hljs-number">10</span>
 
   button = folder.add @, <span class="hljs-string">'exportScreen'</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
-<li>Add colors controls.</li>
-</ul></div></div><div class="code"><div class="wrapper">  folder = gui.addFolder <span class="hljs-string">'colors'</span>
-
-  <span class="hljs-comment">#-<span class="hljs-doctag">TODO:</span> Still has issues.</span>
-  colorPicker = folder.addColor <span class="hljs-property">@stage</span>, <span class="hljs-string">'fill'</span>
-  colorPicker.onChange (color) =&gt; <span class="hljs-property">@stage</span>.fillColor color
-  colorPicker.onFinishChange (color) =&gt; <span class="hljs-property">@stage</span>.fillColor color</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
 <li>Add stage controls.</li>
 </ul></div></div><div class="code"><div class="wrapper">  folder = gui.addFolder <span class="hljs-string">'stage'</span>
+
+  colorPicker = folder.addColor <span class="hljs-property">@stage</span>, <span class="hljs-string">'fill'</span>
+  <span class="hljs-comment">#-<span class="hljs-doctag">NOTE:</span> onFinishChange somehow doesn't work.</span>
+  colorPicker.onChange (color) =&gt; <span class="hljs-property">@stage</span>.fillColor color
 
   range = folder.add <span class="hljs-property">@stage</span>, <span class="hljs-string">'entropy'</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>
 
@@ -129,6 +126,9 @@ and tune that state for various results.</p></div></div><div class="code"><div c
       <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-property">@stage</span>.nodes
         <span class="hljs-keyword">if</span> accessor? <span class="hljs-keyword">then</span> n[accessor] value
         <span class="hljs-keyword">else</span> n[attribute] = value
+
+  colorPicker = folder.addColor <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'stroke'</span>
+  colorPicker.onChange createNodeParamsUpdater(<span class="hljs-string">'stroke'</span>, <span class="hljs-string">'strokeColor'</span>)
 
   range = folder.add <span class="hljs-property">@stage</span>.nodeParams, <span class="hljs-string">'vMax'</span>, <span class="hljs-number">0</span>, <span class="hljs-property">@stage</span>.nodeParams.vMax * <span class="hljs-number">2</span>
   range.onFinishChange createNodeParamsUpdater(<span class="hljs-string">'vMax'</span>)

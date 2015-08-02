@@ -46,8 +46,8 @@ attributes reference other values not ready on initial declaration.</p></div></d
     <span class="hljs-property">@defaults</span>.layoutPattern = Wrap.RANDOM
     <span class="hljs-property">@defaults</span>.viewMode = Node.FORMLESS
 
-    <span class="hljs-property">@defaults</span>.nodeParams.viewMode = Node.BALL
-    <span class="hljs-property">@defaults</span>.nodeParams.vMax = Node.defaults.vMax
+    _.extend <span class="hljs-property">@defaults</span>.nodeParams,
+      _.pick(Node.defaults, <span class="hljs-string">'stroke'</span>, <span class="hljs-string">'viewMode'</span>)
 
     <span class="hljs-property">@defaults</span>.frictionMag = <span class="hljs-number">0.01</span> * sketch.state.speedFactor <span class="hljs-comment"># constant * normal</span>
 

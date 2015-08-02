@@ -179,21 +179,14 @@ _setupGUI: ->
   button = folder.add @, 'exportScreen'
 
   ###
-  * Add colors controls.
-  ###
-
-  folder = gui.addFolder 'colors'
-
-  #-TODO: Still has issues.
-  colorPicker = folder.addColor @stage, 'fill'
-  colorPicker.onChange (color) => @stage.fillColor color
-  colorPicker.onFinishChange (color) => @stage.fillColor color
-
-  ###
   * Add stage controls.
   ###
 
   folder = gui.addFolder 'stage'
+
+  colorPicker = folder.addColor @stage, 'fill'
+  #-NOTE: onFinishChange somehow doesn't work.
+  colorPicker.onChange (color) => @stage.fillColor color
 
   range = folder.add @stage, 'entropy', 0, 2
 
@@ -226,6 +219,9 @@ _setupGUI: ->
       for n in @stage.nodes
         if accessor? then n[accessor] value
         else n[attribute] = value
+
+  colorPicker = folder.addColor @stage.nodeParams, 'stroke'
+  colorPicker.onChange createNodeParamsUpdater('stroke', 'strokeColor')
 
   range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
   range.onFinishChange createNodeParamsUpdater('vMax')
