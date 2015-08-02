@@ -143,10 +143,13 @@ class Wrap extends Node
     # Contract if needed.
     if @nodes.length > count
       # Return nodes removed.
-      return (@nodes.pop() until @nodes.length is count)
+      nodes = (@nodes.pop() until @nodes.length is count)
+      @nodeCount = @nodes.length
+      return nodes
     # Or expand.
     hasGravity = !!(@forceOptions & PVector.GRAVITY)
     gravity = PVector.createGravity() if hasGravity
+    nodes = []
     until @nodes.length is count
       nodeParams = _.extend {}, @nodeParams, customNodeParams,
         id: @nodes.length
@@ -157,8 +160,9 @@ class Wrap extends Node
       n.applyForce f for f in @customForces
       n.cacheAcceleration()
       @nodes.push n
-    # Observable value for datGUI
-    @nodeCount ?= @nodes.length
+      nodes.push n
+    @nodeCount = @nodes.length # Observable value for dat.GUI.
+    return nodes
 
   updateNodeContainment: (n) ->
     shift = if @gravity is on then 1 else (1 - @entropy)

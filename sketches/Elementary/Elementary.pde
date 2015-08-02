@@ -153,7 +153,7 @@ _setupClasses: ->
 _setupGUI: ->
 
   ###
-  The sketch has state and the datGUI library builds an interface to manipulate
+  The sketch has state and the dat.GUI library builds an interface to manipulate
   and tune that state for various results.
   ###
 
@@ -201,6 +201,7 @@ _setupGUI: ->
 
   range = folder.add @stage, 'nodeCount', 0, 500
   range.onFinishChange (count) => @stage.updateNodeCount count
+  range.listen()
 
   toggle = folder.add @stage, 'gravity'
   toggle.onFinishChange (toggled) =>
