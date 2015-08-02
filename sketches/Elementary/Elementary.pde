@@ -220,6 +220,9 @@ _setupGUI: ->
         if accessor? then n[accessor] value
         else n[attribute] = value
 
+  colorPicker = folder.addColor @stage.nodeParams, 'stroke'
+  colorPicker.onChange createNodeParamsUpdater('stroke', 'strokeColor')
+
   range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
   range.onFinishChange createNodeParamsUpdater('vMax')
 
