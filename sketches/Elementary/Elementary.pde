@@ -220,11 +220,17 @@ _setupGUI: ->
 
   folder = gui.addFolder 'node'
 
-  createNodeParamsUpdater = (attribute) =>
-    (value) => n[attribute] = value for n in @stage.nodes
+  createNodeParamsUpdater = (attribute, accessor) =>
+    (value) =>
+      for n in @stage.nodes
+        if accessor? then n[accessor] value
+        else n[attribute] = value
 
   toggle = folder.add @stage.nodeParams, 'collide'
   toggle.onFinishChange createNodeParamsUpdater('collide')
+
+  toggle = folder.add @stage.nodeParams, 'attract'
+  toggle.onFinishChange createNodeParamsUpdater('attract', 'isAttractor')
 
   toggle = folder.add @stage.nodeParams, 'varyMass'
   toggle.onFinishChange createNodeParamsUpdater('varyMass')

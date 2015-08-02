@@ -57,6 +57,7 @@ class Wrap extends Node
 
     nodeDensity: 1 / 10
     nodeParams:
+      attract: off
       collide: on
       varyMass: on
 
