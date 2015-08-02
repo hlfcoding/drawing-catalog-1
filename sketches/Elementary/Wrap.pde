@@ -56,10 +56,9 @@ class Wrap extends Node
     varyMass: off
 
     nodeDensity: 1 / 10
-    nodeParams:
-      attract: off
-      collide: on
-      varyMass: on
+    nodeParams: _.pick(Node.defaults,
+      'vMax', 'attractDecayRate', 'evadeLifespan', 'tempRepulsionDecayRate',
+      'attract', 'collide', 'varyMass')
 
   @setup: ->
 

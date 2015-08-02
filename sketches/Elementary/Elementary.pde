@@ -229,6 +229,15 @@ _setupGUI: ->
   range = folder.add @stage.nodeParams, 'vMax', 0, @stage.nodeParams.vMax * 2
   range.onFinishChange createNodeParamsUpdater('vMax')
 
+  range = folder.add @stage.nodeParams, 'attractDecayRate', 0, @stage.nodeParams.attractDecayRate * 2
+  range.onFinishChange createNodeParamsUpdater('attractDecayRate')
+
+  range = folder.add @stage.nodeParams, 'evadeLifespan', 0, @stage.nodeParams.evadeLifespan * 2
+  range.onFinishChange createNodeParamsUpdater('evadeLifespan')
+
+  range = folder.add @stage.nodeParams, 'tempRepulsionDecayRate', 0, @stage.nodeParams.tempRepulsionDecayRate * 2
+  range.onFinishChange createNodeParamsUpdater('tempRepulsionDecayRate')
+
   toggle = folder.add @stage.nodeParams, 'attract'
   toggle.onFinishChange createNodeParamsUpdater('attract', 'isAttractor')
 
