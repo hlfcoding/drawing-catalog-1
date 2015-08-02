@@ -307,7 +307,8 @@ class Node
   fillColor: (fc) -> @fill = color.ensure fc if fc?; @fill
   strokeColor: (sc) -> @stroke = color.ensure sc if sc?; @stroke
 
-  withNeighbors: (fn) -> fn n for n in @wrap.nodes when n isnt @
+  #- FIXME: Guarding against optional value shouldn't be needed.
+  withNeighbors: (fn) -> fn n for n in @wrap.nodes when n? and n isnt @
 
   # Callbacks
   # ---------

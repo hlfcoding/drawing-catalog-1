@@ -139,26 +139,25 @@ class Wrap extends Node
     @updateNodeCount @nodes.length if @autoReplace
 
   updateNodeCount: (count, customNodeParams) ->
-    count ?= parseInt @width() * @nodeDensity # Infer if needed.
-    currentCount = @nodes.length
+    count ?= @width() * @nodeDensity # Infer if needed.
+    count = parseInt count
     # Contract if needed.
-    if count < currentCount
+    if @nodes.length > count
       # Return nodes removed.
-      return (@nodes.pop() for i in [(currentCount - 1)...count])
+      return (@nodes.pop() until @nodes.length is count)
     # Or expand.
     hasGravity = !!(@forceOptions & PVector.GRAVITY)
     gravity = PVector.createGravity() if hasGravity
-    for i in [0..(count - currentCount)]
-      do (ordinal = i + 1) =>
-        nodeParams = _.extend {}, @nodeParams, customNodeParams,
-          id: currentCount + ordinal
-          wrap: @
-        n = new Node nodeParams
-        n.p.randomize() if @layoutPattern is Wrap.RANDOM and not customNodeParams?.p?
-        n.applyForce gravity if hasGravity
-        n.applyForce f for f in @customForces
-        n.cacheAcceleration()
-        @nodes.push n
+    until @nodes.length is count
+      nodeParams = _.extend {}, @nodeParams, customNodeParams,
+        id: @nodes.length
+        wrap: @
+      n = new Node nodeParams
+      n.p.randomize() if @layoutPattern is Wrap.RANDOM and not customNodeParams?.p?
+      n.applyForce gravity if hasGravity
+      n.applyForce f for f in @customForces
+      n.cacheAcceleration()
+      @nodes.push n
     # Observable value for datGUI
     @nodeCount ?= @nodes.length
 
@@ -238,7 +237,7 @@ class Wrap extends Node
     , @
     return if handled
     # Add attractor node in empty space.
-    @updateNodeCount @nodes.length,
+    @updateNodeCount @nodes.length + 1,
       attract: on
       p: [ mouseX, mouseY, 0 ]
 
