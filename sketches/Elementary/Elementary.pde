@@ -120,7 +120,9 @@ _setupExtensions: ->
   ###
 
   #-This should be less magical.
-  color.ensure = (c) -> if c > 0 then c - 16777216 else c
+  color.ensure = (c) ->
+    c = parseInt c.substr(1), 16 if _.isString(c)
+    if c > 0 then c - 16777216 else c
 
   color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
 
