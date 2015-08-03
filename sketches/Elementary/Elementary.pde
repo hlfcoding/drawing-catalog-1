@@ -85,7 +85,7 @@ _setupConstants: ->
 
   size.SMALL = [300, 300]
   size.MEDIUM = [720, 480]
-  size.TWITTER = [1252, 626]
+  size.TWITTER = [1500, 500]
 
 # An initializer for extensions:
 _setupExtensions: ->
