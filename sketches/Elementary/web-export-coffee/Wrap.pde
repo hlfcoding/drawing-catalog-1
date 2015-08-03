@@ -76,7 +76,6 @@ class Wrap extends Node
     @defaults.layoutPattern = Wrap.RANDOM
     @defaults.viewMode = Node.FORMLESS
 
-    @defaults.nodeParams.viewMode = Node.BALL
     _.extend @defaults.nodeParams,
       _.pick(Node.defaults, 'stroke', 'viewMode')
 

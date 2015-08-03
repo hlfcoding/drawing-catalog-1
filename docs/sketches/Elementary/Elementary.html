@@ -35,7 +35,7 @@ to modify.</p></div></div><div class="code"><div class="wrapper">  color.BLACK =
 
   size.SMALL = [<span class="hljs-number">300</span>, <span class="hljs-number">300</span>]
   size.MEDIUM = [<span class="hljs-number">720</span>, <span class="hljs-number">480</span>]
-  size.TWITTER = [<span class="hljs-number">1252</span>, <span class="hljs-number">626</span>]</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>An initializer for extensions:</p></div></div><div class="code"><div class="wrapper"><span class="hljs-attribute">_setupExtensions</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
+  size.TWITTER = [<span class="hljs-number">1500</span>, <span class="hljs-number">500</span>]</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>An initializer for extensions:</p></div></div><div class="code"><div class="wrapper"><span class="hljs-attribute">_setupExtensions</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
 <li>PVector extension to add helper constants and methods for the sketch. The main
 addition is the concept of a vector type.</li>
 </ul></div></div><div class="code"><div class="wrapper">  PVector.G = <span class="hljs-number">0.01</span>
@@ -59,7 +59,9 @@ addition is the concept of a vector type.</li>
     <span class="hljs-property">@y</span> = random height</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
 <li>Add helpers to the color API methods, mainly for conversion.</li>
 </ul></div></div><div class="code"><div class="wrapper">  <span class="hljs-comment">#-This should be less magical.</span>
-  color.ensure = <span class="hljs-function"><span class="hljs-params">(c)</span> -&gt;</span> <span class="hljs-keyword">if</span> c &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">then</span> c - <span class="hljs-number">16777216</span> <span class="hljs-keyword">else</span> c
+  color.ensure = <span class="hljs-function"><span class="hljs-params">(c)</span> -&gt;</span>
+    c = parseInt c.substr(<span class="hljs-number">1</span>), <span class="hljs-number">16</span> <span class="hljs-keyword">if</span> _.isString(c)
+    <span class="hljs-keyword">if</span> c &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">then</span> c - <span class="hljs-number">16777216</span> <span class="hljs-keyword">else</span> c
 
   color.transparentize = <span class="hljs-function"><span class="hljs-params">(c, ratio)</span> -&gt;</span> color red(c), green(c), blue(c), alpha(c) * ratio</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><ul>
 <li>Add helpers to number methods, mainly for macro-calculations.</li>

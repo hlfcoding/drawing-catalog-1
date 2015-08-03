@@ -59,7 +59,7 @@ SketchElementary = (function() {
     this._setupClasses();
     colorMode(RGB, 255);
     noStroke();
-    _ref = size.MEDIUM, w = _ref[0], h = _ref[1];
+    _ref = size.TWITTER, w = _ref[0], h = _ref[1];
     size(w, h);
     background(color.WHITE);
     this._setupStage();
@@ -84,7 +84,7 @@ SketchElementary = (function() {
     frameRate.REAL = 60;
     size.SMALL = [300, 300];
     size.MEDIUM = [720, 480];
-    return size.TWITTER = [1252, 626];
+    return size.TWITTER = [1500, 500];
   };
 
   SketchElementary.prototype._setupExtensions = function() {
@@ -119,6 +119,9 @@ SketchElementary = (function() {
     */
 
     color.ensure = function(c) {
+      if (_.isString(c)) {
+        c = parseInt(c.substr(1), 16);
+      }
       if (c > 0) {
         return c - 16777216;
       } else {
@@ -934,7 +937,6 @@ SketchElementary = (function() {
       this.defaults.containment = Wrap.REFLECTIVE;
       this.defaults.layoutPattern = Wrap.RANDOM;
       this.defaults.viewMode = Node.FORMLESS;
-      this.defaults.nodeParams.viewMode = Node.BALL;
       _.extend(this.defaults.nodeParams, _.pick(Node.defaults, 'stroke', 'viewMode'));
       return this.defaults.frictionMag = 0.01 * sketch.state.speedFactor;
     };

@@ -18,7 +18,7 @@
   <link rel="stylesheet" type="text/css" href="theme.css">
   <style type="text/css">
     /* Dynamic */
-    #content { width: 720px; }
+    #content { width: 1500px; }
   </style>
   <!--[if lt IE 9]>
     <script type="text/javascript">alert("Your browser does not support the canvas tag.");</script>
@@ -33,7 +33,7 @@
 <body>
   <div id="content">
     <div>
-      <canvas id="Elementary" width="720" height="480">
+      <canvas id="Elementary" width="1500" height="500">
         <p>Your browser does not support the canvas tag.</p>
         <!-- Note: you can put any alternative content here. -->
       </canvas>
@@ -70,7 +70,7 @@ class SketchElementary
     "Processing API injection iffy goes here";
   
     #- Required for CS-P5-mode parser.
-    #- size(720, 480);
+    #- size(1500, 500);
   
     # The `sketch` global is actually a reference to the sketch instance. This
     # approach is unique to the CS-P5 mode implementation. It acts as a namespace
@@ -99,7 +99,7 @@ class SketchElementary
     # Next, initialize Processing sketch settings.
     colorMode RGB, 255
     noStroke()
-    [w, h] = size.MEDIUM # Update size here.
+    [w, h] = size.TWITTER # Update size here.
     size w, h
     background color.WHITE
     
@@ -140,7 +140,7 @@ class SketchElementary
   
     size.SMALL = [300, 300]
     size.MEDIUM = [720, 480]
-    size.TWITTER = [1252, 626]
+    size.TWITTER = [1500, 500]
   
   # An initializer for extensions:
   _setupExtensions: ->
@@ -175,7 +175,9 @@ class SketchElementary
     ###
   
     #-This should be less magical.
-    color.ensure = (c) -> if c > 0 then c - 16777216 else c
+    color.ensure = (c) ->
+      c = parseInt c.substr(1), 16 if _.isString(c)
+      if c > 0 then c - 16777216 else c
   
     color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
   
@@ -820,7 +822,6 @@ class SketchElementary
       @defaults.layoutPattern = Wrap.RANDOM
       @defaults.viewMode = Node.FORMLESS
   
-      @defaults.nodeParams.viewMode = Node.BALL
       _.extend @defaults.nodeParams,
         _.pick(Node.defaults, 'stroke', 'viewMode')
   

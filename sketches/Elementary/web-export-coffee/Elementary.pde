@@ -15,7 +15,7 @@ sketch = null
 setup: ->   
 
   #- Required for CS-P5-mode parser.
-  #- size(720, 480);
+  #- size(1500, 500);
 
   # The `sketch` global is actually a reference to the sketch instance. This
   # approach is unique to the CS-P5 mode implementation. It acts as a namespace
@@ -44,7 +44,7 @@ setup: ->
   # Next, initialize Processing sketch settings.
   colorMode RGB, 255
   noStroke()
-  [w, h] = size.MEDIUM # Update size here.
+  [w, h] = size.TWITTER # Update size here.
   size w, h
   background color.WHITE
   
@@ -85,7 +85,7 @@ _setupConstants: ->
 
   size.SMALL = [300, 300]
   size.MEDIUM = [720, 480]
-  size.TWITTER = [1252, 626]
+  size.TWITTER = [1500, 500]
 
 # An initializer for extensions:
 _setupExtensions: ->
@@ -120,7 +120,9 @@ _setupExtensions: ->
   ###
 
   #-This should be less magical.
-  color.ensure = (c) -> if c > 0 then c - 16777216 else c
+  color.ensure = (c) ->
+    c = parseInt c.substr(1), 16 if _.isString(c)
+    if c > 0 then c - 16777216 else c
 
   color.transparentize = (c, ratio) -> color red(c), green(c), blue(c), alpha(c) * ratio
 
