@@ -1,4 +1,4 @@
-# Drawing Catalog #1
+# Drawing Catalog #1 [![Code Climate](https://codeclimate.com/github/hlfcoding/drawing-catalog-1/badges/gpa.svg)](https://codeclimate.com/github/hlfcoding/drawing-catalog-1)
 
 CoffeeScript sketches and boilerplate using Processing via
 [fjenett/coffeescript-mode-processing][]. [Annotated source code] also available.
