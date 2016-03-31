@@ -40,6 +40,9 @@ hlf-jquery> grunt lib
 hlf-jquery> grunt docs
 ```
 
+## License
+
+Copyright (c) 2012-present Peng Wang
 
 [fjenett/coffeescript-mode-processing]: http://github.com/fjenett/coffeescript-mode-processing
 [Annotated source code]: http://hlfcoding.github.io/drawing-catalog-1/docs/index.html
