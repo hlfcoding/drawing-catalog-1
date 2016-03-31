@@ -1,0 +1,20 @@
+{
+  "folders":
+  [
+    {
+      "path": ".",
+      "file_exclude_patterns": [
+        "*.sublime-workspace",
+        "template-coffee/*.js"
+      ],
+      "folder_exclude_patterns": [
+        ".grunt",
+        "docs",
+        "gh-pages",
+        "lib",
+        "node_modules",
+        "web-export-coffee"
+      ]
+    }
+  ]
+}

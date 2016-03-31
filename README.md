@@ -40,29 +40,6 @@ hlf-jquery> grunt lib
 hlf-jquery> grunt docs
 ```
 
-## Sample ST2 Project File
-
-```json
-{
-  "folders":
-  [
-    {
-      "path": "processing-coffee-sketches",
-      "file_exclude_patterns": [
-        "template-coffee/*.js"
-      ],
-      "folder_exclude_patterns": [
-        ".grunt",
-        "docs",
-        "gh-pages",
-        "lib",
-        "node_modules",
-        "web-export-coffee"
-      ]
-    }
-  ]
-}
-```
 
 [fjenett/coffeescript-mode-processing]: http://github.com/fjenett/coffeescript-mode-processing
 [Annotated source code]: http://hlfcoding.github.io/drawing-catalog-1/docs/index.html
