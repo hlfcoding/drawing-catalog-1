@@ -17,36 +17,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "projectPath": "README.md",
         "targetPath": "index",
         "pageTitle": "index",
-        "firstHeader": {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "Drawing Catalog #1",
-            "slug": "drawing-catalog-1",
-            "isFileHeader": true
-          },
-          "depth": 1,
-          "children": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Attraction",
-                "slug": "attraction"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Sample ST2 Project File",
-                "slug": "sample-st2-project-file"
-              },
-              "depth": 2
-            }
-          ]
-        },
-        "title": "Drawing Catalog #1"
+        "title": "index"
       },
       "depth": 1,
       "outline": [
@@ -62,8 +33,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Sample ST2 Project File",
-            "slug": "sample-st2-project-file"
+            "title": "License",
+            "slug": "license"
           },
           "depth": 2
         }

@@ -1,4 +1,4 @@
-# Drawing Catalog #1
+# Drawing Catalog #1 [![Code Climate](https://codeclimate.com/github/hlfcoding/drawing-catalog-1/badges/gpa.svg)](https://codeclimate.com/github/hlfcoding/drawing-catalog-1)
 
 CoffeeScript sketches and boilerplate using Processing via
 [fjenett/coffeescript-mode-processing][]. [Annotated source code] also available.
@@ -40,29 +40,9 @@ hlf-jquery> grunt lib
 hlf-jquery> grunt docs
 ```
 
-## Sample ST2 Project File
+## License
 
-```json
-{
-  "folders":
-  [
-    {
-      "path": "processing-coffee-sketches",
-      "file_exclude_patterns": [
-        "template-coffee/*.js"
-      ],
-      "folder_exclude_patterns": [
-        ".grunt",
-        "docs",
-        "gh-pages",
-        "lib",
-        "node_modules",
-        "web-export-coffee"
-      ]
-    }
-  ]
-}
-```
+Copyright (c) 2012-present Peng Wang
 
 [fjenett/coffeescript-mode-processing]: http://github.com/fjenett/coffeescript-mode-processing
 [Annotated source code]: http://hlfcoding.github.io/drawing-catalog-1/docs/index.html
