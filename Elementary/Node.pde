@@ -24,4 +24,16 @@ class Node {
     f.mult(-1 * friction);
     a.add(f);
   }
+  
+  void bounce(char axis, float vLoss, float aLoss) {
+    float vBounced = -(1 - vLoss);
+    float aBounced = -(1 - aLoss);
+    if (axis == 'x') {
+      v.x *= vBounced;
+      a.x *= aBounced;
+    } else if (axis == 'y') {
+      v.y *= vBounced;
+      a.y *= aBounced;
+    }
+  }
 }
