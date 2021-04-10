@@ -1,7 +1,7 @@
 /*
  [x] Velocity, acceleration
  [x] Draw balls
- [ ] Draw lines
+ [x] Draw lines
  [x] Wall bounds
  [ ] Torus bounds
  [ ] Gravity, mass

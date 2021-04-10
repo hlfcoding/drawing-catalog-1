@@ -9,6 +9,7 @@ class Space {
 
   void setup() {
     Node n = new Node();
+    n.drawMode = 'b';
     PVector r = PVector.random2D();
     n.p.set(abs(r.x) * width, abs(r.y) * height);
     nodes[0] = n;
@@ -27,23 +28,17 @@ class Space {
   }
 
   void affect(Node n) {
-    float nLeft = n.p.x - n.w/2, nRight = n.p.x + n.w/2;
-    float nTop = n.p.y - n.h/2, nBottom = n.p.y + n.h/2;
     float left = 0, right = width, top = 0, bottom = height;
     float vLoss = 0.2, aLoss = 0.1;
-    if (nLeft < left && n.v.x < 0) {
-      n.p.x = n.w/2;
-      n.bounce('x', vLoss, aLoss);
-    } else if (nRight > right && n.v.x > 0) {
-      n.p.x = width - n.w/2;
-      n.bounce('x', vLoss, aLoss);
+    if (n.left() < left && n.v.x < 0) {
+      n.bounce('x', left, vLoss, aLoss);
+    } else if (n.right() > right && n.v.x > 0) {
+      n.bounce('x', right, vLoss, aLoss);
     }
-    if (nTop < top && n.v.y < 0) {
-      n.p.y = n.h/2;
-      n.bounce('y', vLoss, aLoss);
-    } else if (nBottom > bottom && n.v.y > 0) {
-      n.p.y = height - n.h/2;
-      n.bounce('y', vLoss, aLoss);
+    if (n.top() < top && n.v.y < 0) {
+      n.bounce('y', top, vLoss, aLoss);
+    } else if (n.bottom() > bottom && n.v.y > 0) {
+      n.bounce('y', bottom, vLoss, aLoss);
     }
   }
 }
