@@ -1,5 +1,5 @@
 class Node {
-  PVector p, pPrev;
+  PVector p, pPrev, pNext;
   PVector v;
   PVector a;
 
@@ -35,6 +35,10 @@ class Node {
     } else if (drawMode == 'l') { // line
       line(p.x, p.y, pPrev.x, pPrev.y);
     }
+    if (pNext != null) {
+      p = pNext;
+      pNext = null;
+    }
   }
 
   void move(float friction) {
@@ -62,6 +66,17 @@ class Node {
         ((pEdge == 0) ? -1 : 1) * h/2 : 0);
       v.y *= vBounced;
       a.y *= aBounced;
+    }
+  }
+
+  void teleport(char axis, float pEdge) {
+    pNext = p.copy();
+    if (axis == 'x') {
+      pNext.x = pEdge - ((drawMode == 'b') ?
+        ((pEdge == 0) ? 1 : -1) * w/2 : 0);
+    } else if (axis == 'y') {
+      pNext.y = pEdge - ((drawMode == 'b') ?
+        ((pEdge == 0) ? 1 : -1) * h/2 : 0);
     }
   }
 }

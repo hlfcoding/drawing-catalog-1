@@ -3,7 +3,7 @@
  [x] Draw balls
  [x] Draw lines
  [x] Wall bounds
- [ ] Torus bounds
+ [x] Torus bounds
  [ ] Gravity, mass
  */
 
