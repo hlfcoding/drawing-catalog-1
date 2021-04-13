@@ -2,9 +2,11 @@ class Node {
   PVector p, pPrev, pNext;
   PVector v;
   PVector a;
+  int aCounter;
 
   float w, h;
 
+  char actMode; // (b)rownian
   char drawMode; // (b)all, (l)ine
 
   Node() {
@@ -13,6 +15,7 @@ class Node {
     a = new PVector();
     w = 10;
     h = 10;
+    actMode = 'b';
     drawMode = 'b';
   }
 
@@ -41,14 +44,26 @@ class Node {
     }
   }
 
+  void act() {
+    if (actMode == 'b') {
+      if (frameCount % round(frameRate) == 0) {
+        PVector r = PVector.random2D();
+        a.set(r);
+        aCounter = round(frameRate/2);
+      } else if (aCounter > 0) {
+        aCounter--;
+      }
+    }
+  }
+
   void move(float friction) {
-    v.add(a);
+    if (aCounter > 0) {
+      v.add(a);
+    }
     pPrev = p.copy();
     p.add(v);
-    PVector f = v.copy();
-    f.normalize();
-    f.mult(-1 * friction);
-    a.add(f);
+    PVector f = v.copy().mult(friction);
+    v.sub(f);
   }
 
   // -

@@ -13,6 +13,7 @@ class Space {
   void setup() {
     boundsMode = 't';
     Node n = new Node();
+    n.actMode = 'b';
     n.drawMode = 'b';
     PVector r = PVector.random2D();
     n.p.set(abs(r.x) * width, abs(r.y) * height);
@@ -21,10 +22,7 @@ class Space {
 
   void draw() {
     for (Node n : nodes) {
-      if (frameCount % round(frameRate) == 0) {
-        PVector r = PVector.random2D();
-        n.a.set(r);
-      }
+      n.act();
       n.move(friction);
       affect(n);
       n.draw();
