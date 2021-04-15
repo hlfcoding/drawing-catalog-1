@@ -51,6 +51,8 @@ class Node {
         a.set(r);
         aCounter = round(frameRate/2);
       } else if (aCounter > 0) {
+        PVector r = PVector.random2D().mult(0.3);
+        a.add(r).limit(1);
         aCounter--;
       }
     }
