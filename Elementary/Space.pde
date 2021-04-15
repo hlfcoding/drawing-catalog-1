@@ -6,7 +6,7 @@ class Space {
 
   Space(int count) {
     nodes = new Node[count];
-    friction = 0.2;
+    friction = 1.0/5;
     boundsMode = 'w';
   }
 
@@ -32,7 +32,7 @@ class Space {
   void affect(Node n) {
     float left = 0, right = width, top = 0, bottom = height;
     if (boundsMode == 'w') {
-      float vLoss = 0.1, aLoss = 0.1;
+      float vLoss = 1.0/10, aLoss = 1.0/10;
       if (n.left() < left && n.v.x < 0) {
         n.bounce('x', left, vLoss, aLoss);
       } else if (n.right() > right && n.v.x > 0) {

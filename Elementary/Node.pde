@@ -2,6 +2,7 @@ class Node {
   PVector p, pPrev, pNext;
   PVector v;
   PVector a;
+  float aCeil;
   int aCounter;
 
   float w, h;
@@ -13,6 +14,8 @@ class Node {
     p = new PVector();
     v = new PVector();
     a = new PVector();
+    aCeil = 1;
+    aCounter = 0;
     w = 10;
     h = 10;
     actMode = 'b';
@@ -39,6 +42,7 @@ class Node {
       line(p.x, p.y, pPrev.x, pPrev.y);
     }
     if (pNext != null) {
+      // Sometimes need to draw before updating position.
       p = pNext;
       pNext = null;
     }
@@ -47,11 +51,11 @@ class Node {
   void act() {
     if (actMode == 'b') {
       if (frameCount % round(frameRate) == 0) {
-        PVector r = PVector.random2D();
+        PVector r = PVector.random2D().mult(aCeil);
         a.set(r);
         aCounter = round(frameRate/2);
       } else if (aCounter > 0) {
-        PVector r = PVector.random2D().mult(0.3);
+        PVector r = PVector.random2D().mult(aCeil/3);
         a.add(r).limit(1);
         aCounter--;
       }
@@ -59,13 +63,9 @@ class Node {
   }
 
   void move(float friction) {
-    if (aCounter > 0) {
-      v.add(a);
-    }
     pPrev = p.copy();
-    p.add(v);
-    PVector f = v.copy().mult(friction);
-    v.sub(f);
+    PVector anyA = (aCounter > 0) ? a : null;
+    Physics.move(p, v, anyA, friction * aCeil);
   }
 
   // -

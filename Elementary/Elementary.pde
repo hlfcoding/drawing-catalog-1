@@ -11,6 +11,7 @@ Space space = new Space(1);
 
 void setup() {
   size(300, 300);
+  pixelDensity(displayDensity());
 
   space.setup();
 }
