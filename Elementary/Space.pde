@@ -10,14 +10,15 @@ class Space {
     boundsMode = 'w';
   }
 
-  void setup() {
-    boundsMode = 't';
-    Node n = new Node();
-    n.actMode = 'b';
-    n.drawMode = 'b';
-    PVector r = PVector.random2D();
-    n.p.set(abs(r.x) * width, abs(r.y) * height);
-    nodes[0] = n;
+  void setup(char actMode, char drawMode) {
+    for (int i = 0; i < nodes.length; i++) {
+      Node n = new Node();
+      n.actMode = actMode;
+      n.drawMode = drawMode;
+      PVector r = PVector.random2D();
+      n.p.set(abs(r.x) * width, abs(r.y) * height);
+      nodes[i] = n;
+    }
   }
 
   void draw() {
