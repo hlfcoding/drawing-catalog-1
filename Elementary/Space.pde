@@ -3,17 +3,25 @@ class Space {
   float friction;
 
   char boundsMode; // (w)all, (t)orus
+  int neighborsCeil; // 0 to disable
 
   Space(int count) {
     nodes = new Node[count];
     friction = 1.0/5;
     boundsMode = 'w';
+    neighborsCeil = 0;
   }
 
   void setup(char actMode, char drawMode) {
     for (int i = 0; i < nodes.length; i++) {
       Node n = new Node();
+      if (actMode == 'n') {
+        n.w = n.h = 3;
+      }
       n.actMode = actMode;
+      if (actMode == 'a') {
+        actMode = 'n';
+      }
       n.drawMode = drawMode;
       PVector r = PVector.random2D();
       n.p.set(abs(r.x) * width, abs(r.y) * height);
@@ -23,7 +31,11 @@ class Space {
 
   void draw() {
     for (Node n : nodes) {
-      n.act();
+      ArrayList<Node> neighbors = null;
+      if (n.actMode == 'a') {
+        neighbors = this.neighbors(n);
+      }
+      n.act(neighbors);
       n.move(friction);
       affect(n);
       n.draw();
@@ -56,5 +68,16 @@ class Space {
         n.teleport('y', top);
       }
     }
+  }
+
+  ArrayList<Node> neighbors(Node node) {
+    ArrayList<Node> a = new ArrayList<Node>();
+    for (Node n : nodes) {
+      if (node == n) {
+        continue;
+      }
+      a.add(n);
+    }
+    return a;
   }
 }

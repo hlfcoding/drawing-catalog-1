@@ -7,7 +7,7 @@ class Node {
 
   float w, h;
 
-  char actMode; // (b)rownian
+  char actMode; // (a)ttractor, (b)rownian, (n)one
   char drawMode; // (b)all, (l)ine
 
   Node() {
@@ -34,6 +34,10 @@ class Node {
   float top() {
     return p.y - ((drawMode == 'b') ? h/2 : 0);
   }
+  float mass() {
+    float density = 1;
+    return w * h * density;
+  }
 
   void draw() {
     if (drawMode == 'b') { // ball
@@ -48,8 +52,13 @@ class Node {
     }
   }
 
-  void act() {
-    if (actMode == 'b') {
+  void act(ArrayList<Node> neighbors) {
+    if (neighbors != null) {
+      for (Node n : neighbors) {
+        affect(n);
+      }
+    }
+    if (actMode == 'b' || actMode == 'a') {
       if (frameCount % round(frameRate) == 0) {
         PVector r = PVector.random2D().mult(aCeil);
         a.set(r);
@@ -94,6 +103,15 @@ class Node {
     } else if (axis == 'y') {
       pNext.y = pEdge - ((drawMode == 'b') ?
         ((pEdge == 0) ? 1 : -1) * h/2 : 0);
+    }
+  }
+
+  // -
+
+  void affect(Node n) {
+    if (actMode == 'a') {
+      n.aCounter = 1;
+      Physics.attract(n.a, p, mass(), n.p, n.mass());
     }
   }
 }
