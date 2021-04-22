@@ -73,19 +73,26 @@ interface GroupBehavior {
 }
 
 class Attraction implements GroupBehavior {
-  float odds;
+  float torOdds;
+  ArrayList<Node> tors;
+  ArrayList<Node> tees;
+  HashMap<Integer, ArrayList<Node>> tions;
 
   Attraction() {
-    odds = 1.0/10;
+    torOdds = 1.0/10;
+    tors = new ArrayList<Node>();
+    tees = new ArrayList<Node>();
+    tions = new HashMap<Integer, ArrayList<Node>>();
   }
 
   void setup(Node[] nodes) {
-    int quota = ceil(odds * nodes.length);
+    int quota = ceil(torOdds * nodes.length);
     for (Node n : nodes) {
       if (quota > 0) {
-        n.actMode = 'a';
+        tors.add(n);
         quota--;
       } else {
+        tees.add(n);
         n.actMode = 'n';
         n.w = sqrt(n.w);
         n.h = sqrt(n.h);
@@ -94,27 +101,15 @@ class Attraction implements GroupBehavior {
   }
 
   void update(Node[] nodes) {
-    // get attractors
-    ArrayList<Node> attractors = new ArrayList<Node>();
-    for (Node n : nodes) {
-      if (n.actMode == 'a') {
-        attractors.add(n);
+    for (Node tor : tors) {
+      ArrayList<Node> neighbors = tions.get(tor.id);
+      if (neighbors == null) {
+        neighbors = tees; // TODO
+        tions.put(tor.id, neighbors);
       }
-    }
-    // get attractees
-    ArrayList<Node> attractees = new ArrayList<Node>();
-    for (Node n : nodes) {
-      if (n.actMode == 'n') {
-        attractees.add(n);
-      }
-    }
-    // get neighbors per attractor
-    for (Node nA : attractors) {
-      ArrayList<Node> neighbors = attractees;
-      // each attractor affects neighbors
       for (Node n : neighbors) {
-        nA.aCounter = 1;
-        Physics.attract(n.a, nA.p, nA.mass(), n.p, n.mass());
+        n.aCounter = 1;
+        Physics.attract(n.a, tor.p, tor.mass(), n.p, n.mass());
       }
     }
   }

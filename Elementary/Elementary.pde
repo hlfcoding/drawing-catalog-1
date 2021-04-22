@@ -31,6 +31,6 @@ Space space2() {
   Space s = new Space(2);
   s.behaviors.add(new Attraction());
   s.boundsMode = 't';
-  s.setup('a', 'b');
+  s.setup('b', 'b');
   return s;
 }

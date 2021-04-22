@@ -1,4 +1,8 @@
+int nodeIds = 0;
+
 class Node {
+  int id;
+
   PVector p, pPrev, pNext;
   PVector v;
   PVector a;
@@ -7,10 +11,11 @@ class Node {
 
   float w, h;
 
-  char actMode; // (a)ttractor, (b)rownian, (n)one
+  char actMode; // (b)rownian, (n)one
   char drawMode; // (b)all, (l)ine
 
   Node() {
+    id = nodeIds++;
     p = new PVector();
     v = new PVector();
     a = new PVector();
@@ -53,7 +58,7 @@ class Node {
   }
 
   void act() {
-    if (actMode == 'b' || actMode == 'a') { // TODO
+    if (actMode == 'b') {
       if (frameCount % round(frameRate) == 0) {
         PVector r = PVector.random2D().mult(aCeil);
         a.set(r);
