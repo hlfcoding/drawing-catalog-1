@@ -78,11 +78,16 @@ class Attraction implements GroupBehavior {
   ArrayList<Node> tees;
   HashMap<Integer, ArrayList<Node>> tions;
 
+  float aFriction;
+  float vTerminal;
+
   Attraction() {
     torOdds = 1.0/10;
     tors = new ArrayList<Node>();
     tees = new ArrayList<Node>();
     tions = new HashMap<Integer, ArrayList<Node>>();
+    aFriction = 0.1;
+    vTerminal = 0;
   }
 
   void setup(Node[] nodes) {
@@ -96,6 +101,9 @@ class Attraction implements GroupBehavior {
         n.actMode = 'n';
         n.w = sqrt(n.w);
         n.h = sqrt(n.h);
+        if (vTerminal == 0) {
+          vTerminal = n.w;
+        }
       }
     }
   }
@@ -109,7 +117,9 @@ class Attraction implements GroupBehavior {
       }
       for (Node n : neighbors) {
         n.aCounter = 1;
+        n.a.mult(1.0 - aFriction);
         Physics.attract(n.a, tor.p, tor.mass(), n.p, n.mass());
+        n.v.limit(vTerminal);
       }
     }
   }

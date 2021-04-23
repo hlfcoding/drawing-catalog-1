@@ -3,11 +3,12 @@ static class Physics {
     (PVector a2, PVector p1, float m1, PVector p2, float m2)
   {
     PVector f = PVector.sub(p1, p2);
-    float d = constrain(f.mag(), 40, 80); // TODO
-    float k = 1;
+    float dOrbit = sqrt(m1) * 4;
+    float d = max(dOrbit, f.mag());
+    float k = 10;
     f.normalize();
-    f.mult((k * m1 * m2) / sq(d));
-    a2.mult(0.6).add(f);
+    f.mult((k * m1 * m2) / sq(d)); // Effect of force.
+    a2.add(f.div(m2));
   }
 
   static void move
@@ -16,7 +17,7 @@ static class Physics {
     if (a != null) {
       v.add(a);
     }
-    PVector f = v.copy().mult(friction);
+    PVector f = v.copy().mult(friction); // Effect of force.
     v.sub(f);
     p.add(v);
   }
