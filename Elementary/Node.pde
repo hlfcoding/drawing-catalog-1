@@ -7,7 +7,7 @@ class Node {
   PVector v;
   PVector a;
   float aCeil;
-  int aCounter;
+  int energyFrames;
 
   float w, h;
 
@@ -20,7 +20,7 @@ class Node {
     v = new PVector();
     a = new PVector();
     aCeil = 1;
-    aCounter = 0;
+    energyFrames = 0;
     w = 10;
     h = 10;
     actMode = 'b';
@@ -59,21 +59,21 @@ class Node {
 
   void act() {
     if (actMode == 'b') {
-      if (frameCount % round(frameRate) == 0) {
+      if (isNewSecond()) {
         PVector r = PVector.random2D().mult(aCeil);
         a.set(r);
-        aCounter = round(frameRate/2);
-      } else if (aCounter > 0) {
+        energyFrames = round(frameRate/2);
+      } else if (energyFrames > 0) {
         PVector r = PVector.random2D().mult(aCeil/3);
         a.add(r).limit(1);
-        aCounter--;
+        energyFrames--;
       }
     }
   }
 
   void move(float friction) {
     pPrev = p.copy();
-    PVector anyA = (aCounter > 0) ? a : null;
+    PVector anyA = (energyFrames > 0) ? a : null;
     Physics.move(p, v, anyA, friction * aCeil);
   }
 

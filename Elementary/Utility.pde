@@ -7,7 +7,7 @@ static class Physics {
     float d = max(dOrbit, f.mag());
     float k = 10;
     f.normalize();
-    f.mult((k * m1 * m2) / sq(d)); // Effect of force.
+    f.mult(k * (m1 * m2) / sq(d)); // Effect of force.
     a2.add(f.div(m2));
   }
 
@@ -21,4 +21,8 @@ static class Physics {
     v.sub(f);
     p.add(v);
   }
+}
+
+boolean isNewSecond() {
+  return frameCount % round(frameRate) == 0;
 }
