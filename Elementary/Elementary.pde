@@ -4,7 +4,7 @@
  [x] Draw lines
  [x] Wall bounds
  [x] Torus bounds
- [ ] Gravity, mass
+ [x] Gravity, mass
  */
 
 Space space;

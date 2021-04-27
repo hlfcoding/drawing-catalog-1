@@ -39,7 +39,7 @@ class Node {
   float top() {
     return p.y - ((drawMode == 'b') ? h/2 : 0);
   }
-  float mass() {
+  float mass() { // AKA influence.
     float density = 1;
     return w * h * density;
   }

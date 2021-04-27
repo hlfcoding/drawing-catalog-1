@@ -111,16 +111,26 @@ class Attraction implements GroupBehavior {
   void update(Node[] nodes) {
     for (Node tor : tors) {
       ArrayList<Node> neighbors = tions.get(tor.id);
-      if (neighbors == null) {
-        neighbors = tees; // TODO
+      if (neighbors == null || isNewSecond()) {
+        float field = attractorField(tor);
+        neighbors = new ArrayList<Node>();
+        for (Node tee : tees) {
+          if (tor.p.dist(tee.p) <= field) {
+            neighbors.add(tee);
+          }
+        }
         tions.put(tor.id, neighbors);
       }
       for (Node n : neighbors) {
         n.energyFrames = 1; // HACK
         n.a.mult(1.0 - aFriction);
-        Physics.attract(n.a, tor.p, tor.mass(), n.p, n.mass());
+        Physics.attractToOrbit(n.a, tor.p, tor.mass(), n.p, n.mass());
         n.v.limit(vTerminal);
       }
     }
+  }
+
+  private float attractorField(Node tor) {
+    return tor.mass();
   }
 }

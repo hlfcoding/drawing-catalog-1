@@ -1,5 +1,5 @@
 static class Physics {
-  static void attract
+  static void attractToOrbit
     (PVector a2, PVector p1, float m1, PVector p2, float m2)
   {
     PVector f = PVector.sub(p1, p2);
