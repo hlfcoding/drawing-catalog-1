@@ -10,6 +10,18 @@ static class Physics {
     f.mult(k * (m1 * m2) / sq(d)); // Effect of force.
     a2.add(f.div(m2));
   }
+  static float progressUntilOrbit
+    (PVector p1, float m1, PVector p2)
+  {
+    float dField = m1;
+    float d = PVector.dist(p1, p2);
+    float dOrbit = sqrt(m1) * 4;
+    if (d <= dOrbit) {
+      d = 1;
+    }
+    float p = abs(dField - d) / dField;
+    return p;
+  }
 
   static void move
     (PVector p, PVector v, PVector a, float friction)

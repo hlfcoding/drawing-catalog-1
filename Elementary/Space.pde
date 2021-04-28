@@ -34,7 +34,12 @@ class Space {
       n.act();
       n.move(friction);
       affect(n);
+      pushStyle();
+      for (GroupBehavior b : behaviors) {
+        b.style(n);
+      }
       n.draw();
+      popStyle();
     }
   }
 
@@ -70,6 +75,8 @@ class Space {
 interface GroupBehavior {
   void setup(Node[] nodes);
   void update(Node[] nodes);
+
+  void style(Node node);
 }
 
 class Attraction implements GroupBehavior {
@@ -132,5 +139,32 @@ class Attraction implements GroupBehavior {
 
   private float attractorField(Node tor) {
     return tor.mass();
+  }
+
+  void style(Node node) {
+    if (node.drawMode == 'l') {
+      if (tees.contains(node)) {
+        Node tee = node;
+        Node tor = attractor(tee);
+        if (tor == null) {
+          stroke(0, 0);
+        } else {
+          float p = Physics.progressUntilOrbit(tor.p, tor.mass(), tee.p);
+          stroke(abs(p - 0.2), sq(p - 0.8));
+        }
+      } else if (tors.contains(node)) {
+        stroke(0, 0.05);
+      }
+    }
+  }
+
+  private Node attractor(Node tee) {
+    for (Node tor : tors) {
+      ArrayList<Node> tees = tions.get(tor.id);
+      if (tees.contains(tee)) {
+        return tor;
+      }
+    }
+    return null;
   }
 }
