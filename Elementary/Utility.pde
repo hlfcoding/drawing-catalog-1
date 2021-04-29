@@ -5,10 +5,10 @@ static class Physics {
     PVector f = PVector.sub(p1, p2);
     float dOrbit = sqrt(m1) * 4;
     float d = max(dOrbit, f.mag());
-    float k = 10;
+    float k = 1;
     f.normalize();
     f.mult(k * (m1 * m2) / sq(d)); // Effect of force.
-    a2.add(f.div(m2));
+    a2.add(f);
   }
   static float progressUntilOrbit
     (PVector p1, float m1, PVector p2)
