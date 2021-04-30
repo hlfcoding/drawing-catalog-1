@@ -129,7 +129,7 @@ class Attraction implements GroupBehavior {
         tions.put(tor.id, neighbors);
       }
       for (Node n : neighbors) {
-        n.energyFrames = 1; // HACK
+        n.energyFrames = secondsOfFrames(1);
         n.a.mult(1.0 - aFriction);
         Physics.attractToOrbit(n.a, tor.p, tor.mass(), n.p, n.mass());
         n.v.limit(vTerminal);

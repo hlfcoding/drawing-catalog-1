@@ -38,3 +38,7 @@ static class Physics {
 boolean isNewSecond() {
   return frameCount % round(frameRate) == 0;
 }
+
+int secondsOfFrames(float n) {
+  return round(frameRate * n);
+}

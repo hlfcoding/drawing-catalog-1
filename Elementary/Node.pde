@@ -62,10 +62,14 @@ class Node {
       if (isNewSecond()) {
         PVector r = PVector.random2D().mult(aCeil);
         a.set(r);
-        energyFrames = round(frameRate/2);
+        energyFrames = secondsOfFrames(0.5);
       } else if (energyFrames > 0) {
         PVector r = PVector.random2D().mult(aCeil/3);
         a.add(r).limit(1);
+        energyFrames--;
+      }
+    } else if (actMode == 'n') {
+      if (energyFrames > 0) {
         energyFrames--;
       }
     }
