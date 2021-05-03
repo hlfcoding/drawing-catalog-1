@@ -122,7 +122,7 @@ class Attraction implements GroupBehavior {
         float field = attractorField(tor);
         neighbors = new ArrayList<Node>();
         for (Node tee : tees) {
-          if (tor.p.dist(tee.p) <= field) {
+          if (tor.p.dist(tee.p) <= field) { // TODO: Torus support.
             neighbors.add(tee);
           }
         }
@@ -150,7 +150,7 @@ class Attraction implements GroupBehavior {
           stroke(0, 0);
         } else {
           float p = Physics.progressUntilOrbit(tor.p, tor.mass(), tee.p);
-          stroke(abs(p - 0.2), sq(p - 0.8));
+          stroke(sq(0.9 - p), abs(0.9 - p));
         }
       } else if (tors.contains(node)) {
         stroke(0, 0.05);

@@ -16,7 +16,7 @@ void setup() {
   colorMode(RGB, 1.0);
   pixelDensity(displayDensity());
 
-  space = space2();
+  space = space3();
 }
 
 void draw() {
@@ -43,7 +43,7 @@ Space space3() {
 
   Space s = new Space(30);
   s.behaviors.add(new Attraction());
-  s.boundsMode = 'w';
+  s.boundsMode = 't';
   s.setup('b', 'l');
   return s;
 }
