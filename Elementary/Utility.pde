@@ -2,7 +2,7 @@ static class Physics {
   static void attractToOrbit
     (PVector a2, PVector p1, float m1, PVector p2, float m2)
   {
-    PVector f = PVector.sub(p1, p2);
+    PVector f = PVector.sub(p1, p2); // TODO: Torus support.
     float dOrbit = sqrt(m1) * 4;
     float d = max(dOrbit, f.mag());
     float k = 1;
@@ -14,7 +14,7 @@ static class Physics {
     (PVector p1, float m1, PVector p2)
   {
     float dField = m1;
-    float d = PVector.dist(p1, p2);
+    float d = PVector.dist(p1, p2); // TODO: Torus support.
     float dOrbit = sqrt(m1) * 4;
     if (d <= dOrbit) {
       d = 1;

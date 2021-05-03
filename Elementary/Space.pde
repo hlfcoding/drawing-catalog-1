@@ -22,7 +22,7 @@ class Space {
       nodes[i] = n;
     }
     for (GroupBehavior b : behaviors) {
-      b.setup(nodes);
+      b.setup(nodes, boundsMode);
     }
   }
 
@@ -73,7 +73,7 @@ class Space {
 }
 
 interface GroupBehavior {
-  void setup(Node[] nodes);
+  void setup(Node[] nodes, char boundsMode);
   void update(Node[] nodes);
 
   void style(Node node);
@@ -88,6 +88,8 @@ class Attraction implements GroupBehavior {
   float aFriction;
   float vTerminal;
 
+  char boundsMode;
+
   Attraction() {
     torOdds = 1.0/10;
     tors = new ArrayList<Node>();
@@ -97,7 +99,8 @@ class Attraction implements GroupBehavior {
     vTerminal = 0;
   }
 
-  void setup(Node[] nodes) {
+  void setup(Node[] nodes, char boundsMode) {
+    this.boundsMode = boundsMode;
     int quota = ceil(torOdds * nodes.length);
     for (Node n : nodes) {
       if (quota > 0) {
@@ -122,7 +125,7 @@ class Attraction implements GroupBehavior {
         float field = attractorField(tor);
         neighbors = new ArrayList<Node>();
         for (Node tee : tees) {
-          if (tor.p.dist(tee.p) <= field) { // TODO: Torus support.
+          if (dist(tor, tee) <= field) {
             neighbors.add(tee);
           }
         }
@@ -139,6 +142,25 @@ class Attraction implements GroupBehavior {
 
   private float attractorField(Node tor) {
     return tor.mass();
+  }
+
+  private float dist(Node tor, Node tee) {
+    if (boundsMode != 't') {
+      return tee.p.dist(tor.p);
+    }
+    // TODO: Optimize.
+    float[] candidates = {
+      tor.p.dist(tee.p),
+      tor.p.copy().add(width, 0).dist(tee.p),
+      tor.p.copy().add(-width, 0).dist(tee.p),
+      tor.p.copy().add(0, height).dist(tee.p),
+      tor.p.copy().add(0, -height).dist(tee.p),
+      tor.p.copy().add(width, height).dist(tee.p),
+      tor.p.copy().add(-width, height).dist(tee.p),
+      tor.p.copy().add(width, -height).dist(tee.p),
+      tor.p.copy().add(-width, -height).dist(tee.p)
+    };
+    return min(candidates);
   }
 
   void style(Node node) {
