@@ -79,7 +79,7 @@ interface GroupBehavior {
   void style(Node node);
 }
 
-class Attraction implements GroupBehavior {
+class Attraction implements GroupBehavior, PhysicalContext {
   float torOdds;
   ArrayList<Node> tors;
   ArrayList<Node> tees;
@@ -125,7 +125,7 @@ class Attraction implements GroupBehavior {
         float field = attractorField(tor);
         neighbors = new ArrayList<Node>();
         for (Node tee : tees) {
-          if (dist(tor, tee) <= field) {
+          if (dist(tor.p, tee.p) <= field) {
             neighbors.add(tee);
           }
         }
@@ -144,25 +144,6 @@ class Attraction implements GroupBehavior {
     return tor.mass();
   }
 
-  private float dist(Node tor, Node tee) {
-    if (boundsMode != 't') {
-      return tee.p.dist(tor.p);
-    }
-    // TODO: Optimize.
-    float[] candidates = {
-      tor.p.dist(tee.p),
-      tor.p.copy().add(width, 0).dist(tee.p),
-      tor.p.copy().add(-width, 0).dist(tee.p),
-      tor.p.copy().add(0, height).dist(tee.p),
-      tor.p.copy().add(0, -height).dist(tee.p),
-      tor.p.copy().add(width, height).dist(tee.p),
-      tor.p.copy().add(-width, height).dist(tee.p),
-      tor.p.copy().add(width, -height).dist(tee.p),
-      tor.p.copy().add(-width, -height).dist(tee.p)
-    };
-    return min(candidates);
-  }
-
   void style(Node node) {
     if (node.drawMode == 'l') {
       if (tees.contains(node)) {
@@ -171,7 +152,7 @@ class Attraction implements GroupBehavior {
         if (tor == null) {
           stroke(0, 0);
         } else {
-          float p = Physics.progressUntilOrbit(tor.p, tor.mass(), tee.p);
+          float p = Physics.progressUntilOrbit(tor.p, tor.mass(), tee.p, this);
           stroke(sq(0.9 - p), abs(0.9 - p));
         }
       } else if (tors.contains(node)) {
@@ -188,5 +169,24 @@ class Attraction implements GroupBehavior {
       }
     }
     return null;
+  }
+
+  float dist(PVector p1, PVector p2) {
+    if (boundsMode != 't') {
+      return p1.dist(p2);
+    }
+    // TODO: Optimize.
+    float[] candidates = {
+      p1.dist(p2),
+      p1.copy().add(width, 0).dist(p2),
+      p1.copy().add(-width, 0).dist(p2),
+      p1.copy().add(0, height).dist(p2),
+      p1.copy().add(0, -height).dist(p2),
+      p1.copy().add(width, height).dist(p2),
+      p1.copy().add(-width, height).dist(p2),
+      p1.copy().add(width, -height).dist(p2),
+      p1.copy().add(-width, -height).dist(p2)
+    };
+    return min(candidates);
   }
 }

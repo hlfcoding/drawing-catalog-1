@@ -11,10 +11,10 @@ static class Physics {
     a2.add(f);
   }
   static float progressUntilOrbit
-    (PVector p1, float m1, PVector p2)
+    (PVector p1, float m1, PVector p2, PhysicalContext ctx)
   {
     float dField = m1;
-    float d = PVector.dist(p1, p2); // TODO: Torus support.
+    float d = ctx.dist(p1, p2);
     float dOrbit = sqrt(m1) * 4;
     if (d <= dOrbit) {
       d = 1;
@@ -41,4 +41,8 @@ boolean isNewSecond() {
 
 int secondsOfFrames(float n) {
   return round(frameRate * n);
+}
+
+interface PhysicalContext {
+  float dist(PVector p1, PVector p2);
 }
