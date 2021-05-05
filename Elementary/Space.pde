@@ -134,7 +134,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
       for (Node n : neighbors) {
         n.energyFrames = secondsOfFrames(1);
         n.a.mult(1.0 - aFriction);
-        Physics.attractToOrbit(n.a, tor.p, tor.mass(), n.p, n.mass());
+        Physics.attractToOrbit(n.a, tor.p, tor.mass(), n.p, n.mass(), this);
         n.v.limit(vTerminal);
       }
     }
@@ -172,21 +172,31 @@ class Attraction implements GroupBehavior, PhysicalContext {
   }
 
   float dist(PVector p1, PVector p2) {
+    return p1.dist(normalPosition(p2, p1));
+  }
+
+  PVector normalPosition(PVector pOf, PVector pTo) {
     if (boundsMode != 't') {
-      return p1.dist(p2);
+      return pOf;
     }
     // TODO: Optimize.
-    float[] candidates = {
-      p1.dist(p2),
-      p1.copy().add(width, 0).dist(p2),
-      p1.copy().add(-width, 0).dist(p2),
-      p1.copy().add(0, height).dist(p2),
-      p1.copy().add(0, -height).dist(p2),
-      p1.copy().add(width, height).dist(p2),
-      p1.copy().add(-width, height).dist(p2),
-      p1.copy().add(width, -height).dist(p2),
-      p1.copy().add(-width, -height).dist(p2)
+    PVector[] candidates = {
+      pOf, 
+      pOf.copy().add(width, 0), 
+      pOf.copy().add(-width, 0), 
+      pOf.copy().add(0, height), 
+      pOf.copy().add(0, -height), 
+      pOf.copy().add(width, height), 
+      pOf.copy().add(-width, height), 
+      pOf.copy().add(width, -height), 
+      pOf.copy().add(-width, -height)
     };
-    return min(candidates);
+    PVector result = null;
+    for (PVector c : candidates) {
+      if (result == null || c.dist(pTo) < result.dist(pTo)) {
+        result = c;
+      }
+    }
+    return result;
   }
 }

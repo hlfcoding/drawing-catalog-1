@@ -1,8 +1,9 @@
 static class Physics {
   static void attractToOrbit
-    (PVector a2, PVector p1, float m1, PVector p2, float m2)
+    (PVector a2, PVector p1, float m1, PVector p2, float m2, 
+    PhysicalContext ctx)
   {
-    PVector f = PVector.sub(p1, p2); // TODO: Torus support.
+    PVector f = PVector.sub(p1, ctx.normalPosition(p2, p1));
     float dOrbit = sqrt(m1) * 4;
     float d = max(dOrbit, f.mag());
     float k = 1;
@@ -45,4 +46,5 @@ int secondsOfFrames(float n) {
 
 interface PhysicalContext {
   float dist(PVector p1, PVector p2);
+  PVector normalPosition(PVector pOf, PVector pTo);
 }
