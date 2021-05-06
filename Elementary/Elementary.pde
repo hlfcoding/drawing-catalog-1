@@ -42,8 +42,16 @@ Space space3() {
   frameRate(30);
 
   Space s = new Space(30);
-  s.behaviors.add(new Attraction());
+  Attraction b = new Attraction();
+  b.delegate = new Space3Handlers();
+  s.behaviors.add(b);
   s.boundsMode = 't';
   s.setup('b', 'l');
   return s;
+}
+class Space3Handlers implements AttractionDelegate {
+  color strokeAttracted(float progressUntilOrbit) {
+    float p = progressUntilOrbit;
+    return color(sq(0.9 - p), abs(0.9 - p));
+  }
 }

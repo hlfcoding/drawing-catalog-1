@@ -79,6 +79,10 @@ interface GroupBehavior {
   void style(Node node);
 }
 
+interface AttractionDelegate {
+  color strokeAttracted(float progressUntilOrbit);
+}
+
 class Attraction implements GroupBehavior, PhysicalContext {
   float torOdds;
   ArrayList<Node> tors;
@@ -90,6 +94,11 @@ class Attraction implements GroupBehavior, PhysicalContext {
 
   char boundsMode;
 
+  color strokeAttractor;
+  color strokeUnattracted;
+
+  AttractionDelegate delegate;
+
   Attraction() {
     torOdds = 1.0/10;
     tors = new ArrayList<Node>();
@@ -97,6 +106,9 @@ class Attraction implements GroupBehavior, PhysicalContext {
     tions = new HashMap<Integer, ArrayList<Node>>();
     aFriction = 0.1;
     vTerminal = 0;
+    strokeAttractor = color(0, 0.05);
+    strokeUnattracted = color(0, 0);
+    delegate = null;
   }
 
   void setup(Node[] nodes, char boundsMode) {
@@ -150,13 +162,13 @@ class Attraction implements GroupBehavior, PhysicalContext {
         Node tee = node;
         Node tor = attractor(tee);
         if (tor == null) {
-          stroke(0, 0);
-        } else {
+          stroke(strokeUnattracted);
+        } else if (delegate != null) {
           float p = Physics.progressUntilOrbit(tor.p, tor.mass(), tee.p, this);
-          stroke(sq(0.9 - p), abs(0.9 - p));
+          stroke(delegate.strokeAttracted(p));
         }
       } else if (tors.contains(node)) {
-        stroke(0, 0.05);
+        stroke(strokeAttractor);
       }
     }
   }
