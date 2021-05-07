@@ -84,10 +84,10 @@ interface AttractionDelegate {
 }
 
 class Attraction implements GroupBehavior, PhysicalContext {
-  float torOdds;
-  ArrayList<Node> tors;
-  ArrayList<Node> tees;
-  HashMap<Integer, ArrayList<Node>> tions;
+  float attractorOdds;
+  private ArrayList<Node> tors;
+  private ArrayList<Node> tees;
+  private HashMap<Integer, ArrayList<Node>> tions;
 
   float aFriction;
   float vTerminal;
@@ -100,7 +100,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
   AttractionDelegate delegate;
 
   Attraction() {
-    torOdds = 1.0/10;
+    attractorOdds = 1.0/10;
     tors = new ArrayList<Node>();
     tees = new ArrayList<Node>();
     tions = new HashMap<Integer, ArrayList<Node>>();
@@ -113,7 +113,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
 
   void setup(Node[] nodes, char boundsMode) {
     this.boundsMode = boundsMode;
-    int quota = ceil(torOdds * nodes.length);
+    int quota = ceil(attractorOdds * nodes.length);
     for (Node n : nodes) {
       if (quota > 0) {
         tors.add(n);
