@@ -6,6 +6,8 @@
  [x] Torus bounds
  [x] Gravity, mass
  [ ] Styling
+ [ ] Field
+ [ ] Flocking
  */
 
 Space space;
@@ -16,7 +18,7 @@ void setup() {
   colorMode(RGB, 1.0);
   pixelDensity(displayDensity());
 
-  space = space3();
+  space = space4();
 }
 
 void draw() {
@@ -54,4 +56,13 @@ class Space3Handlers implements AttractionDelegate {
     float p = progressUntilOrbit;
     return color(sq(0.9 - p), abs(0.9 - p));
   }
+}
+
+Space space4() {
+  Space s = new Space(10);
+  NoiseField b = new NoiseField();
+  s.behaviors.add(b);
+  s.boundsMode = 't';
+  s.setup('n', 'l');
+  return s;
 }

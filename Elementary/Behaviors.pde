@@ -138,3 +138,14 @@ class Attraction implements GroupBehavior, PhysicalContext {
     return result;
   }
 }
+
+class NoiseField implements GroupBehavior {
+  NoiseField() {
+  }
+  void setup(Node[] nodes, char boundsMode) {
+  }
+  void update(Node[] nodes) {
+  }
+  void style(Node node) {
+  }
+}
