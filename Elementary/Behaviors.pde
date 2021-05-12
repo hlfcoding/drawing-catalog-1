@@ -1,3 +1,10 @@
+interface GroupBehavior {
+  void setup(Node[] nodes, char boundsMode);
+  void update(Node[] nodes);
+
+  void style(Node node);
+}
+
 interface AttractionDelegate {
   color strokeAttracted(float progressUntilOrbit);
 }
