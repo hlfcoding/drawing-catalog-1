@@ -61,6 +61,7 @@ class Space3Handlers implements AttractionDelegate {
 Space space4() {
   Space s = new Space(10);
   NoiseField b = new NoiseField();
+  b.debug = true;
   s.behaviors.add(b);
   s.boundsMode = 't';
   s.setup('n', 'l');

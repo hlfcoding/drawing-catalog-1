@@ -140,10 +140,40 @@ class Attraction implements GroupBehavior, PhysicalContext {
 }
 
 class NoiseField implements GroupBehavior {
+  float[][] values;
+
+  boolean debug;
+  int resolution;
+
   NoiseField() {
+    debug = false;
+    resolution = 20;
   }
+
   void setup(Node[] nodes, char boundsMode) {
+    int res = resolution;
+    int cols = width / res;
+    int rows = height / res;
+    values = new float[rows][cols];
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        float x = c * res;
+        float y = r * res;
+        float v = noise(x, y);
+        values[r][c] = v;
+        if (debug) {
+          float offset = res/2.0;
+          pushMatrix();
+          translate(x + offset, y + offset);
+          rotate(TWO_PI * v);
+          line(-offset, 0, offset, 0);
+          popMatrix();
+          //ellipse(x, y, v * res, v * res);
+        }
+      }
+    }
   }
+
   void update(Node[] nodes) {
   }
   void style(Node node) {
