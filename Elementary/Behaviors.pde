@@ -140,7 +140,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
 }
 
 class NoiseField implements GroupBehavior {
-  float[][] values;
+  float[][] cells;
 
   boolean debug;
   int resolution;
@@ -154,24 +154,31 @@ class NoiseField implements GroupBehavior {
     int res = resolution;
     int cols = width / res;
     int rows = height / res;
-    values = new float[rows][cols];
+    cells = new float[rows][cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         float x = c * res;
         float y = r * res;
-        float v = noise(x, y);
-        values[r][c] = v;
+        float n = noise(x, y);
+        cells[r][c] = n;
         if (debug) {
-          float offset = res/2.0;
-          pushMatrix();
-          translate(x + offset, y + offset);
-          rotate(TWO_PI * v);
-          line(-offset, 0, offset, 0);
-          popMatrix();
-          //ellipse(x, y, v * res, v * res);
+          drawUnitVector(r, c);
         }
       }
     }
+  }
+  
+  private void drawUnitVector(int row, int col) {
+    int res = resolution;
+    float x = col * res;
+    float y = row * res;
+    float offset = res / 2.0;
+    float noise = cells[row][col];
+    pushMatrix();
+    translate(x + offset, y + offset);
+    rotate(TWO_PI * noise);
+    line(-offset, 0, offset, 0);
+    popMatrix();
   }
 
   void update(Node[] nodes) {
