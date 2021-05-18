@@ -167,7 +167,7 @@ class NoiseField implements GroupBehavior {
       }
     }
   }
-  
+
   private void drawUnitVector(int row, int col) {
     int res = resolution;
     float x = col * res;
@@ -182,7 +182,20 @@ class NoiseField implements GroupBehavior {
   }
 
   void update(Node[] nodes) {
+    if (!isNewSecond()) {
+      return;
+    }
+    for (Node n : nodes) {
+      int res = resolution;
+      int col = floor(n.p.x / res);
+      int row = floor(n.p.y / res);
+      float noise = cells[row][col];
+      PVector f = PVector.fromAngle(TWO_PI * noise);
+      n.a.add(f);
+      n.energyFrames = secondsOfFrames(0.5);
+    }
   }
+
   void style(Node node) {
   }
 }
