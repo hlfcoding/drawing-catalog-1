@@ -151,16 +151,12 @@ class NoiseField implements GroupBehavior {
   }
 
   void setup(Node[] nodes, char boundsMode) {
-    int res = resolution;
-    int cols = width / res;
-    int rows = height / res;
+    int cols = toCol(width);
+    int rows = toRow(height);
     cells = new float[rows][cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        float x = c * res;
-        float y = r * res;
-        float n = noise(x, y);
-        cells[r][c] = n;
+        cells[r][c] = noise(toX(c), toY(r));
         if (debug) {
           drawUnitVector(r, c);
         }
@@ -169,14 +165,10 @@ class NoiseField implements GroupBehavior {
   }
 
   private void drawUnitVector(int row, int col) {
-    int res = resolution;
-    float x = col * res;
-    float y = row * res;
-    float offset = res / 2.0;
-    float noise = cells[row][col];
+    float offset = resolution / 2.0;
     pushMatrix();
-    translate(x + offset, y + offset);
-    rotate(TWO_PI * noise);
+    translate(toX(col) + offset, toY(row) + offset);
+    rotate(angle(row, col));
     line(-offset, 0, offset, 0);
     popMatrix();
   }
@@ -186,16 +178,29 @@ class NoiseField implements GroupBehavior {
       return;
     }
     for (Node n : nodes) {
-      int res = resolution;
-      int col = floor(n.p.x / res);
-      int row = floor(n.p.y / res);
-      float noise = cells[row][col];
-      PVector f = PVector.fromAngle(TWO_PI * noise);
-      n.a.add(f);
+      float rad = angle(toRow(n.p.y), toCol(n.p.x));
+      n.a.add(PVector.fromAngle(rad));
       n.energyFrames = secondsOfFrames(0.5);
     }
   }
 
   void style(Node node) {
+  }
+
+  private float angle(int row, int col) {
+    float noise = cells[row][col];
+    return TWO_PI * noise;
+  }
+  private int toCol(float x) {
+    return floor(x / resolution);
+  }
+  private int toRow(float y) {
+    return floor(y / resolution);
+  }
+  private float toX(int col) {
+    return col * resolution;
+  }
+  private float toY(int row) {
+    return row * resolution;
   }
 }
