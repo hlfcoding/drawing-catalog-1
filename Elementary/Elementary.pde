@@ -64,6 +64,6 @@ Space space4() {
   //b.debug = true;
   s.behaviors.add(b);
   s.boundsMode = 't';
-  s.setup('b', 'l');
+  s.setup('n', 'l');
   return s;
 }

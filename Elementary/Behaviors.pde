@@ -169,7 +169,10 @@ class NoiseField implements GroupBehavior {
     pushMatrix();
     translate(toX(col) + offset, toY(row) + offset);
     rotate(angle(row, col));
+    pushStyle();
+    stroke(1, 0, 0);
     line(-offset, 0, offset, 0);
+    popStyle();
     popMatrix();
   }
 
@@ -179,8 +182,17 @@ class NoiseField implements GroupBehavior {
     }
     for (Node n : nodes) {
       float rad = angle(toRow(n.p.y), toCol(n.p.x));
-      n.a.add(PVector.fromAngle(rad));
-      n.energyFrames = secondsOfFrames(0.5);
+      PVector f = PVector.fromAngle(rad);
+      PVector f2 = f.copy().rotate(PI);
+      if (debug) {
+        println(PVector.angleBetween(n.a, f), PVector.angleBetween(n.a, f2));
+      }
+      if (PVector.angleBetween(n.a, f2) < PVector.angleBetween(n.a, f)) {
+        n.a.set(PVector.lerp(n.a, f2, 0.5));
+      } else {
+        n.a.set(PVector.lerp(n.a, f, 0.5));
+      }
+      n.energyFrames = secondsOfFrames(0.1);
     }
   }
 
