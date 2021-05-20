@@ -17,8 +17,8 @@ class Space {
       Node n = new Node();
       n.actMode = actMode;
       n.drawMode = drawMode;
-      PVector r = PVector.random2D();
-      n.p.set(abs(r.x) * width, abs(r.y) * height);
+      PVector r = PVector.random2D().mult(0.5);
+      n.p.set((r.x + 0.5) * width, (r.y + 0.5) * height);
       nodes[i] = n;
     }
     for (GroupBehavior b : behaviors) {
