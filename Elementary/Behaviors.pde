@@ -144,10 +144,19 @@ class NoiseField implements GroupBehavior {
 
   boolean debug;
   int resolution;
+  float smoothing;
+
+  int energyFramesPerUpdate;
+  int framesPerUpdate;
+  private int framesUntilUpdate;
 
   NoiseField() {
     debug = false;
     resolution = 20;
+    smoothing = 0.5;
+    energyFramesPerUpdate = secondsOfFrames(0.1);
+    framesPerUpdate = secondsOfFrames(1);
+    framesUntilUpdate = 0;
   }
 
   void setup(Node[] nodes, char boundsMode) {
@@ -177,18 +186,22 @@ class NoiseField implements GroupBehavior {
   }
 
   void update(Node[] nodes) {
-    if (!isNewSecond()) {
+    if (framesUntilUpdate > 0) {
+      framesUntilUpdate--;
       return;
+    } else {
+      framesUntilUpdate = framesPerUpdate;
     }
     for (Node n : nodes) {
       float rad = angle(toRow(n.p.y), toCol(n.p.x));
       PVector f1 = PVector.fromAngle(rad);
-      PVector f2 = f1.copy().rotate(PI);
+      PVector f2 = f1.copy().mult(-1);
       PVector fSmoothest =
         (PVector.angleBetween(n.a, f2) < PVector.angleBetween(n.a, f1))
         ? f2 : f1;
-      n.a.set(PVector.lerp(n.a, fSmoothest, 0.5));
-      n.energyFrames = secondsOfFrames(0.1);
+      PVector f = PVector.lerp(n.a, fSmoothest, 1 - smoothing); // Effect of force.
+      n.a.set(f);
+      n.energyFrames = energyFramesPerUpdate;
     }
   }
 
