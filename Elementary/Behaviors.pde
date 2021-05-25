@@ -160,8 +160,8 @@ class NoiseField implements GroupBehavior {
   }
 
   void setup(Node[] nodes, char boundsMode) {
-    int cols = toCol(width);
-    int rows = toRow(height);
+    int cols = toCol(width) + 1;
+    int rows = toRow(height) + 1;
     cells = new float[rows][cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
@@ -213,10 +213,10 @@ class NoiseField implements GroupBehavior {
     return TWO_PI * noise;
   }
   private int toCol(float x) {
-    return floor(x / resolution);
+    return max(0, floor(x / resolution));
   }
   private int toRow(float y) {
-    return floor(y / resolution);
+    return max(0, floor(y / resolution));
   }
   private float toX(int col) {
     return col * resolution;
