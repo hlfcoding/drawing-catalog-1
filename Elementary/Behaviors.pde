@@ -206,6 +206,12 @@ class NoiseField implements GroupBehavior {
   }
 
   void style(Node node) {
+    if (node.drawMode == 'l') {
+      float rad = node.v.heading();
+      float seamless = sin(rad);
+      float normalized = (seamless + 1) / 2;
+      stroke(sq(normalized));
+    }
   }
 
   private float angle(int row, int col) {

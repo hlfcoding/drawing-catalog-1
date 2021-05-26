@@ -4,9 +4,10 @@
  [x] Draw lines
  [x] Wall bounds
  [x] Torus bounds
- [x] Gravity, mass
- [ ] Styling
- [ ] Field
+ [x] Gravity
+ [/] Mass
+ [/] Styling
+ [/] Field
  [ ] Flocking
  */
 
