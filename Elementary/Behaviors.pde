@@ -18,6 +18,10 @@ class Attraction implements GroupBehavior, PhysicalContext {
   float aFriction;
   float vTerminal;
 
+  int energyFramesPerUpdate;
+  int framesPerUpdate;
+  private int framesUntilUpdate;
+
   char boundsMode;
 
   color strokeAttractor;
@@ -32,6 +36,9 @@ class Attraction implements GroupBehavior, PhysicalContext {
     tions = new HashMap<Integer, ArrayList<Node>>();
     aFriction = 0.1;
     vTerminal = 0;
+    energyFramesPerUpdate = secondsOfFrames(1);
+    framesPerUpdate = secondsOfFrames(1);
+    framesUntilUpdate = 0;
     strokeAttractor = color(0, 0.05);
     strokeUnattracted = color(0, 0);
     delegate = null;
@@ -59,7 +66,10 @@ class Attraction implements GroupBehavior, PhysicalContext {
   void update(Node[] nodes) {
     for (Node tor : tors) {
       ArrayList<Node> neighbors = tions.get(tor.id);
-      if (neighbors == null || isNewSecond()) {
+      if (neighbors != null && framesUntilUpdate > 0) {
+        framesUntilUpdate--;
+      } else {
+        framesUntilUpdate = framesPerUpdate;
         float field = attractorField(tor);
         neighbors = new ArrayList<Node>();
         for (Node tee : tees) {
@@ -70,7 +80,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
         tions.put(tor.id, neighbors);
       }
       for (Node n : neighbors) {
-        n.energyFrames = secondsOfFrames(1);
+        n.energyFrames = energyFramesPerUpdate;
         n.a.mult(1.0 - aFriction);
         Physics.attractToOrbit(n.a, tor.p, tor.mass(), n.p, n.mass(), this);
         n.v.limit(vTerminal);

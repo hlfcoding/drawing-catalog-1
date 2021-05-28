@@ -36,10 +36,6 @@ static class Physics {
   }
 }
 
-boolean isNewSecond() {
-  return frameCount % round(frameRate) == 0;
-}
-
 PVector randomVectorNear(float x, float y) {
   float rX = randomGaussian() * width/6;
   float rY = randomGaussian() * height/6;

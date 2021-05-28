@@ -80,7 +80,11 @@ class Node {
   PVector v;
   PVector a;
   float aCeil;
+
   int energyFrames;
+  int energyFramesPerAction;
+  int framesPerAction;
+  private int framesUntilAction;
 
   float w, h;
 
@@ -94,6 +98,9 @@ class Node {
     a = new PVector();
     aCeil = 1;
     energyFrames = 0;
+    energyFramesPerAction = secondsOfFrames(0.5);
+    framesPerAction = secondsOfFrames(1);
+    framesUntilAction = 0;
     w = 10;
     h = 10;
     actMode = 'b';
@@ -132,14 +139,18 @@ class Node {
 
   void act() {
     if (actMode == 'b') {
-      if (isNewSecond()) {
+      if (framesUntilAction == 0) {
+        framesUntilAction = framesPerAction;
         PVector r = PVector.random2D().mult(aCeil);
         a.set(r);
-        energyFrames = secondsOfFrames(0.5);
-      } else if (energyFrames > 0) {
-        PVector r = PVector.random2D().mult(aCeil/3);
-        a.add(r).limit(1);
-        energyFrames--;
+        energyFrames = energyFramesPerAction;
+      } else {
+        framesUntilAction--;
+        if (energyFrames > 0) {
+          PVector r = PVector.random2D().mult(aCeil/3);
+          a.add(r).limit(1);
+          energyFrames--;
+        }
       }
     } else if (actMode == 'n') {
       if (energyFrames > 0) {
