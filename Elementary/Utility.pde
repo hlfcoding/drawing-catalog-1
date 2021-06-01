@@ -1,10 +1,13 @@
 static class Physics {
   static void attractToOrbit
     (PVector a2, PVector p1, float m1, PVector p2, float m2, 
-    PhysicalContext ctx)
+    PhysicalContext ctx, boolean stopIfClose)
   {
     PVector f = PVector.sub(p1, ctx.normalPosition(p2, p1));
     float dOrbit = sqrt(m1) * 4;
+    if (stopIfClose && f.mag() < dOrbit) {
+      return;
+    }
     float d = max(dOrbit, f.mag());
     float k = 1;
     f.normalize();

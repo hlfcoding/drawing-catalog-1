@@ -23,6 +23,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
   private int framesUntilUpdate;
 
   char boundsMode;
+  boolean stopIfClose;
 
   color strokeAttractor;
   color strokeUnattracted;
@@ -39,6 +40,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
     energyFramesPerUpdate = secondsOfFrames(1);
     framesPerUpdate = secondsOfFrames(1);
     framesUntilUpdate = 0;
+    stopIfClose = false;
     strokeAttractor = color(0, 0.05);
     strokeUnattracted = color(0, 0);
     delegate = null;
@@ -82,7 +84,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
       for (Node n : neighbors) {
         n.energyFrames = energyFramesPerUpdate;
         n.a.mult(1.0 - aFriction);
-        Physics.attractToOrbit(n.a, tor.p, tor.mass(), n.p, n.mass(), this);
+        Physics.attractToOrbit(n.a, tor.p, tor.mass(), n.p, n.mass(), this, stopIfClose);
         n.v.limit(vTerminal);
       }
     }

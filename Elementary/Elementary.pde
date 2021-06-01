@@ -47,6 +47,7 @@ Space space3() {
   Space s = new Space(30);
   Attraction b = new Attraction();
   b.delegate = new Space3Handlers();
+  b.stopIfClose = true;
   s.behaviors.add(b);
   s.boundsMode = 't';
   s.setup('b', 'l');
