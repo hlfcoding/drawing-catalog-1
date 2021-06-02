@@ -19,7 +19,7 @@ void setup() {
   colorMode(RGB, 1.0);
   pixelDensity(displayDensity());
 
-  space = space4();
+  space = space3();
 }
 
 void draw() {
@@ -44,7 +44,7 @@ Space space2() {
 Space space3() {
   frameRate(30);
 
-  Space s = new Space(30);
+  Space s = new Space(100);
   Attraction b = new Attraction();
   b.delegate = new Space3Handlers();
   b.stopIfClose = true;
@@ -55,8 +55,10 @@ Space space3() {
 }
 class Space3Handlers implements AttractionDelegate {
   color strokeAttracted(float progressUntilOrbit) {
-    float p = progressUntilOrbit;
-    return color(sq(0.9 - p), abs(0.9 - p));
+    float darkerIfFurther = 1 - progressUntilOrbit;
+    float darkened = sq(darkerIfFurther);
+    float dampened = darkened / 2;
+    return color(dampened);
   }
 }
 
