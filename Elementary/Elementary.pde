@@ -11,6 +11,15 @@
  [ ] Flocking
  */
 
+/*
+ min V: 2, max V: 5
+ periodic A: 1 per frame until max V, again when at min V
+ friction: constant 10% decay on V, must be less than A
+ [ ] NoiseField
+ [ ] Brownian
+ [ ] Attraction
+ */
+
 Space space;
 
 void setup() {
@@ -19,7 +28,7 @@ void setup() {
   colorMode(RGB, 1.0);
   pixelDensity(displayDensity());
 
-  space = space3();
+  space = space4();
 }
 
 void draw() {

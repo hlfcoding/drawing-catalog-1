@@ -198,13 +198,12 @@ class NoiseField implements GroupBehavior {
   }
 
   void update(Node[] nodes) {
-    if (framesUntilUpdate > 0) {
-      framesUntilUpdate--;
-      return;
-    } else {
-      framesUntilUpdate = framesPerUpdate;
-    }
+    int minV = 2;
+    int maxV = 5;
+    float friction = 0.1;
     for (Node n : nodes) {
+      n.aCeil = 0;
+
       float rad = angle(toRow(n.p.y), toCol(n.p.x));
       PVector f1 = PVector.fromAngle(rad);
       PVector f2 = f1.copy().mult(-1);
@@ -213,8 +212,52 @@ class NoiseField implements GroupBehavior {
         ? f2 : f1;
       PVector f = PVector.lerp(n.a, fSmoothest, 1 - smoothing); // Effect of force.
       n.a.set(f);
-      n.energyFrames = energyFramesPerUpdate;
+
+      if (n.v.mag() < minV) {
+        n.v.set(f);
+        n.v.setMag(minV);
+        n.energyFrames = 0;
+        if (n.id == 1) {
+          println("state", 1);
+        }
+      } else if (n.v.mag() < maxV) {
+        if (n.energyFrames == 0) {
+          n.energyFrames = 2;
+          if (n.id == 1) {
+            println("state", 2);
+          }
+        }
+        n.v.sub(n.v.copy().mult(friction));
+      } else {
+        n.energyFrames = -1;
+        if (n.id == 1) {
+          println("state", 3);
+        }
+        n.v.sub(n.v.copy().mult(friction));
+      }
+      if (n.id == 1) {
+        println(n.v.mag());
+      }
     }
+    /*
+    if (framesUntilUpdate > 0) {
+     framesUntilUpdate--;
+     return;
+     } else {
+     framesUntilUpdate = framesPerUpdate;
+     }
+     for (Node n : nodes) {
+     float rad = angle(toRow(n.p.y), toCol(n.p.x));
+     PVector f1 = PVector.fromAngle(rad);
+     PVector f2 = f1.copy().mult(-1);
+     PVector fSmoothest =
+     (PVector.angleBetween(n.a, f2) < PVector.angleBetween(n.a, f1))
+     ? f2 : f1;
+     PVector f = PVector.lerp(n.a, fSmoothest, 1 - smoothing); // Effect of force.
+     n.a.set(f);
+     n.energyFrames = energyFramesPerUpdate;
+     }
+     */
   }
 
   void style(Node node) {
