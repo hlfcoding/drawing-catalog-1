@@ -12,9 +12,9 @@
  */
 
 /*
- min V: 2, max V: 5
- periodic A: 1 per frame until max V, again when at min V
- friction: constant 10% decay on V, must be less than A
+ min V: 0.5, max V: 2
+ periodic A: 0.2 per frame until max V, again when at min V
+ friction: constant 0.1 decay on V, must be less than A
  [ ] NoiseField
  [ ] Brownian
  [ ] Attraction
@@ -38,7 +38,7 @@ void draw() {
 Space space1() {
   Space s = new Space(1);
   s.boundsMode = 't';
-  s.setup('b', 'b');
+  s.setup('b', 'b', 'e');
   return s;
 }
 
@@ -46,7 +46,7 @@ Space space2() {
   Space s = new Space(2);
   s.behaviors.add(new Attraction());
   s.boundsMode = 't';
-  s.setup('b', 'b');
+  s.setup('b', 'b', 'e');
   return s;
 }
 
@@ -59,7 +59,7 @@ Space space3() {
   b.stopIfClose = true;
   s.behaviors.add(b);
   s.boundsMode = 't';
-  s.setup('b', 'l');
+  s.setup('b', 'l', 'e');
   return s;
 }
 class Space3Handlers implements AttractionDelegate {
@@ -77,6 +77,7 @@ Space space4() {
   //b.debug = true;
   s.behaviors.add(b);
   s.boundsMode = 't';
-  s.setup('n', 'l');
+  s.friction = 0.1;
+  s.setup('n', 'l', 'l');
   return s;
 }

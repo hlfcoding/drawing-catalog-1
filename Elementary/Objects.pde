@@ -12,11 +12,12 @@ class Space {
     boundsMode = 'w';
   }
 
-  void setup(char actMode, char drawMode) {
+  void setup(char actMode, char drawMode, char moveMode) {
     for (int i = 0; i < nodes.length; i++) {
       Node n = new Node();
       n.actMode = actMode;
       n.drawMode = drawMode;
+      n.moveMode = moveMode;
       n.p.set(randomVectorNear(width/2, height/2));
       nodes[i] = n;
     }
@@ -27,7 +28,7 @@ class Space {
 
   void draw() {
     for (GroupBehavior b : behaviors) {
-      b.update(nodes);
+      b.update(nodes, friction);
     }
     for (Node n : nodes) {
       n.act();
@@ -90,6 +91,7 @@ class Node {
 
   char actMode; // (b)rownian, (n)one
   char drawMode; // (b)all, (l)ine
+  char moveMode; // (e)nergy, (l)imits
 
   Node() {
     id = nodeIds++;
@@ -105,6 +107,7 @@ class Node {
     h = 10;
     actMode = 'b';
     drawMode = 'b';
+    moveMode = 'e';
   }
 
   float bottom() {
@@ -161,7 +164,10 @@ class Node {
 
   void move(float friction) {
     pPrev = p.copy();
-    PVector anyA = (energyFrames > 0) ? a : null;
+    PVector anyA = a;
+    if (moveMode == 'e' && energyFrames <= 0) {
+      anyA = null;
+    }
     Physics.move(p, v, anyA, friction * aCeil);
   }
 

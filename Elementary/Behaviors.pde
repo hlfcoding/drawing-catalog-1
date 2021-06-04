@@ -1,6 +1,6 @@
 interface GroupBehavior {
   void setup(Node[] nodes, char boundsMode);
-  void update(Node[] nodes);
+  void update(Node[] nodes, float friction);
 
   void style(Node node);
 }
@@ -65,7 +65,7 @@ class Attraction implements GroupBehavior, PhysicalContext {
     }
   }
 
-  void update(Node[] nodes) {
+  void update(Node[] nodes, float friction) {
     for (Node tor : tors) {
       ArrayList<Node> neighbors = tions.get(tor.id);
       if (neighbors != null && framesUntilUpdate > 0) {
@@ -197,43 +197,37 @@ class NoiseField implements GroupBehavior {
     popMatrix();
   }
 
-  void update(Node[] nodes) {
-    int minV = 2;
-    int maxV = 5;
-    float friction = 0.1;
+  void update(Node[] nodes, float friction) {
+    float minV = 0.5;
+    float maxV = 2;
+    float maxA = maxV * friction * 2;
     for (Node n : nodes) {
-      n.aCeil = 0;
-
-      float rad = angle(toRow(n.p.y), toCol(n.p.x));
-      PVector f1 = PVector.fromAngle(rad);
-      PVector f2 = f1.copy().mult(-1);
-      PVector fSmoothest =
-        (PVector.angleBetween(n.a, f2) < PVector.angleBetween(n.a, f1))
-        ? f2 : f1;
-      PVector f = PVector.lerp(n.a, fSmoothest, 1 - smoothing); // Effect of force.
-      n.a.set(f);
-
-      if (n.v.mag() < minV) {
-        n.v.set(f);
-        n.v.setMag(minV);
-        n.energyFrames = 0;
+      if (n.v.mag() > maxV) {
+        n.a.mult(0);
         if (n.id == 1) {
-          println("state", 1);
+          println("state", 3);
         }
-      } else if (n.v.mag() < maxV) {
-        if (n.energyFrames == 0) {
-          n.energyFrames = 2;
+      } else {
+        float rad = angle(toRow(n.p.y), toCol(n.p.x));
+        PVector f1 = PVector.fromAngle(rad);
+        PVector f2 = f1.copy().mult(-1);
+        PVector fSmoothest =
+          (PVector.angleBetween(n.a, f2) < PVector.angleBetween(n.a, f1))
+          ? f2 : f1;
+        PVector f = PVector.lerp(n.a, fSmoothest, 1 - smoothing); // Effect of force.
+        n.a.set(f).mult(maxA);
+        if (n.v.mag() < minV) {
+          n.v.set(f);
+          n.v.setMag(minV);
+          if (n.id == 1) {
+            println("state", 1);
+          }
+          //n.v.add(n.v.copy().mult(friction));
+        } else if (n.v.mag() < maxV) {
           if (n.id == 1) {
             println("state", 2);
           }
         }
-        n.v.sub(n.v.copy().mult(friction));
-      } else {
-        n.energyFrames = -1;
-        if (n.id == 1) {
-          println("state", 3);
-        }
-        n.v.sub(n.v.copy().mult(friction));
       }
       if (n.id == 1) {
         println(n.v.mag());
