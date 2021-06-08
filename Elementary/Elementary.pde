@@ -15,7 +15,7 @@
  min V: 0.5, max V: 2
  periodic A: 0.2 per frame until max V, again when at min V
  friction: constant 0.1 decay on V, must be less than A
- [ ] NoiseField
+ [/] NoiseField
  [ ] Brownian
  [ ] Attraction
  */

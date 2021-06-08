@@ -219,7 +219,7 @@ class NoiseField implements GroupBehavior {
       float rad = node.v.heading();
       float shift = frameCount / frameRate;
       float seamless = sin(rad + shift);
-      float dampened = (seamless + 1) / 2;
+      float dampened = (seamless + 1) / 3;
       float darkened = sq(dampened);
       stroke(darkened);
     }
