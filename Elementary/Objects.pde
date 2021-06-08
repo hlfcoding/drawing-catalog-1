@@ -80,6 +80,7 @@ class Node {
   PVector p, pPrev, pNext;
   PVector v;
   PVector a;
+  float vFloor, vCeil;
   float aCeil;
 
   int energyFrames;
@@ -98,6 +99,8 @@ class Node {
     p = new PVector();
     v = new PVector();
     a = new PVector();
+    vFloor = 0.5;
+    vCeil = 2;
     aCeil = 1;
     energyFrames = 0;
     energyFramesPerAction = secondsOfFrames(0.5);
@@ -164,11 +167,24 @@ class Node {
 
   void move(float friction) {
     pPrev = p.copy();
-    PVector anyA = a;
+    PVector anyA = a.copy();
+    float scaledFriction = friction;
     if (moveMode == 'e' && energyFrames <= 0) {
       anyA = null;
+      scaledFriction *= aCeil;
+    } else if (moveMode == 'l') {
+      float aCeil = vCeil * friction * 2;
+      float vMag = v.mag();
+      if (vMag > vCeil) {
+        anyA.mult(0);
+      } else {
+        anyA.mult(aCeil);
+        if (vMag < vFloor) {
+          v.set(anyA).setMag(vFloor);
+        }
+      }
     }
-    Physics.move(p, v, anyA, friction * aCeil);
+    Physics.move(p, v, anyA, scaledFriction);
   }
 
   // -

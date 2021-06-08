@@ -158,7 +158,6 @@ class NoiseField implements GroupBehavior {
   int resolution;
   float smoothing;
 
-  int energyFramesPerUpdate;
   int framesPerUpdate;
   private int framesUntilUpdate;
 
@@ -166,8 +165,7 @@ class NoiseField implements GroupBehavior {
     debug = false;
     resolution = 20;
     smoothing = 0.5;
-    energyFramesPerUpdate = secondsOfFrames(0.1);
-    framesPerUpdate = secondsOfFrames(1);
+    framesPerUpdate = secondsOfFrames(0.1);
     framesUntilUpdate = 0;
   }
 
@@ -198,60 +196,22 @@ class NoiseField implements GroupBehavior {
   }
 
   void update(Node[] nodes, float friction) {
-    float minV = 0.5;
-    float maxV = 2;
-    float maxA = maxV * friction * 2;
-    for (Node n : nodes) {
-      if (n.v.mag() > maxV) {
-        n.a.mult(0);
-        if (n.id == 1) {
-          println("state", 3);
-        }
-      } else {
-        float rad = angle(toRow(n.p.y), toCol(n.p.x));
-        PVector f1 = PVector.fromAngle(rad);
-        PVector f2 = f1.copy().mult(-1);
-        PVector fSmoothest =
-          (PVector.angleBetween(n.a, f2) < PVector.angleBetween(n.a, f1))
-          ? f2 : f1;
-        PVector f = PVector.lerp(n.a, fSmoothest, 1 - smoothing); // Effect of force.
-        n.a.set(f).mult(maxA);
-        if (n.v.mag() < minV) {
-          n.v.set(f);
-          n.v.setMag(minV);
-          if (n.id == 1) {
-            println("state", 1);
-          }
-          //n.v.add(n.v.copy().mult(friction));
-        } else if (n.v.mag() < maxV) {
-          if (n.id == 1) {
-            println("state", 2);
-          }
-        }
-      }
-      if (n.id == 1) {
-        println(n.v.mag());
-      }
-    }
-    /*
     if (framesUntilUpdate > 0) {
-     framesUntilUpdate--;
-     return;
-     } else {
-     framesUntilUpdate = framesPerUpdate;
-     }
-     for (Node n : nodes) {
-     float rad = angle(toRow(n.p.y), toCol(n.p.x));
-     PVector f1 = PVector.fromAngle(rad);
-     PVector f2 = f1.copy().mult(-1);
-     PVector fSmoothest =
-     (PVector.angleBetween(n.a, f2) < PVector.angleBetween(n.a, f1))
-     ? f2 : f1;
-     PVector f = PVector.lerp(n.a, fSmoothest, 1 - smoothing); // Effect of force.
-     n.a.set(f);
-     n.energyFrames = energyFramesPerUpdate;
-     }
-     */
+      framesUntilUpdate--;
+      return;
+    } else {
+      framesUntilUpdate = framesPerUpdate;
+    }
+    for (Node n : nodes) {
+      float rad = angle(toRow(n.p.y), toCol(n.p.x));
+      PVector f1 = PVector.fromAngle(rad);
+      PVector f2 = f1.copy().mult(-1);
+      PVector fSmoothest =
+        (PVector.angleBetween(n.a, f2) < PVector.angleBetween(n.a, f1))
+        ? f2 : f1;
+      PVector f = PVector.lerp(n.a, fSmoothest, 1 - smoothing); // Effect of force.
+      n.a.set(f);
+    }
   }
 
   void style(Node node) {
